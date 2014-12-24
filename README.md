@@ -18,7 +18,7 @@ phonegap create my-plugin-example-app && cd $_
 phonegap local plugin add https://github.com/flomio/flomio_phonegap_plugin.git
 ```
 
-- Open `index.html and add a button
+- Open `index.html` and add a button
 
 ```html
 <button onclick="floPlugin.webToSdkCommand();">Say hello to your plugin!</button>
