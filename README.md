@@ -15,7 +15,7 @@ phonegap create my-plugin-example-app && cd $_
 - Add the plugin to it
 
 ```bash
-phonegap local plugin add https://github.com/flomio/flomio_phonegap_plugin.git
+phonegap plugin add https://github.com/flomio/flomio_phonegap_plugin.git
 ```
 
 - Open `index.html` and add a button
