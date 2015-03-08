@@ -5,9 +5,6 @@
     version="0.1.0">
     <name>Flomio Proximity ID</name>
     <description>Operates Flomio's NFC, BLE, and UHF RFID hardware.</description>
-    <js-module src="www/FLOPlugin.js" name="FLOPlugin">
-          <clobbers target="floPlugin " />
-    </js-module>
     <!-- ios -->
     <platform name="ios">    
         <config-file target="config.xml" parent="/*">
@@ -19,6 +16,6 @@
             <clobbers target="floPlugin" />
         </js-module>
         <header-file src="src/ios/FLOPlugin.h" />
-	      <source-file src="src/ios/FLOPlugin.m" />
+	<source-file src="src/ios/FLOPlugin.m" />
     </platform>
 </plugin>
