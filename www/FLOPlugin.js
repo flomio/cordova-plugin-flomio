@@ -4,7 +4,7 @@ var exec = require('cordova/exec');
  */
 function FLOPlugin() {}
 
-floPlugin.prototype.webToSdkCommand = function() {
+FLOPlugin.prototype.webToSdkCommand = function() {
   exec(function(result){
       // result handler
       console.log(result);
