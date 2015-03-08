@@ -4,7 +4,7 @@ Flomio's Proximity ID plugin for Cordova.
 
 ## Installation
 
-- Make sure that you have [Node](http://nodejs.org/) and [Cordova CLI](https://github.com/mwbrooks/phonegap-cli) installed on your machine.
+- Make sure that you have [Node](http://nodejs.org/) and [Cordova CLI](http://cordova.apache.org/docs/en/4.0.0/guide_cli_index.md.html) installed on your machine.
 
 - Create your Cordova example app
 
@@ -15,7 +15,7 @@ cordova create my-plugin-example-app && cd $_
 - Add the plugin to it
 
 ```bash
-cordova plugin add https://github.com/flomio/flomio_phonegap_plugin.git
+cordova plugin add https://github.com/flomio/flomio_cordova_plugin.git
 ```
 
 - Open `index.html` and add a button
