@@ -13,7 +13,7 @@ FLOPlugin.prototype.webToSdkCommand = function() {
       // error handler
       console.log("Flomio SDK plugin error occurred: " + error);
     }, 
-    "floPlugin", 
+    "FLOPlugin", 
     "webToSdkCommand", 
     []
   );
