@@ -1,4 +1,4 @@
-# Flomio Plugin
+# Flomio Cordova Plugin
 
 Flomio's Proximity ID plugin for Cordova. 
 
