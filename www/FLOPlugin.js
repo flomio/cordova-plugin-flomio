@@ -6,7 +6,7 @@ function FLOPlugin() {}
 
 FLOPlugin.prototype.webToSdkCommand = function() {
   exec(function(result){
-      // result handler
+      // result handler, response from native method call
       console.log(result);
     },
     function(error){
