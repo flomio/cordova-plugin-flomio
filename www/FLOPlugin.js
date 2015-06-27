@@ -15,6 +15,7 @@ FLOPlugin.prototype.webToSdkCommand = function() {
     }, 
     "FLOPlugin", 
     "webToSdkCommand", 
+    "webToSdkCommandAsync", 
     []
   );
 }
