@@ -6,5 +6,6 @@
 }
 
 - (void)webToSdkCommand:(CDVInvokedUrlCommand*)command;
+- (void)webToSdkCommandAsync:(CDVInvokedUrlCommand*)command;
 
 @end

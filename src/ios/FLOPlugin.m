@@ -11,7 +11,7 @@
 }
 
 
-- (void)webToSdkCommandAsync:(CDVInvokedUrlCommand*)command
+- (void)start:(CDVInvokedUrlCommand*)command
 {
     
     asyncCallbackId = command.callbackId;
@@ -23,11 +23,11 @@
 
 
 //Starts Timer
-- (void)start:(CDVInvokedUrlCommand*)command
+- (void)webToSdkCommandAsync:(CDVInvokedUrlCommand*)command
 {
     [NSTimer scheduledTimerWithTimeInterval:1.0
                                      target:self
-                                   selector:@selector(webToSdkCommandAsync:)
+                                   selector:@selector(start:)
                                    userInfo:nil
                                     repeats:YES];
 }
