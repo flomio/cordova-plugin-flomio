@@ -7,14 +7,12 @@
 {
     
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Hello - that's your plugin :)"];
-  [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 
-- (void)start:(CDVInvokedUrlCommand*)command
+- (void)start
 {
-    
-    asyncCallbackId = command.callbackId;
     
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Hello - that's your plugin :)"];
     [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
@@ -25,11 +23,72 @@
 //Starts Timer
 - (void)webToSdkCommandAsync:(CDVInvokedUrlCommand*)command
 {
+    
+    _readerManager = [[ReaderManager alloc] init];
+    _readerManager.delegate = self;
+    
+    // Stop reader scan when the app becomes inactive
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(inactive) name:UIApplicationDidEnterBackgroundNotification object:nil];
+    // Start reader scan when the app becomes active
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(active) name:UIApplicationDidBecomeActiveNotification object:nil];
+    
+    
+    asyncCallbackId = command.callbackId;
+    
     [NSTimer scheduledTimerWithTimeInterval:1.0
                                      target:self
-                                   selector:@selector(start:)
+                                   selector:@selector(start)
                                    userInfo:nil
                                     repeats:YES];
+}
+
+- (void)active {
+    NSLog(@"App Activated");
+    [_readerManager getAvailableReader];
+    _readerManager.deviceEnabled = [NSNumber numberWithBool:YES]; //enable the reader
+    _readerManager.scanPeriod = [NSNumber numberWithInteger:500]; //in ms
+    _readerManager.scanSound = [NSNumber numberWithBool:YES]; //play scan sound
+    _readerManager.operationState = kReadUUID; //kReadDataBlocks or kWriteDataBlocks
+    _readerManager.startBlock = [NSNumber numberWithInteger:8]; //start reading from 4th data block
+    _readerManager.messageToWrite = @"http://flomio.com"; // set a default message to write
+}
+
+- (void)inactive {
+    [_readerManager.reader sleep];
+}
+
+#pragma mark - ReaderManagerDelegate
+
+- (void)ReaderManager:(Reader *)reader readerAlert:(UIImageView *)imageView {
+    
+}
+
+#pragma mark - ReaderDelegate
+
+- (void)didFindATag:(Tag *)tag withOperationState:(ReaderStateType)operationState withError:(NSError *)error {
+    dispatch_async(dispatch_get_main_queue(), ^{ // Second dispatch message to log tag and restore screen
+        if (!error) {
+            switch (operationState) {
+                case kReadUUID: {
+                    NSLog(@"%@",tag.data); // Log the UUID
+                    break;
+                }
+                case kReadDataBlocks: {
+                    NSLog(@"%@",tag.data); // Log the Data
+                    NDEFMessage *newMessage = [[NDEFMessage alloc] initWithByteBuffer:tag.data];
+                    NSLog(@"%@",newMessage); // Log the NDEF
+                    break;
+                }
+                case kWriteDataBlocks: {
+                    break;
+                }
+                default:
+                    break;
+            }
+        } else {
+            NSLog(@"%@",error.userInfo); // Log the error
+        }
+    });
 }
 
 @end
