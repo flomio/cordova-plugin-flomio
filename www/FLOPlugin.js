@@ -14,8 +14,22 @@ FLOPlugin.prototype.webToSdkCommand = function() {
       console.log("Flomio SDK plugin error occurred: " + error);
     }, 
     "FLOPlugin", 
-    "webToSdkCommand", 
-    "webToSdkCommandAsync", 
+    "webToSdkCommand",  
+    []
+  );
+}
+
+FLOPlugin.prototype.webToSdkCommandAsync = function() {
+  exec(function(result){
+      // result handler, response from native method call
+      console.log(result);
+    },
+    function(error){
+      // error handler
+      console.log("Flomio SDK plugin error occurred: " + error);
+    }, 
+    "FLOPlugin", 
+    "webToSdkCommandAsync",  
     []
   );
 }
