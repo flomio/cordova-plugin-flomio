@@ -24,6 +24,7 @@
 - (void)webToSdkCommandAsync:(CDVInvokedUrlCommand*)command
 {
     
+    NSLog(@"LOCO");
     _readerManager = [[ReaderManager alloc] init];
     _readerManager.delegate = self;
     
@@ -35,11 +36,7 @@
     
     asyncCallbackId = command.callbackId;
     
-    [NSTimer scheduledTimerWithTimeInterval:1.0
-                                     target:self
-                                   selector:@selector(start)
-                                   userInfo:nil
-                                    repeats:YES];
+    [self active];
 }
 
 - (void)active {
@@ -61,16 +58,26 @@
 
 - (void)ReaderManager:(Reader *)reader readerAlert:(UIImageView *)imageView {
     
+    if (!reader.delegate)
+        reader.delegate = self; // Set reader delagate once it's clear reader's connected
+    
+    
 }
 
 #pragma mark - ReaderDelegate
 
 - (void)didFindATag:(Tag *)tag withOperationState:(ReaderStateType)operationState withError:(NSError *)error {
     dispatch_async(dispatch_get_main_queue(), ^{ // Second dispatch message to log tag and restore screen
+        
         if (!error) {
+            
             switch (operationState) {
                 case kReadUUID: {
-                    NSLog(@"%@",tag.data); // Log the UUID
+                    
+                    NSLog(@"tag.data:%@",tag.data); // Log the UUID
+                    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[NSString stringWithFormat:@"%@",tag.data]];
+                    [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+                    [self.commandDelegate sendPluginResult:pluginResult callbackId:asyncCallbackId];
                     break;
                 }
                 case kReadDataBlocks: {
@@ -86,7 +93,7 @@
                     break;
             }
         } else {
-            NSLog(@"%@",error.userInfo); // Log the error
+            NSLog(@"SSSS%@",error.userInfo); // Log the error
         }
     });
 }
