@@ -22,7 +22,8 @@ FLOPlugin.prototype.webToSdkCommand = function() {
 FLOPlugin.prototype.webToSdkCommandAsync = function() {
   exec(function(result){
       // result handler, response from native method call
-      console.log(result);
+      // console.log(result);
+	  alert(result);
     },
     function(error){
       // error handler

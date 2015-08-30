@@ -42,9 +42,8 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(active) name:UIApplicationDidBecomeActiveNotification object:nil];
         
     }
-    
-//    asyncCallbackId = command.callbackId;
-    
+	
+    asyncCallbackId = command.callbackId;
     [self active];
 }
 
@@ -90,6 +89,9 @@
             switch (operationState) {
                 case kReadUUID: {
                     NSLog(@"%@",tag.data); // Log the UUID
+					CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[NSString stringWithFormat:@"%@",tag.data]];
+                    [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+                    [self.commandDelegate sendPluginResult:pluginResult callbackId:asyncCallbackId];
                     break;
                 }
                 case kReadDataBlocks: {
