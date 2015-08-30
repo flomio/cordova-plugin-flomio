@@ -10,6 +10,12 @@
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
+-(void) regularCall:(NSTimer*) t 
+{
+	CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[NSString stringWithFormat:@"tag scan!"]];
+    [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:asyncCallbackId];
+}
 
 - (void)start
 {
@@ -44,6 +50,8 @@
     }
 	
     asyncCallbackId = command.callbackId;
+	NSTimer* myTimer = [NSTimer scheduledTimerWithTimeInterval: 5.0 target: self
+	                                   selector: @selector(regularCall:) userInfo: nil repeats: YES];
     [self active];
 }
 

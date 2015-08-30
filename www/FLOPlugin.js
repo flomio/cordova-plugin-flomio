@@ -19,11 +19,11 @@ FLOPlugin.prototype.webToSdkCommand = function() {
   );
 }
 
-FLOPlugin.prototype.webToSdkCommandAsync = function() {
+FLOPlugin.prototype.webToSdkCommandAsync = function(resultCallback) {
   exec(function(result){
       // result handler, response from native method call
-      // console.log(result);
-	  alert(result);
+      console.log(result);
+	  resultCallback(result);
     },
     function(error){
       // error handler
