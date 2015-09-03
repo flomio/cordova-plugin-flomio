@@ -47,6 +47,6 @@ cordova prepare
 
 - Drag and drop the Flomio SDK folder into the project (check "Create groups" and "Add to targets").
 
-- Add `lc++` to "Other Linker Flags" under "Build Settings".
+- Add `-lc++` to "Other Linker Flags" under "Build Settings".
 
 - Build and run the app on an iOS device.
