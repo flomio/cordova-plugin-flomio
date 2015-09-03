@@ -1,3 +1,8 @@
+/** 
+FLOPlugin.h
+Uses Flomio SDK version 1.5 
+**/
+
 #import <Cordova/CDV.h>
 #import "ReaderManager.h"
 #import "Reader.h"

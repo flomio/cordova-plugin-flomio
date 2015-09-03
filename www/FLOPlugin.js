@@ -4,25 +4,9 @@ var exec = require('cordova/exec');
  */
 function FLOPlugin() {}
 
-FLOPlugin.prototype.webToSdkCommand = function() {
+FLOPlugin.prototype.startPolling = function(resultCallback) {
   exec(function(result){
       // result handler, response from native method call
-      console.log(result);
-    },
-    function(error){
-      // error handler
-      console.log("Flomio SDK plugin error occurred: " + error);
-    }, 
-    "FLOPlugin", 
-    "webToSdkCommand",  
-    []
-  );
-}
-
-FLOPlugin.prototype.webToSdkCommandAsync = function(resultCallback) {
-  exec(function(result){
-      // result handler, response from native method call
-      console.log(result);
 	  resultCallback(result);
     },
     function(error){
@@ -30,10 +14,10 @@ FLOPlugin.prototype.webToSdkCommandAsync = function(resultCallback) {
       console.log("Flomio SDK plugin error occurred: " + error);
     }, 
     "FLOPlugin", 
-    "webToSdkCommandAsync",  
+    "startPolling",  
     []
   );
 }
 
 var floPlugin = new FLOPlugin();
-module.exports = floPlugin
+module.exports = floPlugin;

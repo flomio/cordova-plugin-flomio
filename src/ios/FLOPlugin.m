@@ -1,33 +1,15 @@
+/*
+FLOPlugin.m
+Uses Flomio SDK version 1.5 
+*/
+
 #import "FLOPlugin.h"
 #import <Cordova/CDV.h>
 
 @implementation FLOPlugin
 
-- (void)webToSdkCommand:(CDVInvokedUrlCommand*)command
-{
-    
-    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Hello - that's your plugin :)"];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-}
-
--(void) regularCall:(NSTimer*) t 
-{
-	CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[NSString stringWithFormat:@"tag scan!"]];
-    [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:asyncCallbackId];
-}
-
-- (void)start
-{
-    
-    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Hello - that's your plugin :)"];
-    [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:asyncCallbackId];
-}
-
-
-//Starts Timer
-- (void)webToSdkCommandAsync:(CDVInvokedUrlCommand*)command
+/** Starts the reader polling for tags */
+- (void)startPolling:(CDVInvokedUrlCommand*)command
 {
     
     _readerManager = [[ReaderManager alloc] init];
@@ -37,8 +19,7 @@
     [_readerManager startReaders];
     
     //FloBLE Tag Type Strings, instantiate as a global variable in the header.
-    
-    _tagTypeStrings = @[@"UNKNOWN_TAG_TYPE", @"NFC_FORUM_TYPE_1", @"NFC_FORUM_TYPE_2", @"NFC_FORUM_TYPE_3", @"NFC_FORUM_TYPE_4", @"MIFARE_CLASSIC",@"TYPE_V"];  // this needs to equal the enum nfc_tag_types_t in floble.
+    _tagTypeStrings = @[@"UNKNOWN_TAG_TYPE", @"NFC_FORUM_TYPE_1", @"NFC_FORUM_TYPE_2", @"NFC_FORUM_TYPE_3", @"NFC_FORUM_TYPE_4", @"MIFARE_CLASSIC", @"TYPE_V"];  // this needs to equal the enum nfc_tag_types_t in floble.
     
     if (_readerManager.isFlojackEnabled == [NSNumber numberWithBool:YES]) {
         // Stop reader scan when the app becomes inactive
@@ -50,11 +31,10 @@
     }
 	
     asyncCallbackId = command.callbackId;
-	NSTimer* myTimer = [NSTimer scheduledTimerWithTimeInterval: 5.0 target: self
-	                                   selector: @selector(regularCall:) userInfo: nil repeats: YES];
     [self active];
 }
 
+/** Initial setup once app is active */
 - (void)active {
     NSLog(@"App Activated");
     [_readerManager getAvailableReader];
@@ -66,6 +46,7 @@
     _readerManager.messageToWrite = @"http://flomio.com"; // set a default message to write
 }
 
+/** Send reader to sleep once app becomes inactive */
 - (void)inactive {
     [_readerManager.reader sleep];
 }
@@ -73,24 +54,26 @@
 #pragma mark - ReaderManagerDelegate
 
 - (void)ReaderManager:(Reader *)reader readerAlert:(UIImageView *)imageView {
-    if (!reader.delegate)
+    if (!reader.delegate) {
         reader.delegate = self; // Set reader delagate once it's clear reader's connected
-//    imageView.hidden = NO;
-//    imageView.alpha = 1.0f;
-//    // Then fades away after 2 seconds (the cross-fade animation will take 0.5s)
-//    [UIView animateWithDuration:0.5 delay:2.0 options:0 animations:^{
-//        // Animate the alpha value of your imageView from 1.0 to 0.0 here
-//        imageView.alpha = 0.0f;
-//    } completion:^(BOOL finished) {
-//        // Once the animation is completed and the alpha has gone to 0.0, hide the view for good
-//        imageView.hidden = YES;
-//    }];
-//    imageView.center = [self.view convertPoint:self.view.center fromView:self.view.superview];
-//    [self.view addSubview:imageView];
+	}
+   imageView.hidden = NO;
+   imageView.alpha = 1.0f;
+   // Then fades away after 2 seconds (the cross-fade animation will take 0.5s)
+   [UIView animateWithDuration:0.5 delay:2.0 options:0 animations:^{
+       // Animate the alpha value of your imageView from 1.0 to 0.0 here
+       imageView.alpha = 0.0f;
+   } completion:^(BOOL finished) {
+       // Once the animation is completed and the alpha has gone to 0.0, hide the view for good
+       imageView.hidden = YES;
+   }];
+   imageView.center = [self.viewController.view convertPoint:self.viewController.view.center fromView:self.viewController.view.superview];
+   [self.viewController.view addSubview:imageView];
 }
 
 #pragma mark - ReaderDelegate
 
+/** Called every time a compatible tag is found */
 - (void)didFindATag:(Tag *)tag withOperationState:(ReaderStateType)operationState withError:(NSError *)error {
     dispatch_async(dispatch_get_main_queue(), ^{ // Second dispatch message to log tag and restore screen
         if (!error) {
