@@ -27,11 +27,31 @@ Uses Flomio SDK version 1.5
         
         // Start reader scan when the app becomes active
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(active) name:UIApplicationDidBecomeActiveNotification object:nil];
-        
     }
 	
     asyncCallbackId = command.callbackId;
     [self active];
+}
+
+- (void)acknowledgeScan:(CDVInvokedUrlCommand*)command {
+	
+	lastReceivedScan = [command.arguments objectAtIndex:0];
+	if(lastReceivedScan == lastScan) {
+		[ToastView showToastInParentView:self.view withText:@"Last scan received." withDuaration:2.0];
+	} else {
+		[ToastView showToastInParentView:self.view withText:@"Last scan not properly received. Re-sending..." withDuaration:2.0];
+		
+		// Send the scan data again
+		CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[NSString stringWithFormat:@"%@",lastScan]];
+        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:asyncCallbackId];
+	}
+}
+
+/** Stops the reader polling for tags */
+- (void)stopPolling:(CDVInvokedUrlCommand*)command {
+	
+	[self inactive];
 }
 
 /** Initial setup once app is active */
@@ -80,6 +100,7 @@ Uses Flomio SDK version 1.5
             switch (operationState) {
                 case kReadUUID: {
                     NSLog(@"%@",tag.data); // Log the UUID
+					lastScan = tag.data;
 					CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[NSString stringWithFormat:@"%@",tag.data]];
                     [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
                     [self.commandDelegate sendPluginResult:pluginResult callbackId:asyncCallbackId];
