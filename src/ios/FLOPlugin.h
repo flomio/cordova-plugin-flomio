@@ -21,7 +21,7 @@ Uses Flomio SDK version 1.5
 
 - (void)startPolling:(CDVInvokedUrlCommand*)command;
 - (void)stopPolling:(CDVInvokedUrlCommand*)command;
-
+- (void)acknowledgeScan:(CDVInvokedUrlCommand*)command;
 - (void)active;
 - (void)inactive;
 - (void)ReaderManager:(Reader *)reader readerAlert:(UIImageView *)imageView;
