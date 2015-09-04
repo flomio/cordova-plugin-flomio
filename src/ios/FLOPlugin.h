@@ -14,9 +14,7 @@ Uses Flomio SDK version 1.5
 
 @interface FLOPlugin : CDVPlugin <ReaderManagerDelegate, ReaderDelegate> {
     NSString *asyncCallbackId;
-	NSString *lastScan;
-	NSString *lastReceivedScan;
-	BOOL readerIsActive = NO;
+	NSData *lastScan;
 }
 
 - (void)startPolling:(CDVInvokedUrlCommand*)command;

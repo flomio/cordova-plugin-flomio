@@ -34,12 +34,15 @@ Uses Flomio SDK version 1.5
 }
 
 - (void)acknowledgeScan:(CDVInvokedUrlCommand*)command {
-	
-	lastReceivedScan = [command.arguments objectAtIndex:0];
-	if(lastReceivedScan == lastScan) {
-		[ToastView showToastInParentView:self.view withText:@"Last scan received." withDuaration:2.0];
+    
+    NSString* lastReceivedScan = [command.arguments objectAtIndex:0];
+    NSString* lastScanCopy = [NSString stringWithFormat:@"%@",lastScan];
+
+	if([lastReceivedScan isEqualToString:lastScanCopy]) {
+		NSString* message = [NSString stringWithFormat:@"%@%@%@", @"Last scan with UID ", lastScanCopy ,@" received"];
+		[ToastView showToastInParentView:self.viewController.view withText:message withDuaration:2.0];
 	} else {
-		[ToastView showToastInParentView:self.view withText:@"Last scan not properly received. Re-sending..." withDuaration:2.0];
+		[ToastView showToastInParentView:self.viewController.view withText:@"Last scan not properly received. Re-sending..." withDuaration:2.0];
 		
 		// Send the scan data again
 		CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[NSString stringWithFormat:@"%@",lastScan]];
