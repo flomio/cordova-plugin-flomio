@@ -107,7 +107,8 @@ Uses Flomio SDK version 1.5
 					
 					NSString* tagUid = [NSString* stringWithFormat:@"%@", tag.data];
 					// NSString* tagType = [NSString* stringWithFormat:@"%@", tag.data];
-					NSArray* result = [NSArray arrayWithObjects:tagUid, @"TAG_TYPE"];
+                    NSString* tagType = @"TAG_TYPE";
+					NSArray* result = [NSArray arrayWithObjects:tagUid, tagType, nil];
 					
 					CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
                     [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
