@@ -5,16 +5,16 @@ var exec = require('cordova/exec');
 function FLOPlugin() {}
 
 FLOPlugin.prototype.startPolling = function(resultCallback) {
-  exec(function(result){
+  exec(function(tagUid, tagType){
       // result handler, response from native method call
-	  resultCallback(result);
+	  resultCallback(tagUid, tagType);
     },
     function(error){
       // error handler
       console.log("Flomio SDK plugin error occurred: " + error);
     }, 
     "FLOPlugin", 
-    "startPolling",  
+    "startPolling",
     []
   );
 }

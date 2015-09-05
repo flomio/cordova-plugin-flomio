@@ -104,7 +104,12 @@ Uses Flomio SDK version 1.5
                 case kReadUUID: {
                     NSLog(@"%@",tag.data); // Log the UUID
 					lastScan = tag.data;
-					CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[NSString stringWithFormat:@"%@",tag.data]];
+					
+					NSString* tagUid = [NSString* stringWithFormat:@"%@", tag.data];
+					// NSString* tagType = [NSString* stringWithFormat:@"%@", tag.data];
+					NSArray* result = [NSArray arrayWithObjects:tagUid, @"TAG_TYPE"];
+					
+					CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
                     [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
                     [self.commandDelegate sendPluginResult:pluginResult callbackId:asyncCallbackId];
                     break;
