@@ -105,7 +105,7 @@ Uses Flomio SDK version 1.5
                     NSLog(@"%@",tag.data); // Log the UUID
 					lastScan = tag.data;
 					
-					NSString* tagUid = [NSString* stringWithFormat:@"%@", tag.data];
+					NSString* tagUid = [NSString stringWithFormat:@"%@", tag.data];
 					// NSString* tagType = [NSString* stringWithFormat:@"%@", tag.data];
                     NSString* tagType = @"TAG_TYPE";
 					NSArray* result = [NSArray arrayWithObjects:tagUid, tagType, nil];
