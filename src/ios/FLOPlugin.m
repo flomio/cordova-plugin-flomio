@@ -73,11 +73,12 @@ Uses Flomio SDK version 1.6
     _readerManager.operationState = kReadUUID; //kReadDataBlocks or kWriteDataBlocks
     _readerManager.startBlock = [NSNumber numberWithInteger:8]; //start reading from 4th data block
     _readerManager.messageToWrite = @"http://flomio.com"; // set a default message to write
-    
+	
+	NSString* deviceInfo;
 	if(_readerManager.isFlojackEnabled) {
-		NSString* deviceInfo = [NSString stringWithFormat:@"{\"id\":\"%@\",\"type\":\"%@\"}", _readerManager.reader.deviceId, @"FloJack"];
+		deviceInfo = [NSString stringWithFormat:@"{\"id\":\"%@\",\"type\":\"%@\"}", _readerManager.reader.deviceId, @"FloJack"];
 	} else {
-		NSString* deviceInfo = [NSString stringWithFormat:@"{\"id\":\"%@\",\"type\":\"%@\"}", _readerManager.reader.deviceId, @"FloBLE"];
+		deviceInfo = [NSString stringWithFormat:@"{\"id\":\"%@\",\"type\":\"%@\"}", _readerManager.reader.deviceId, @"FloBLE"];
 	}
     
     NSLog(deviceInfo);
@@ -92,10 +93,11 @@ Uses Flomio SDK version 1.6
     
     [_readerManager.reader sleep];
     
+	NSString* deviceInfo;
 	if(_readerManager.isFlojackEnabled) {
-		NSString* deviceInfo = [NSString stringWithFormat:@"{\"id\":\"%@\",\"type\":\"%@\"}", _readerManager.reader.deviceId, @"FloJack"];
+		deviceInfo = [NSString stringWithFormat:@"{\"id\":\"%@\",\"type\":\"%@\"}", _readerManager.reader.deviceId, @"FloJack"];
 	} else {
-		NSString* deviceInfo = [NSString stringWithFormat:@"{\"id\":\"%@\",\"type\":\"%@\"}", _readerManager.reader.deviceId, @"FloBLE"];
+		deviceInfo = [NSString stringWithFormat:@"{\"id\":\"%@\",\"type\":\"%@\"}", _readerManager.reader.deviceId, @"FloBLE"];
 	}
 	
     NSLog(deviceInfo);
