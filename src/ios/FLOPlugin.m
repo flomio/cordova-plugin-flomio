@@ -1,6 +1,6 @@
 /*
 FLOPlugin.m
-Uses Flomio SDK version 1.5 
+Uses Flomio SDK version 1.6
 */
 
 #import "FLOPlugin.h"
@@ -36,13 +36,19 @@ Uses Flomio SDK version 1.5
 - (void)acknowledgeScan:(CDVInvokedUrlCommand*)command {
     
     NSString* lastReceivedScan = [command.arguments objectAtIndex:0];
-    NSString* lastScanCopy = [NSString stringWithFormat:@"%@",lastScan];
+	NSString* lastScanCopy;
+	
+	if(_readerManager.isFlojackEnabled) {
+		lastScanCopy = [NSString stringWithFormat:@"%@",lastScan];
+	} else {
+		lastScanCopy = lastFloBleScan;
+	}
 
 	if([lastReceivedScan isEqualToString:lastScanCopy]) {
 		NSString* message = [NSString stringWithFormat:@"%@%@%@", @"Last scan with UID ", lastScanCopy ,@" received"];
-		[ToastView showToastInParentView:self.viewController.view withText:message withDuaration:2.0];
+		[ToastView showToastInParentView:self.viewController.view withText:message withDuration:2.0];
 	} else {
-		[ToastView showToastInParentView:self.viewController.view withText:@"Last scan not properly received. Re-sending..." withDuaration:2.0];
+		[ToastView showToastInParentView:self.viewController.view withText:@"Last scan not properly received. Re-sending..." withDuration:2.0];
 		
 		// Send the scan data again
 		CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[NSString stringWithFormat:@"%@",lastScan]];
@@ -67,11 +73,36 @@ Uses Flomio SDK version 1.5
     _readerManager.operationState = kReadUUID; //kReadDataBlocks or kWriteDataBlocks
     _readerManager.startBlock = [NSNumber numberWithInteger:8]; //start reading from 4th data block
     _readerManager.messageToWrite = @"http://flomio.com"; // set a default message to write
+    
+	if(_readerManager.isFlojackEnabled) {
+		NSString* deviceInfo = [NSString stringWithFormat:@"{\"id\":\"%@\",\"type\":\"%@\"}", _readerManager.reader.deviceId, @"FloJack"];
+	} else {
+		NSString* deviceInfo = [NSString stringWithFormat:@"{\"id\":\"%@\",\"type\":\"%@\"}", _readerManager.reader.deviceId, @"FloBLE"];
+	}
+    
+    NSLog(deviceInfo);
+    NSArray* result = [NSArray arrayWithObjects:@"READER_STATUS_ACTIVE", deviceInfo, nil];
+    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
+    [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:asyncCallbackId];
 }
 
 /** Send reader to sleep once app becomes inactive */
 - (void)inactive {
+    
     [_readerManager.reader sleep];
+    
+	if(_readerManager.isFlojackEnabled) {
+		NSString* deviceInfo = [NSString stringWithFormat:@"{\"id\":\"%@\",\"type\":\"%@\"}", _readerManager.reader.deviceId, @"FloJack"];
+	} else {
+		NSString* deviceInfo = [NSString stringWithFormat:@"{\"id\":\"%@\",\"type\":\"%@\"}", _readerManager.reader.deviceId, @"FloBLE"];
+	}
+	
+    NSLog(deviceInfo);
+    NSArray* result = [NSArray arrayWithObjects:@"READER_STATUS_INACTIVE", deviceInfo, nil];
+    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
+    [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:asyncCallbackId];
 }
 
 #pragma mark - ReaderManagerDelegate
@@ -135,6 +166,43 @@ Uses Flomio SDK version 1.5
 
 - (void)setDeviceStatus:(BOOL)enabled {
     _readerManager.deviceEnabled = [NSNumber numberWithBool:enabled];
+}
+
+#pragma mark - FLOBLE ReaderManagerDelegate Methods
+
+- (void)floReaderManager:(ReaderManager *)theFloReaderManager didWriteTagAndStatusWas:(NSInteger)statusCode {
+	[self floReaderManager:theFloReaderManager didWriteTagAndStatusWas:statusCode];  
+}
+
+- (void)floReaderManager:(ReaderManager *)floReaderManager didScanTag:(FJNFCTag *)theNfcTag fromDevice:(NSString *)deviceId {
+    NSLog(@"Tag detected: %@ from Device:%@",[theNfcTag.uid fj_asHexString], deviceId);
+	
+    NSLog(@"%@", [theNfcTag.uid fj_asHexString]); // Log the UUID
+	lastFloBleScan = [theNfcTag.uid fj_asHexString];
+	
+	NSString* tagUid = [NSString stringWithFormat:@"%@", [theNfcTag.uid fj_asHexString]];
+	// NSString* tagType = [NSString* stringWithFormat:@"%@", tag.data];
+    NSString* tagType = @"TAG_TYPE";
+	NSArray* result = [NSArray arrayWithObjects:tagUid, tagType, nil];
+	
+	CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
+    [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:asyncCallbackId];
+}
+
+- (void)floReaderManager:(ReaderManager *)floReaderManager didHaveStatus:(NSInteger)statusCode {
+}
+
+- (void)floReaderManager:(ReaderManager *)floReaderManager didReceiveFirmwareVersion:(NSString *)theVersionNumber {
+}
+
+- (void)floReaderManager:(ReaderManager *)floReaderManager didReceiveHardwareVersion:(NSString *)theVersionNumber; {
+}
+
+- (void)floReaderManager:(ReaderManager *)floReaderManager didReceiveSnifferThresh:(NSString *)theSnifferValue; {
+}
+
+- (void)floReaderManager:(ReaderManager *)floReaderManager didReceiveSnifferCalib:(NSString *)theCalibValues; {
 }
 
 @end

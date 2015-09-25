@@ -1,6 +1,6 @@
 /*
 FLOPlugin.h
-Uses Flomio SDK version 1.5 
+Uses Flomio SDK version 1.6
 */
 
 #import <Cordova/CDV.h>
@@ -15,6 +15,7 @@ Uses Flomio SDK version 1.5
 @interface FLOPlugin : CDVPlugin <ReaderManagerDelegate, ReaderDelegate> {
     NSString *asyncCallbackId;
 	NSData *lastScan;
+	NSString *lastFloBleScan;
 }
 
 - (void)startPolling:(CDVInvokedUrlCommand*)command;
