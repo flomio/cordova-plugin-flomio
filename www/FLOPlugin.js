@@ -4,35 +4,48 @@ var exec = require('cordova/exec');
  */
 function FLOPlugin() {}
 
-FLOPlugin.prototype.webToSdkCommand = function() {
-  exec(function(result){
+FLOPlugin.prototype.startPolling = function(resultCallback) {
+  exec(function(tagUid, tagType){
       // result handler, response from native method call
-      console.log(result);
+	  resultCallback(tagUid, tagType);
     },
     function(error){
       // error handler
       console.log("Flomio SDK plugin error occurred: " + error);
     }, 
     "FLOPlugin", 
-    "webToSdkCommand",  
+    "startPolling",
     []
   );
 }
 
-FLOPlugin.prototype.webToSdkCommandAsync = function() {
+FLOPlugin.prototype.acknowledgeScan = function(lastReceivedScan) {
   exec(function(result){
-      // result handler, response from native method call
-      console.log(result);
+      // TODO
     },
     function(error){
       // error handler
       console.log("Flomio SDK plugin error occurred: " + error);
     }, 
     "FLOPlugin", 
-    "webToSdkCommandAsync",  
+    "acknowledgeScan",  
+    [lastReceivedScan]
+  );
+}
+
+FLOPlugin.prototype.stopPolling = function() {
+  exec(function(result){
+      // TODO
+    },
+    function(error){
+      // error handler
+      console.log("Flomio SDK plugin error occurred: " + error);
+    }, 
+    "FLOPlugin", 
+    "stopPolling",  
     []
   );
 }
 
 var floPlugin = new FLOPlugin();
-module.exports = floPlugin
+module.exports = floPlugin;

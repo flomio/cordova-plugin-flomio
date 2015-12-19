@@ -16,6 +16,8 @@
             <clobbers target="floPlugin" />
         </js-module>
         <header-file src="src/ios/FLOPlugin.h" />
-	<source-file src="src/ios/FLOPlugin.m" />
+		<source-file src="src/ios/FLOPlugin.m" />
+        <header-file src="src/ios/ToastView.h" />
+		<source-file src="src/ios/ToastView.m" />
     </platform>
 </plugin>
