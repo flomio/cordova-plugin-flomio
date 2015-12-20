@@ -1,6 +1,6 @@
 /*
 FLOPlugin.h
-Uses Flomio SDK version 1.7 (with Feitian support)
+Uses Flomio SDK version 1.8 (with Feitian support)
 */
 
 #import <Cordova/CDV.h>

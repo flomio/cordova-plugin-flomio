@@ -15,7 +15,7 @@ FLOPlugin.prototype.startPolling = function(readerType, resultCallback) {
     }, 
     "FLOPlugin", 
     "startPolling",
-    [readerType]
+    [readerType]  // readerType is "FLO" or "EMV"
   );
 }
 
