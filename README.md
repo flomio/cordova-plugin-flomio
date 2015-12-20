@@ -1,6 +1,8 @@
 # Flomio Cordova Plugin
 
-Flomio's Proximity ID plugin for Cordova. 
+Flomio's Proximity ID plugin for Cordova.
+
+**Current SDK version: 1.8**
 
 ## Installation
 
