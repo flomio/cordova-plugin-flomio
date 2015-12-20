@@ -45,7 +45,7 @@ Uses Flomio SDK version 1.8 (with Feitian support)
     BOOL isCardConnected;
     
     NSString *serialNumber;
-    NSString *asyncCallbackId;
+    //NSString *asyncCallbackId;
     ///////////////////////////
 
     ///////////////////////////
