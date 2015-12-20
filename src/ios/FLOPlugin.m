@@ -13,7 +13,7 @@ Uses Flomio SDK version 1.8 (with Feitian support)
 {
     NSString* readerType = [command.arguments objectAtIndex:0];
 
-    if ([readerType isEqualToString:@"EMV"])
+    if ([readerType isEqualToString:@"EMV"])  // EMV = Feitian
     {
         isCardConnected = NO;
         _readInf = [[ReaderInterface alloc]init];
@@ -24,7 +24,7 @@ Uses Flomio SDK version 1.8 (with Feitian support)
         feitianConnected = YES;
         asyncCallbackId = command.callbackId;
     }
-    else
+    else  // FLO = FloJack / FloBLE
     {
         _readerManager = [[ReaderManager alloc] init];
         _readerManager.isFloBLEEnabled = [NSNumber numberWithBool:NO]; // Enable or Disable FloBLE as Needed
