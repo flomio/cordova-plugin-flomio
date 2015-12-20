@@ -4,7 +4,7 @@ var exec = require('cordova/exec');
  */
 function FLOPlugin() {}
 
-FLOPlugin.prototype.startPolling = function(resultCallback) {
+FLOPlugin.prototype.startPolling = function(readerType, resultCallback) {
   exec(function(tagUid, tagType){
       // result handler, response from native method call
 	  resultCallback(tagUid, tagType);
@@ -15,7 +15,7 @@ FLOPlugin.prototype.startPolling = function(resultCallback) {
     }, 
     "FLOPlugin", 
     "startPolling",
-    []
+    [readerType]  // readerType is "FLO" or "EMV"
   );
 }
 
