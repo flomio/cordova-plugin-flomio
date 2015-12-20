@@ -1,7 +1,5 @@
 # Flomio Cordova Plugin
 
-***WORK IN PROGRESS: NOT YET SUITABLE FOR REGULAR USE***
-
 Flomio's Proximity ID plugin for Cordova. 
 
 ## Installation
@@ -28,13 +26,13 @@ cordova plugin add https://github.com/flomio/flomio_cordova_plugin.git
 </feature>
 ```
 
-- Create a tag scan callback and include the command to start polling.
+- Create a tag scan callback and include the command to start polling. Also specify whether the current reader is of type "FLO" (FloJack / FloBLE) or "EMV" (Feitian).
 
 ```
 var callback = function(result) {
 	console.log(result);
 }
-floPlugin.startPolling(callback);
+floPlugin.startPolling("FLO", callback);
 ```
 
 - Prepare the app.
