@@ -49,4 +49,8 @@ cordova prepare
 
 - Add `-lc++` to "Other Linker Flags" under "Build Settings".
 
+- Disable bitcode. `Build Settings -> Build Options -> Enable Bitcode` to `No`.
+
+- Manually add the SDK folder to library search paths. `Build Settings -> Search Paths -> User Header Search Paths`, double-click and add `"$(SRCROOT)/FlomioSDKv1.<X>/include/SDKClasses"`
+
 - Build and run the app on an iOS device.
