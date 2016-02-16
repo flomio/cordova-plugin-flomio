@@ -1,26 +1,30 @@
 # Flomio Cordova Plugin
 
-Flomio's Proximity ID plugin for Cordova.
+Flomio's Proximity ID plugin for Cordova/Meteor.
 
-**Current SDK version: 1.8**
+**Current Flomio SDK version: 1.9**
 
 ## Installation
 
-- Make sure that you have [Node](http://nodejs.org/) and [Cordova CLI](http://cordova.apache.org/docs/en/4.0.0/guide_cli_index.md.html) installed on your machine.
+- Make sure that you have [Node](http://nodejs.org/) and [Cordova CLI](http://cordova.apache.org/docs/en/4.0.0/guide_cli_index.md.html) or the [Meteor CLI](https://www.meteor.com/install) installed on your machine.
 
-- Create your Cordova example app.
+- Create your Cordova or Meteor example app.
 
 ```bash
 cordova create my-plugin-example-app && cd $_
+--
+meteor create my-plugin-example-app && cd $_
 ```
 
 - Add the plugin to it.
 
 ```bash
 cordova plugin add https://github.com/flomio/flomio_cordova_plugin.git
+--
+meteor add cordova:com.flomio.proximityid@https://github.com/flomio/flomio_cordova_plugin/tarball/<latest commit code>
 ```
 
-- Register plugin within `config.xml` of your app.
+- Register plugin within `config.xml` of your app in Cordova. Meteor takes care of this for you (so skip this step).
 
 ```xml
 <feature name="FLOPlugin">
@@ -41,6 +45,8 @@ floPlugin.startPolling("FLO", callback);
 
 ```bash
 cordova prepare
+--
+meteor add-platform ios
 ```
 
 - Open the generated Xcode project located at `platforms/ios`.
