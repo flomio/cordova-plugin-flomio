@@ -4,42 +4,50 @@ var exec = require('cordova/exec');
  */
 function FLOPlugin() {}
 
-FLOPlugin.prototype.startPolling = function(readerType, resultCallback) {
-  exec(function(tagUid, tagType){
-      // result handler, response from native method call
-	  resultCallback(tagUid, tagType);
+FLOPlugin.prototype.selectReader = function(readerType, callback)
+{
+  exec(
+    function()  // result handler, response from native method call
+    {
+      // no result returned
     },
-    function(error){
-      // error handler
-      console.log("Flomio SDK plugin error occurred: " + error);
+    function(error)  // error handler
+    {
+      callback(null, error);
+    },
+    "FLOPlugin",
+    "selectReader",
+    [readerType]  // readerType is "FloJack", "FloBLE-EMV" or "FloBLE-Plus" (case insensitive)
+  );
+}
+
+FLOPlugin.prototype.startPolling = function(callback)
+{
+  exec(
+    function(tagUid, tagType)
+    {
+  	  callback({tagUid: tagUid, tagType: tagType}, null);
+    },
+    function(error)
+    {
+      callback(null, error);
     }, 
     "FLOPlugin", 
     "startPolling",
-    [readerType]  // readerType is "FLO" or "EMV"
+    []
   );
 }
 
-FLOPlugin.prototype.acknowledgeScan = function(lastReceivedScan) {
-  exec(function(result){
-      // TODO
+FLOPlugin.prototype.stopPolling = function()
+{
+  exec(
+    function()
+    {
+      // no result returned
     },
-    function(error){
-      // error handler
-      console.log("Flomio SDK plugin error occurred: " + error);
-    }, 
-    "FLOPlugin", 
-    "acknowledgeScan",  
-    [lastReceivedScan]
-  );
-}
-
-FLOPlugin.prototype.stopPolling = function() {
-  exec(function(result){
-      // TODO
-    },
-    function(error){
-      // error handler
-      console.log("Flomio SDK plugin error occurred: " + error);
+    function(error)
+    {
+      callback(null, error);
     }, 
     "FLOPlugin", 
     "stopPolling",  

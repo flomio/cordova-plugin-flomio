@@ -1,80 +1,36 @@
 /*
 FLOPlugin.h
-Uses Flomio SDK version 1.8 (with Feitian support)
+Uses Flomio SDK version 1.9
 */
 
 #import <Cordova/CDV.h>
-
-///////////////////////////
-// FloJack / FloBLE
 #import "ReaderManager.h"
-#import "Reader.h"
-#import "NDEFMessage.h"
-#import "ReaderManager.h"
-#import "Reader.h"
-#import "NSData+FJStringDisplay.h"
-#import "ToastView.h"
-///////////////////////////
 
-///////////////////////////
-// Feitian
-#import <Foundation/Foundation.h>
-#import "ReaderInterface.h"
-#import "winscard.h"
-#import "ft301u.h"
-///////////////////////////
-
-@protocol FeitianReaderDelegate <NSObject>
-@optional
-
-- (void)didFeitianReaderSendUUID:(NSString*)uuid fromDevide:(NSString *)sn;
-
-@end
-
-@interface FLOPlugin : CDVPlugin <ReaderManagerDelegate, ReaderDelegate, ReaderInterfaceDelegate> {
-	BOOL feitianConnected;
-	BOOL floConnected;
-
-	///////////////////////////
-	// Feitian
-	BOOL cardIsAttached;
+@interface FLOPlugin : CDVPlugin <ReaderManagerDelegate>
+{
+    // Flo-reader attributes
+    ReaderManager *sharedManager;
     
-    SCARDCONTEXT gContxtHandle;
-    SCARDHANDLE  gCardHandle;
-    
-    BOOL isCardConnected;
-    
-    NSString *serialNumber;
-    //NSString *asyncCallbackId;
-    ///////////////////////////
-
-    ///////////////////////////
-    // FloJack / FloBLE
-    NSString *asyncCallbackId;
-	NSData *lastScan;
-	NSString *lastFloBleScan;
-	///////////////////////////
+    // Cordova attributes
+    NSString *didFindATagUUID_callbackId;
 }
 
-///////////////////////////
-// FloJack / FloBLE
+// Cordova functions
+- (void)init:(CDVInvokedUrlCommand*)command;
+- (void)setScanPeriod:(CDVInvokedUrlCommand*)command;
+- (void)setScanSound:(CDVInvokedUrlCommand*)command;
+- (void)selectReader:(CDVInvokedUrlCommand*)command;
 - (void)startPolling:(CDVInvokedUrlCommand*)command;
 - (void)stopPolling:(CDVInvokedUrlCommand*)command;
-- (void)acknowledgeScan:(CDVInvokedUrlCommand*)command;
-- (void)active;
-- (void)inactive;
+
+// Internal Flo-reader functions
 - (void)ReaderManager:(Reader *)reader readerAlert:(UIImageView *)imageView;
-- (void)didFindATag:(Tag *)tag withOperationState:(ReaderStateType)operationState withError:(NSError *)error;
-- (void)setDeviceStatus:(BOOL)enabled;
+- (void)didUpdateConnectedPeripherals:(NSArray *)peripherals;
+- (void)didFindATagUUID:(NSString *)UUID fromDevice:(NSString *)deviceId;
+- (void)didFindDataBlocks:(NSData *)data fromDevice:(NSString *)deviceId;
+- (void)ReaderManager:(Reader *)reader didSendBatteryLevel:(int)level;
+- (void)ReaderManager:(Reader *)reader isConnected:(BOOL)connected;
 
 @property (nonatomic, strong) ReaderManager *readerManager;
-@property (strong, nonatomic) NSArray *tagTypeStrings;
-///////////////////////////
-
-///////////////////////////
-// Feitian
-@property id<FeitianReaderDelegate> delegate;
-@property (nonatomic,strong) ReaderInterface *readInf;
-///////////////////////////
 
 @end
