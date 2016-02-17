@@ -13,6 +13,7 @@ Uses Flomio SDK version 1.9
 {
     sharedManager = [ReaderManager sharedManager];
     sharedManager.delegate = self;
+    [sharedManager startReaders];
     
     // Set SDK configuration and update reader settings
     sharedManager.deviceEnabled = [NSNumber numberWithBool:YES]; //enable the reader
@@ -96,14 +97,14 @@ Uses Flomio SDK version 1.9
 /** Starts the reader polling for tags */
 - (void)startPolling:(CDVInvokedUrlCommand*)command
 {
-    [sharedManager startReaders];  // start the active reader
+    [sharedManager.reader startScan];  // start the active reader
     didFindATagUUID_callbackId = command.callbackId;
 }
 
 /** Stops the reader polling for tags */
 - (void)stopPolling:(CDVInvokedUrlCommand*)command
 {
-    [sharedManager stopReaders];  // stop the active reader
+    [sharedManager.reader sleep];  // stop the active reader
 }
 
 /** Called when the app becomes active */

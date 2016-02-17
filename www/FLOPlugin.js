@@ -4,7 +4,7 @@ var exec = require('cordova/exec');
  */
 function FLOPlugin() {}
 
-FLOPlugin.prototype.init = function()
+FLOPlugin.prototype.init = function(callback)
 {
   exec(
     function()  // result handler, response from native method call
@@ -55,7 +55,7 @@ FLOPlugin.prototype.startPolling = function(callback)
   );
 }
 
-FLOPlugin.prototype.stopPolling = function()
+FLOPlugin.prototype.stopPolling = function(callback)
 {
   exec(
     function()
