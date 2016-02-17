@@ -4,6 +4,23 @@ var exec = require('cordova/exec');
  */
 function FLOPlugin() {}
 
+FLOPlugin.prototype.init = function()
+{
+  exec(
+    function()  // result handler, response from native method call
+    {
+      // no result returned
+    },
+    function(error)  // error handler
+    {
+      callback(null, error);
+    },
+    "FLOPlugin",
+    "init",
+    []
+  );
+}
+
 FLOPlugin.prototype.selectReader = function(readerType, callback)
 {
   exec(
