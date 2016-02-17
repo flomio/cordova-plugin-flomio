@@ -13,7 +13,7 @@ Uses Flomio SDK version 1.9
 {
     sharedManager = [ReaderManager sharedManager];
     sharedManager.delegate = self;
-    [sharedManager startReaders];
+    activeReaderType = @"null";
     
     // Set SDK configuration and update reader settings
     sharedManager.deviceEnabled = [NSNumber numberWithBool:YES]; //enable the reader
@@ -30,12 +30,104 @@ Uses Flomio SDK version 1.9
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(active) name:UIApplicationDidBecomeActiveNotification object:nil];
 }
 
-/** Set the scan period (in ms) */
-- (void)setScanPeriod:(CDVInvokedUrlCommand*)command
+- (void)setReaderSettings:(CDVInvokedUrlCommand*)command
 {
-    NSString* scanPeriodString = [command.arguments objectAtIndex:0];
-    NSString* trimmedString = [scanPeriodString stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
+    NSString* scanPeriod = [command.arguments objectAtIndex:0];
+    NSString* scanSound = [command.arguments objectAtIndex:1];
+    NSString* operationState = [command.arguments objectAtIndex:2];
+    NSString* startBlock = [command.arguments objectAtIndex:3];
+    NSString* messageToWrite = [command.arguments objectAtIndex:4];
+}
+
+/** Stops the active reader then selects the new active reader */
+- (void)selectReaderType:(CDVInvokedUrlCommand*)command
+{
+    NSString* readerType = [command.arguments objectAtIndex:0];
+    NSString* trimmedString = [readerType stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
+    [sharedManager.reader suspendScan];  // stop all active readers
+    
+    if ([[trimmedString lowercaseString] isEqualToString:@"flojack"])
+    {
+        activeReaderType = @"flojack";
+        [sharedManager setDeviceType:kFlojack];
+        [sharedManager startReaders];
+    }
+    else if ([[trimmedString lowercaseString] isEqualToString:@"floble-emv"])
+    {
+        activeReaderType = @"floble-emv";
+        [sharedManager setDeviceType:kFloBleEmv];
+        [sharedManager startReaders];
+    }
+    else if ([[trimmedString lowercaseString] isEqualToString:@"floble-plus"])
+    {
+        activeReaderType = @"floble-plus";
+        [sharedManager setDeviceType:kFloBlePlus];
+        [sharedManager startReaders];
+    }
+    else
+    {
+        activeReaderType = @"null";
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Enter 'FloJack', 'FloBLE-EMV' or 'FloBLE-Plus' only"];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }
+}
+
+/** Starts the reader polling for tags */
+- (void)startReader:(CDVInvokedUrlCommand*)command
+{
+    didFindATagUUID_callbackId = command.callbackId;
+    NSString* readerUid = [command.arguments objectAtIndex:0];
+    readerUid = [readerUid stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
+    
+    if ([activeReaderType isEqualToString:@"null"])
+    {
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Select a reader type first"];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }
+    else if ([[readerUid lowercaseString] isEqualToString:@"all"])
+    {
+        [sharedManager.reader startScan];  // start all active readers
+    }
+    else
+    {
+        // start a specific reader
+    }
+}
+
+/** Stops the reader polling for tags */
+- (void)stopReader:(CDVInvokedUrlCommand*)command
+{
+    NSString* readerUid = [command.arguments objectAtIndex:0];
+    readerUid = [readerUid stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
+    
+    if ([activeReaderType isEqualToString:@"null"])
+    {
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Select a reader type first"];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }
+    else if ([[readerUid lowercaseString] isEqualToString:@"all"])
+    {
+        [sharedManager.reader suspendScan];  // stop all active readers
+    }
+    else
+    {
+        // stop a specific reader
+    }
+}
+
+- (void)setReaderConnectCallback:(CDVInvokedUrlCommand*)command
+{
+    readerConnected_callbackId = command.callbackId;
+}
+
+////////////////////// INTERNAL FUNCTIONS /////////////////////////
+
+/** Set the scan period (in ms) */
+- (void)setScanPeriod:(NSString*)periodString callbackId:(NSString*)callbackId;
+{
+    NSString* trimmedString = [periodString stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
     int scanPeriod = [trimmedString intValue];
+    //    int scanPeriod = [command.arguments objectAtIndex:0];
     
     if (scanPeriod > 0)
     {
@@ -44,67 +136,31 @@ Uses Flomio SDK version 1.9
     }
     else
     {
-        // throw error
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Scan period must be > 0"];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
     }
 }
 
 /** Toggle on/off scan sound */
-- (void)setScanSound:(CDVInvokedUrlCommand *)command
+- (void)toggleScanSound:(NSString*)toggleString callbackId:(NSString*)callbackId;
 {
-    NSString* scanSound = [command.arguments objectAtIndex:0];
-    NSString* trimmedString = [scanSound stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
+    NSString* toggle = [toggleString stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
     
-    if ([[trimmedString lowercaseString] isEqualToString:@"true"])
+    if ([[toggle lowercaseString] isEqualToString:@"true"])
     {
         sharedManager.scanSound = [NSNumber numberWithBool:YES];
         [sharedManager updateReaderSettings];
     }
-    else if ([[trimmedString lowercaseString] isEqualToString:@"false"])
+    else if ([[toggle lowercaseString] isEqualToString:@"false"])
     {
         sharedManager.scanSound = [NSNumber numberWithBool:NO];
         [sharedManager updateReaderSettings];
     }
     else
     {
-        // throw error
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Enter 'true' or 'false' only"];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
     }
-}
-
-/** Select the active reader */
-- (void)selectReader:(CDVInvokedUrlCommand*)command
-{
-    NSString* readerType = [command.arguments objectAtIndex:0];
-    NSString* trimmedString = [readerType stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
-    
-    if ([[trimmedString lowercaseString] isEqualToString:@"flojack"])
-    {
-        [sharedManager setDeviceType:kFlojack];
-    }
-    else if ([[trimmedString lowercaseString] isEqualToString:@"floble-emv"])
-    {
-        [sharedManager setDeviceType:kFloBleEmv];
-    }
-    else if ([[trimmedString lowercaseString] isEqualToString:@"floble-plus"])
-    {
-        [sharedManager setDeviceType:kFloBlePlus];
-    }
-    else
-    {
-        // throw error
-    }
-}
-
-/** Starts the reader polling for tags */
-- (void)startPolling:(CDVInvokedUrlCommand*)command
-{
-    [sharedManager.reader startScan];  // start the active reader
-    didFindATagUUID_callbackId = command.callbackId;
-}
-
-/** Stops the reader polling for tags */
-- (void)stopPolling:(CDVInvokedUrlCommand*)command
-{
-    [sharedManager.reader sleep];  // stop the active reader
 }
 
 /** Called when the app becomes active */
@@ -117,7 +173,7 @@ Uses Flomio SDK version 1.9
 /** Called when the app becomes inactive */
 - (void)inactive
 {
-    [sharedManager.reader sleep];
+    [sharedManager.reader sleep];  // sleep all active readers
 }
 
 /** Sets the connected/disconnected image */
@@ -147,7 +203,7 @@ Uses Flomio SDK version 1.9
 /** Receives the list of connected peripherals */
 - (void)didUpdateConnectedPeripherals:(NSArray *)peripherals
 {
-    //Return the list of connected peripherals
+    connectedPeripherals = peripherals;
 }
 
 /** Receives the UUID of a scanned tag */
