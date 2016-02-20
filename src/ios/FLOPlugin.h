@@ -15,6 +15,7 @@ Uses Flomio SDK version 1.9
     // Cordova attributes
     NSString* didFindATagUUID_callbackId;
     NSString* readerConnected_callbackId;
+    NSString* readerStatusChange_callbackId;
     NSString* activeReaderType;
 }
 
@@ -29,11 +30,11 @@ Uses Flomio SDK version 1.9
 - (void)sendApdu:(CDVInvokedUrlCommand*)command;
 
 // Internal functions (these perform input validation)
-- (void)setScanPeriod:(NSString*)periodString callbackId:(NSString*)callbackId;
-- (void)toggleScanSound:(NSString*)toggleString callbackId:(NSString*)callbackId;
-- (void)setOperationState:(NSString*)state callbackId:(NSString*)callbackId;
-- (void)setStartBlock:(NSString*)blockString callbackId:(NSString*)callbackId;
-- (void)setMessageToWrite:(NSString*)message callbackId:(NSString*)callbackId;
+- (void)setScanPeriod:(NSString*)periodString :(NSString*)callbackId;
+- (void)toggleScanSound:(NSString*)toggleString :(NSString*)callbackId;
+- (void)setOperationState:(NSString*)state :(NSString*)callbackId;
+- (void)setStartBlock:(NSString*)blockString :(NSString*)callbackId;
+- (void)setMessageToWrite:(NSString*)message :(NSString*)callbackId;
 
 // Internal Flo-reader functions
 - (void)ReaderManager:(Reader *)reader readerAlert:(UIImageView *)imageView;

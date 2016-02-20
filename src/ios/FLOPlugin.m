@@ -37,6 +37,13 @@ Uses Flomio SDK version 1.9
     NSString* operationState = [command.arguments objectAtIndex:2];
     NSString* startBlock = [command.arguments objectAtIndex:3];
     NSString* messageToWrite = [command.arguments objectAtIndex:4];
+    
+    NSString* callbackId = command.callbackId;
+    [self setScanPeriod:scanPeriod :callbackId];
+    [self toggleScanSound:scanSound :callbackId];
+    [self setOperationState:operationState :callbackId];
+    [self setStartBlock:startBlock :callbackId];
+    [self setMessageToWrite:messageToWrite :callbackId];
 }
 
 /** Stops the active reader then selects the new active reader */
@@ -115,6 +122,16 @@ Uses Flomio SDK version 1.9
     }
 }
 
+- (void)sendApdu:(CDVInvokedUrlCommand *)command
+{
+    
+}
+
+- (void)setReaderStatusChangeCallback:(CDVInvokedUrlCommand *)command
+{
+    readerStatusChange_callbackId = command.callbackId;
+}
+
 - (void)setReaderConnectCallback:(CDVInvokedUrlCommand*)command
 {
     readerConnected_callbackId = command.callbackId;
@@ -123,7 +140,7 @@ Uses Flomio SDK version 1.9
 ////////////////////// INTERNAL FUNCTIONS /////////////////////////
 
 /** Set the scan period (in ms) */
-- (void)setScanPeriod:(NSString*)periodString callbackId:(NSString*)callbackId;
+- (void)setScanPeriod:(NSString*)periodString :(NSString*)callbackId;
 {
     NSString* trimmedString = [periodString stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
     int scanPeriod = [trimmedString intValue];
@@ -142,7 +159,7 @@ Uses Flomio SDK version 1.9
 }
 
 /** Toggle on/off scan sound */
-- (void)toggleScanSound:(NSString*)toggleString callbackId:(NSString*)callbackId;
+- (void)toggleScanSound:(NSString*)toggleString :(NSString*)callbackId;
 {
     NSString* toggle = [toggleString stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
     
@@ -162,6 +179,66 @@ Uses Flomio SDK version 1.9
         [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
     }
 }
+
+- (void)setMessageToWrite:(NSString *)message :(NSString *)callbackId
+{
+    if (![message isEqualToString:@""])
+    {
+        sharedManager.messageToWrite = message;
+        [sharedManager updateReaderSettings];
+    }
+    else
+    {
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Enter a non-empty message"];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
+    }
+}
+
+- (void)setStartBlock:(NSString *)blockString :(NSString *)callbackId
+{
+    // TODO: input validation
+    
+    NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
+    formatter.numberStyle = NSNumberFormatterDecimalStyle;
+    NSNumber *startBlock = [formatter numberFromString:blockString];
+    
+    if (!startBlock == nil)
+    {
+        sharedManager.startBlock = startBlock;
+        [sharedManager updateReaderSettings];
+    }
+    else
+    {
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Enter a non-empty start block"];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
+    }
+}
+
+- (void)setOperationState:(NSString *)state :(NSString *)callbackId
+{
+    if ([state isEqualToString:@"read-uid"])
+    {
+        sharedManager.operationState = kReadUUID;
+        [sharedManager updateReaderSettings];
+    }
+    else if ([state isEqualToString:@"read-data-blocks"])
+    {
+        sharedManager.operationState = kReadDataBlocks;
+        [sharedManager updateReaderSettings];
+    }
+    else if ([state isEqualToString:@"write-data-blocks"])
+    {
+        sharedManager.operationState = kWriteDataBlocks;
+        [sharedManager updateReaderSettings];
+    }
+    else
+    {
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Enter a valid operation state"];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
+    }
+}
+
+////////////////////// INTERNAL FLO-READER FUNCTIONS /////////////////////////
 
 /** Called when the app becomes active */
 - (void)active
@@ -233,13 +310,20 @@ Uses Flomio SDK version 1.9
 - (void)ReaderManager:(Reader *)reader didSendBatteryLevel:(int)level
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        //Use the main queue if the UI must be updated with level
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsInt:level];
+        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:readerStatusChange_callbackId];
     });
 }
 
+/** Receives the active device connect/disconnect */
 - (void)ReaderManager:(Reader *)reader isConnected:(BOOL)connected
 {
-    //TRUE or FALSE 
+    dispatch_async(dispatch_get_main_queue(), ^{
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:connected];
+        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:readerConnected_callbackId];
+    });
 }
 
 @end
