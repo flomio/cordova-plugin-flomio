@@ -13,7 +13,12 @@ Uses Flomio SDK version 1.9
 {
     sharedManager = [ReaderManager sharedManager];
     sharedManager.delegate = self;
+    [sharedManager startReaders];
+    
+    // Initialise strings
     activeReaderType = @"null";
+    didFindATagUUID_callbackId = @"null";
+    readerStatusChange_callbackId = @"null";
     
     // Set SDK configuration and update reader settings
     sharedManager.deviceEnabled = [NSNumber numberWithBool:YES]; //enable the reader
@@ -57,19 +62,16 @@ Uses Flomio SDK version 1.9
     {
         activeReaderType = @"flojack";
         [sharedManager setDeviceType:kFlojack];
-        [sharedManager startReaders];
     }
     else if ([[trimmedString lowercaseString] isEqualToString:@"floble-emv"])
     {
         activeReaderType = @"floble-emv";
         [sharedManager setDeviceType:kFloBleEmv];
-        [sharedManager startReaders];
     }
     else if ([[trimmedString lowercaseString] isEqualToString:@"floble-plus"])
     {
         activeReaderType = @"floble-plus";
         [sharedManager setDeviceType:kFloBlePlus];
-        [sharedManager startReaders];
     }
     else
     {
@@ -89,7 +91,7 @@ Uses Flomio SDK version 1.9
     if ([activeReaderType isEqualToString:@"null"])
     {
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Select a reader type first"];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:didFindATagUUID_callbackId];
     }
     else if ([[readerUid lowercaseString] isEqualToString:@"all"])
     {
@@ -130,11 +132,6 @@ Uses Flomio SDK version 1.9
 - (void)setReaderStatusChangeCallback:(CDVInvokedUrlCommand *)command
 {
     readerStatusChange_callbackId = command.callbackId;
-}
-
-- (void)setReaderConnectCallback:(CDVInvokedUrlCommand*)command
-{
-    readerConnected_callbackId = command.callbackId;
 }
 
 ////////////////////// INTERNAL FUNCTIONS /////////////////////////
@@ -202,7 +199,7 @@ Uses Flomio SDK version 1.9
     formatter.numberStyle = NSNumberFormatterDecimalStyle;
     NSNumber *startBlock = [formatter numberFromString:blockString];
     
-    if (!startBlock == nil)
+    if (startBlock != nil)
     {
         sharedManager.startBlock = startBlock;
         [sharedManager updateReaderSettings];
@@ -256,11 +253,6 @@ Uses Flomio SDK version 1.9
 /** Sets the connected/disconnected image */
 - (void)ReaderManager:(Reader *)reader readerAlert:(UIImageView *)imageView
 {
-    if (!reader.delegate)
-    {
-        reader.delegate = self; // Set reader delagate once it's clear reader's connected
-    }
-    
     imageView.hidden = NO;
     imageView.alpha = 1.0f;
     
@@ -290,10 +282,13 @@ Uses Flomio SDK version 1.9
         //Use the main queue if the UI must be updated with the tag UUID or the deviceId
         NSLog(@"Found tag UUID: %@ from device:%@",UUID,deviceId);
         
-        NSArray* result = [NSArray arrayWithObjects:UUID, deviceId, nil];
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
-        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:didFindATagUUID_callbackId];
+        if (![didFindATagUUID_callbackId isEqualToString:@"null"])
+        {
+            NSArray* result = @[deviceId, UUID];
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
+            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:didFindATagUUID_callbackId];
+        }
     });
 }
 
@@ -310,9 +305,19 @@ Uses Flomio SDK version 1.9
 - (void)ReaderManager:(Reader *)reader didSendBatteryLevel:(int)level
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsInt:level];
-        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:readerStatusChange_callbackId];
+        NSString* deviceId = @"deviceId";
+        if ([NSNumber numberWithInt:level] != readerTable[deviceId][@"batteryLevel"])
+        {
+            readerTable[deviceId][@"batteryLevel"] = [NSNumber numberWithInt:level];
+            
+            if (![readerStatusChange_callbackId isEqualToString:@"null"])
+            {
+                NSArray* result = @[deviceId, readerTable[deviceId][@"connected"], [NSNumber numberWithBool:!reader.commSuspended], readerTable[deviceId][@"batteryLevel"]];
+                CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
+                [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+                [self.commandDelegate sendPluginResult:pluginResult callbackId:readerStatusChange_callbackId];
+            }
+        }
     });
 }
 
@@ -320,9 +325,27 @@ Uses Flomio SDK version 1.9
 - (void)ReaderManager:(Reader *)reader isConnected:(BOOL)connected
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:connected];
-        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:readerConnected_callbackId];
+        NSString* deviceId = @"deviceId";
+        if (![[readerTable allKeys] containsObject:deviceId])
+        {
+            NSDictionary* newDevice = @{
+                @"connected": [NSNumber numberWithBool:connected],
+                @"batteryLevel": [NSNumber numberWithInt:-1]
+            };
+            readerTable[deviceId] = newDevice;
+        }
+        else
+        {
+            readerTable[deviceId][@"connected"] = [NSNumber numberWithBool:connected];
+        }
+        
+        if (![readerStatusChange_callbackId isEqualToString:@"null"])
+        {
+            NSArray* result = @[deviceId, readerTable[deviceId][@"connected"], [NSNumber numberWithBool:!reader.commSuspended], readerTable[deviceId][@"batteryLevel"]];
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
+            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:readerStatusChange_callbackId];
+        }
     });
 }
 

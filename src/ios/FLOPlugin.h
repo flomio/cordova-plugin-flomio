@@ -13,10 +13,10 @@ Uses Flomio SDK version 1.9
     NSArray* connectedPeripherals;
     
     // Cordova attributes
-    NSString* didFindATagUUID_callbackId;
-    NSString* readerConnected_callbackId;
-    NSString* readerStatusChange_callbackId;
     NSString* activeReaderType;
+    NSMutableDictionary* readerTable;
+    NSString* didFindATagUUID_callbackId;
+    NSString* readerStatusChange_callbackId;
 }
 
 // Cordova functions
@@ -25,7 +25,6 @@ Uses Flomio SDK version 1.9
 - (void)selectReaderType:(CDVInvokedUrlCommand*)command;
 - (void)startReader:(CDVInvokedUrlCommand*)command;
 - (void)stopReader:(CDVInvokedUrlCommand*)command;
-- (void)setReaderConnectCallback:(CDVInvokedUrlCommand*)command;
 - (void)setReaderStatusChangeCallback:(CDVInvokedUrlCommand*)command;
 - (void)sendApdu:(CDVInvokedUrlCommand*)command;
 

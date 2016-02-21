@@ -21,29 +21,12 @@ FLOPlugin.prototype.init = function()
   );
 }
 
-FLOPlugin.prototype.onReaderConnect = function(resultCallback)
-{
-  exec(
-    function(readerUid)
-    {
-      resultCallback({readerUid: readerUid});
-    },
-    function(error)
-    {
-      console.log("ERROR: FloPlugin.onReaderConnect: " + error);
-    },
-    "FLOPlugin",
-    "setReaderConnectCallback",
-    []
-  );
-}
-
 FLOPlugin.prototype.onReaderStatusChange = function(resultCallback)
 {
   exec(
-    function(readerUid, commStatus, batteryLevel)
+    function(readerUid, connected, commStatus, batteryLevel)
     {
-      resultCallback({readerUid: readerUid, commStatus: commStatus, batteryLevel: batteryLevel});
+      resultCallback({readerUid: readerUid, connected: connected, commStatus: commStatus, batteryLevel: batteryLevel});
     },
     function(error)
     {
@@ -155,7 +138,7 @@ FLOPlugin.prototype.startReader = function(resultCallback, readerUid)  // reader
   }
 
   exec(
-    function(tagUid, readerUid)
+    function(readerUid, tagUid)
     {
   	  resultCallback({tagUid: tagUid, readerUid: readerUid});
     },
