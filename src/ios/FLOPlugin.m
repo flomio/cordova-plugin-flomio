@@ -19,6 +19,7 @@ Uses Flomio SDK version 1.9
     activeReaderType = @"null";
     didFindATagUUID_callbackId = @"null";
     readerStatusChange_callbackId = @"null";
+    readerTable = [NSMutableDictionary dictionary];
     
     // Set SDK configuration and update reader settings
     sharedManager.deviceEnabled = [NSNumber numberWithBool:YES]; //enable the reader
@@ -306,9 +307,23 @@ Uses Flomio SDK version 1.9
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSString* deviceId = @"deviceId";
+        
+        // required if this callback is called before isConnected
+        if (![[readerTable allKeys] containsObject:deviceId])
+        {
+            NSMutableDictionary* newDevice = [NSMutableDictionary
+                                              dictionaryWithDictionary:@{
+                                                                         @"connected": [NSNumber numberWithBool:TRUE],
+                                                                         @"batteryLevel": [NSNumber numberWithInt:-1]
+                                                                         }];
+            [readerTable setObject:newDevice forKey:deviceId];
+        }
+        
         if ([NSNumber numberWithInt:level] != readerTable[deviceId][@"batteryLevel"])
         {
-            readerTable[deviceId][@"batteryLevel"] = [NSNumber numberWithInt:level];
+            NSMutableDictionary* device = [readerTable objectForKey:deviceId];
+            [device setObject:[NSNumber numberWithInt:level] forKey:@"batteryLevel"];
+            [readerTable setObject:device forKey:deviceId];
             
             if (![readerStatusChange_callbackId isEqualToString:@"null"])
             {
@@ -326,25 +341,33 @@ Uses Flomio SDK version 1.9
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSString* deviceId = @"deviceId";
+        BOOL firstConnect = FALSE;
+        
+        // required if this callback is called before didSendBatteryLevel
         if (![[readerTable allKeys] containsObject:deviceId])
         {
-            NSDictionary* newDevice = @{
-                @"connected": [NSNumber numberWithBool:connected],
-                @"batteryLevel": [NSNumber numberWithInt:-1]
-            };
-            readerTable[deviceId] = newDevice;
-        }
-        else
-        {
-            readerTable[deviceId][@"connected"] = [NSNumber numberWithBool:connected];
+            firstConnect = TRUE;
+            NSMutableDictionary* newDevice = [NSMutableDictionary
+                                              dictionaryWithDictionary:@{
+                                                                         @"connected": [NSNumber numberWithBool:connected],
+                                                                         @"batteryLevel": [NSNumber numberWithInt:-1]
+                                                                         }];
+            [readerTable setObject:newDevice forKey:deviceId];
         }
         
-        if (![readerStatusChange_callbackId isEqualToString:@"null"])
+        if (([NSNumber numberWithBool:connected] != readerTable[deviceId][@"connected"]) || firstConnect)
         {
-            NSArray* result = @[deviceId, readerTable[deviceId][@"connected"], [NSNumber numberWithBool:!reader.commSuspended], readerTable[deviceId][@"batteryLevel"]];
-            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
-            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:readerStatusChange_callbackId];
+            NSMutableDictionary* device = [readerTable objectForKey:deviceId];
+            [device setObject:[NSNumber numberWithBool:connected] forKey:@"connected"];
+            [readerTable setObject:device forKey:deviceId];
+            
+            if (![readerStatusChange_callbackId isEqualToString:@"null"])
+            {
+                NSArray* result = @[deviceId, readerTable[deviceId][@"connected"], [NSNumber numberWithBool:!reader.commSuspended], readerTable[deviceId][@"batteryLevel"]];
+                CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
+                [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+                [self.commandDelegate sendPluginResult:pluginResult callbackId:readerStatusChange_callbackId];
+            }
         }
     });
 }
