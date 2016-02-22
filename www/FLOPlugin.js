@@ -21,40 +21,6 @@ FLOPlugin.prototype.init = function()
   );
 }
 
-FLOPlugin.prototype.onReaderStatusChange = function(resultCallback)
-{
-  exec(
-    function(readerUid, connected, commStatus, batteryLevel)
-    {
-      resultCallback({readerUid: readerUid, connected: connected, commStatus: commStatus, batteryLevel: batteryLevel});
-    },
-    function(error)
-    {
-      console.log("ERROR: FloPlugin.onReaderStatusChange: " + error);
-    },
-    "FLOPlugin",
-    "setReaderStatusChangeCallback",
-    []
-  );
-}
-
-FLOPlugin.prototype.sendApdu = function(resultCallback, readerUid, apdu)
-{
-  exec(
-    function(responseApdu)
-    {
-      resultCallback({responseApdu: responseApdu});
-    },
-    function(error)
-    {
-      console.log("ERROR: FloPlugin.sendApdu: " + error);
-    },
-    "FLOPlugin",
-    "sendApdu",
-    [readerUid, apdu]
-  );
-}
-
 FLOPlugin.prototype.selectReaderType = function(readerType)
 {
   exec(
@@ -72,13 +38,27 @@ FLOPlugin.prototype.selectReaderType = function(readerType)
   );
 }
 
-FLOPlugin.prototype.setReaderSettings = function(readerSettings)
+FLOPlugin.prototype.setReaderSettings = function(readerUid, readerSettings)
 {
-  // convert dictionary to array
-  var readerSettingsArray = new Array();
-  for (var key in readerSettings)
+  if(typeof readerUid === 'undefined')
   {
-    readerSettingsArray.push(readerSettings[key]);
+    readerUid = "all";
+  }
+
+  var readerSettingsArray = new Array();
+  var keyArray = new Array("scanPeriod", "scanSound", "operationState", "startBlock", "messageToWrite");
+
+  // convert dictionary to array
+  for(index in keyArray)
+  {
+    if(typeof readerSettingsArray[keyArray[index]] === 'undefined')
+    {
+      readerSettingsArray.push("unchanged");
+    }
+    else
+    {
+      readerSettingsArray.push(readerSettings[keyArray[index]]);
+    }
   }
 
   exec(
@@ -92,41 +72,46 @@ FLOPlugin.prototype.setReaderSettings = function(readerSettings)
     },
     "FLOPlugin",
     "setScanPeriod",
-    [readerSettingsArray]
+    readerUid.concat(readerSettingsArray)
   );
 }
 
-FLOPlugin.prototype.setScanPeriod = function(period)
+FLOPlugin.prototype.getReaderSettings = function(readerUid, resultCallback)
 {
+  if(typeof readerUid === 'undefined')
+  {
+    readerUid = "all";
+  }
+
   exec(
-    function()
+    function(scanPeriod, scanSound, operationState, startBlock, messageToWrite)
     {
-      // no result returned
+      resultCallback({scanPeriod: scanPeriod, scanSound: scanSound, operationState: operationState, startBlock: startBlock, messageToWrite: messageToWrite});
     },
     function(error)
     {
-      console.log("ERROR: FloPlugin.setScanPeriod: " + error);
+      console.log("ERROR: FloPlugin.getReaderSettings: " + error);
     },
     "FLOPlugin",
-    "setScanPeriod",
-    [period]
+    "getReaderSettings",
+    [readerUid]
   );
 }
 
-FLOPlugin.prototype.toggleScanSound = function(trueOrFalse)
+FLOPlugin.prototype.onReaderStatusChange = function(resultCallback)
 {
   exec(
-    function()
+    function(readerUid, connected, commStatus, batteryLevel)
     {
-      // no result returned
+      resultCallback({readerUid: readerUid, connected: connected, commStatus: commStatus, batteryLevel: batteryLevel});
     },
     function(error)
     {
-      console.log("ERROR: FloPlugin.toggleScanSound: " + error);
+      console.log("ERROR: FloPlugin.onReaderStatusChange: " + error);
     },
     "FLOPlugin",
-    "toggleScanSound",
-    [trueOrFalse]
+    "setReaderStatusChangeCallback",
+    []
   );
 }
 
@@ -134,13 +119,13 @@ FLOPlugin.prototype.startReader = function(resultCallback, readerUid)  // reader
 {
   if(typeof readerUid === 'undefined')
   {
-  	readerUid = "all";
+    readerUid = "all";
   }
 
   exec(
     function(readerUid, tagUid)
     {
-  	  resultCallback({tagUid: tagUid, readerUid: readerUid});
+      resultCallback({tagUid: tagUid, readerUid: readerUid});
     },
     function(error)
     {
@@ -156,7 +141,7 @@ FLOPlugin.prototype.stopReader = function(readerUid)  // readerUid is optional
 {
   if(typeof readerUid === 'undefined')
   {
-  	readerUid = "all";
+    readerUid = "all";
   }
 
   exec(
@@ -171,6 +156,23 @@ FLOPlugin.prototype.stopReader = function(readerUid)  // readerUid is optional
     "FLOPlugin", 
     "stopReader",  
     [readerUid]
+  );
+}
+
+FLOPlugin.prototype.sendApdu = function(resultCallback, readerUid, apdu)
+{
+  exec(
+    function(responseApdu)
+    {
+      resultCallback({responseApdu: responseApdu});
+    },
+    function(error)
+    {
+      console.log("ERROR: FloPlugin.sendApdu: " + error);
+    },
+    "FLOPlugin",
+    "sendApdu",
+    [readerUid, apdu]
   );
 }
 

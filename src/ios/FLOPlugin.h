@@ -17,11 +17,13 @@ Uses Flomio SDK version 1.9
     NSMutableDictionary* readerTable;
     NSString* didFindATagUUID_callbackId;
     NSString* readerStatusChange_callbackId;
+    NSString* apduResponse_callbackId;
 }
 
 // Cordova functions
 - (void)init:(CDVInvokedUrlCommand*)command;
 - (void)setReaderSettings:(CDVInvokedUrlCommand*)command;
+- (void)getReaderSettings:(CDVInvokedUrlCommand*)command;
 - (void)selectReaderType:(CDVInvokedUrlCommand*)command;
 - (void)startReader:(CDVInvokedUrlCommand*)command;
 - (void)stopReader:(CDVInvokedUrlCommand*)command;
@@ -29,11 +31,12 @@ Uses Flomio SDK version 1.9
 - (void)sendApdu:(CDVInvokedUrlCommand*)command;
 
 // Internal functions (these perform input validation)
-- (void)setScanPeriod:(NSString*)periodString :(NSString*)callbackId;
-- (void)toggleScanSound:(NSString*)toggleString :(NSString*)callbackId;
-- (void)setOperationState:(NSString*)state :(NSString*)callbackId;
-- (void)setStartBlock:(NSString*)blockString :(NSString*)callbackId;
-- (void)setMessageToWrite:(NSString*)message :(NSString*)callbackId;
+- (BOOL)validateDeviceId:(NSString*)deviceId;
+- (void)setScanPeriod:(NSString*)periodString :(NSString*)deviceId :(NSString*)callbackId;
+- (void)toggleScanSound:(NSString*)toggleString :(NSString*)deviceId :(NSString*)callbackId;
+- (void)setOperationState:(NSString*)state :(NSString*)deviceId :(NSString*)callbackId;
+- (void)setStartBlock:(NSString*)blockString :(NSString*)deviceId :(NSString*)callbackId;
+- (void)setMessageToWrite:(NSString*)message :(NSString*)deviceId :(NSString*)callbackId;
 
 // Internal Flo-reader functions
 - (void)ReaderManager:(Reader *)reader readerAlert:(UIImageView *)imageView;
