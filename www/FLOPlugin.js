@@ -38,7 +38,7 @@ FLOPlugin.prototype.selectReaderType = function(readerType)
   );
 }
 
-FLOPlugin.prototype.setReaderSettings = function(readerUid, readerSettings)
+FLOPlugin.prototype.setReaderSettings = function(readerSettings, readerUid)  // readerUid is optional
 {
   if(typeof readerUid === 'undefined')
   {
@@ -76,7 +76,7 @@ FLOPlugin.prototype.setReaderSettings = function(readerUid, readerSettings)
   );
 }
 
-FLOPlugin.prototype.getReaderSettings = function(readerUid, resultCallback)
+FLOPlugin.prototype.getReaderSettings = function(resultCallback, readerUid)  // readerUid is optional
 {
   if(typeof readerUid === 'undefined')
   {
