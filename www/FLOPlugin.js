@@ -61,7 +61,7 @@ FLOPlugin.prototype.setReaderSettings = function(readerSettings, readerUid)  // 
     }
   }
 
-  console.log(readerSettingsArray.unshift(readerUid));
+  console.log(readerSettingsArray.splice(0, 0, readerUid));
 
   exec(
     function()
@@ -74,7 +74,7 @@ FLOPlugin.prototype.setReaderSettings = function(readerSettings, readerUid)  // 
     },
     "FLOPlugin",
     "setScanPeriod",
-    readerSettingsArray.unshift(readerUid)
+    readerSettingsArray.splice(0, 0, readerUid)
   );
 }
 
