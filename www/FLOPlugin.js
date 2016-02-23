@@ -62,7 +62,6 @@ FLOPlugin.prototype.setReaderSettings = function(readerSettings, readerUid)  // 
   }
 
   readerSettingsArray.unshift(readerUid);
-  console.log(readerSettingsArray);
 
   exec(
     function()

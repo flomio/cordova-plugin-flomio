@@ -55,11 +55,13 @@ Uses Flomio SDK version 1.9
     NSString* messageToWrite = [command.arguments objectAtIndex:5];
     
     NSString* callbackId = command.callbackId;
-    [self setScanPeriod:scanPeriod :deviceId :callbackId];
+    [self setScanPeriod:[NSString stringWithFormat:@"%@", scanPeriod] :deviceId :callbackId];
     [self toggleScanSound:scanSound :deviceId :callbackId];
     [self setOperationState:operationState :deviceId :callbackId];
     [self setStartBlock:startBlock :deviceId :callbackId];
     [self setMessageToWrite:messageToWrite :deviceId :callbackId];
+    
+    [sharedManager updateReaderSettings];
 }
 
 /** Retrieve settings for a particular reader */
@@ -210,7 +212,6 @@ Uses Flomio SDK version 1.9
     if (period > 0)
     {
         sharedManager.scanPeriod = [NSNumber numberWithInteger:period];
-        [sharedManager updateReaderSettings];
     }
     else
     {
@@ -223,16 +224,18 @@ Uses Flomio SDK version 1.9
 - (void)toggleScanSound:(NSString*)toggleString :(NSString*)deviceId :(NSString*)callbackId;
 {
     NSString* toggle = [toggleString stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
+    if ([[toggle lowercaseString] isEqualToString:@"unchanged"])
+    {
+        return;
+    }
     
     if ([[toggle lowercaseString] isEqualToString:@"true"])
     {
         sharedManager.scanSound = [NSNumber numberWithBool:YES];
-        [sharedManager updateReaderSettings];
     }
     else if ([[toggle lowercaseString] isEqualToString:@"false"])
     {
         sharedManager.scanSound = [NSNumber numberWithBool:NO];
-        [sharedManager updateReaderSettings];
     }
     else
     {
@@ -244,10 +247,14 @@ Uses Flomio SDK version 1.9
 /** Sets the default message for ALL devices to write */
 - (void)setMessageToWrite:(NSString *)message :(NSString*)deviceId :(NSString *)callbackId
 {
+    if ([[message lowercaseString] isEqualToString:@"unchanged"])
+    {
+        return;
+    }
+    
     if (![message isEqualToString:@""])
     {
         sharedManager.messageToWrite = message;
-        [sharedManager updateReaderSettings];
     }
     else
     {
@@ -259,6 +266,12 @@ Uses Flomio SDK version 1.9
 /** Sets the block to start reading data from on ALL devices */
 - (void)setStartBlock:(NSString *)blockString :(NSString*)deviceId :(NSString *)callbackId
 {
+    blockString = [blockString stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
+    if ([[blockString lowercaseString] isEqualToString:@"unchanged"])
+    {
+        return;
+    }
+    
     // TODO: start block input validation
     
     NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
@@ -268,7 +281,6 @@ Uses Flomio SDK version 1.9
     if (startBlock != nil)
     {
         sharedManager.startBlock = startBlock;
-        [sharedManager updateReaderSettings];
     }
     else
     {
@@ -280,20 +292,24 @@ Uses Flomio SDK version 1.9
 /** Set the operation state for a specific reader */
 - (void)setOperationState:(NSString *)state :(NSString*)deviceId :(NSString *)callbackId
 {
+    state = [state stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
+    if ([[state lowercaseString] isEqualToString:@"unchanged"])
+    {
+        return;
+    }
+    
     if ([state isEqualToString:@"read-uid"])
     {
         sharedManager.operationState = kReadUUID;
-        [sharedManager updateReaderSettings];
+        
     }
     else if ([state isEqualToString:@"read-data-blocks"])
     {
         sharedManager.operationState = kReadDataBlocks;
-        [sharedManager updateReaderSettings];
     }
     else if ([state isEqualToString:@"write-data-blocks"])
     {
         sharedManager.operationState = kWriteDataBlocks;
-        [sharedManager updateReaderSettings];
     }
     else
     {
