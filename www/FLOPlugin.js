@@ -51,7 +51,7 @@ FLOPlugin.prototype.setReaderSettings = function(readerSettings, readerUid)  // 
   // convert dictionary to array
   for(index in keyArray)
   {
-    if(typeof readerSettingsArray[keyArray[index]] === 'undefined')
+    if(typeof readerSettings[keyArray[index]] === 'undefined')
     {
       readerSettingsArray.push("unchanged");
     }
@@ -61,7 +61,7 @@ FLOPlugin.prototype.setReaderSettings = function(readerSettings, readerUid)  // 
     }
   }
 
-  console.log(readerUid.concat(readerSettingsArray));
+  console.log(readerSettingsArray.unshift(readerUid));
 
   exec(
     function()
@@ -74,7 +74,7 @@ FLOPlugin.prototype.setReaderSettings = function(readerSettings, readerUid)  // 
     },
     "FLOPlugin",
     "setScanPeriod",
-    readerUid.concat(readerSettingsArray)
+    readerSettingsArray.unshift(readerUid)
   );
 }
 
