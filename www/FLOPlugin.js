@@ -51,7 +51,7 @@ FLOPlugin.prototype.setReaderSettings = function(readerSettings, readerUid)  // 
   // convert dictionary to array
   for(index in keyArray)
   {
-    if(typeof readerSettingsArray[keyArray[index]] === 'undefined')
+    if(typeof readerSettings[keyArray[index]] === 'undefined')
     {
       readerSettingsArray.push("unchanged");
     }
@@ -60,6 +60,8 @@ FLOPlugin.prototype.setReaderSettings = function(readerSettings, readerUid)  // 
       readerSettingsArray.push(readerSettings[keyArray[index]]);
     }
   }
+
+  readerSettingsArray.unshift(readerUid);
 
   exec(
     function()
@@ -71,8 +73,8 @@ FLOPlugin.prototype.setReaderSettings = function(readerSettings, readerUid)  // 
       console.log("ERROR: FloPlugin.setReaderSettings: " + error);
     },
     "FLOPlugin",
-    "setScanPeriod",
-    readerUid.concat(readerSettingsArray)
+    "setReaderSettings",
+    readerSettingsArray
   );
 }
 
