@@ -74,7 +74,7 @@ FLOPlugin.prototype.setReaderSettings = function(readerSettings, readerUid)  // 
       console.log("ERROR: FloPlugin.setReaderSettings: " + error);
     },
     "FLOPlugin",
-    "setScanPeriod",
+    "setReaderSettings",
     readerSettingsArray
   );
 }
