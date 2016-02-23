@@ -395,7 +395,7 @@ Uses Flomio SDK version 1.9
             // send status update to Cordova
             if (![readerStatusChange_callbackId isEqualToString:@"null"])
             {
-                NSArray* result = @[deviceId, readerTable[deviceId][@"connected"], [NSNumber numberWithBool:!reader.commSuspended], readerTable[deviceId][@"batteryLevel"]];
+                NSArray* result = @[deviceId, readerTable[deviceId][@"connected"], readerTable[deviceId][@"batteryLevel"]];
                 CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
                 [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
                 [self.commandDelegate sendPluginResult:pluginResult callbackId:readerStatusChange_callbackId];
@@ -433,7 +433,7 @@ Uses Flomio SDK version 1.9
             // send status update to Cordova
             if (![readerStatusChange_callbackId isEqualToString:@"null"])
             {
-                NSArray* result = @[deviceId, readerTable[deviceId][@"connected"], [NSNumber numberWithBool:!reader.commSuspended], readerTable[deviceId][@"batteryLevel"]];
+                NSArray* result = @[deviceId, readerTable[deviceId][@"connected"], readerTable[deviceId][@"batteryLevel"]];
                 CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
                 [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
                 [self.commandDelegate sendPluginResult:pluginResult callbackId:readerStatusChange_callbackId];

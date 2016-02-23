@@ -101,9 +101,9 @@ FLOPlugin.prototype.getReaderSettings = function(resultCallback, readerUid)  // 
 FLOPlugin.prototype.onReaderStatusChange = function(resultCallback)
 {
   exec(
-    function(readerUid, connected, commStatus, batteryLevel)
+    function(readerUid, connected, batteryLevel)
     {
-      resultCallback({readerUid: readerUid, connected: connected, commStatus: commStatus, batteryLevel: batteryLevel});
+      resultCallback({readerUid: readerUid, connected: connected, batteryLevel: batteryLevel});
     },
     function(error)
     {
