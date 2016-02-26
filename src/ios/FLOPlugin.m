@@ -58,7 +58,7 @@ Uses Flomio SDK version 1.9
     [self setScanPeriod:[NSString stringWithFormat:@"%@", scanPeriod] :deviceId :callbackId];
     [self toggleScanSound:scanSound :deviceId :callbackId];
     [self setOperationState:operationState :deviceId :callbackId];
-    [self setStartBlock:startBlock :deviceId :callbackId];
+    [self setStartBlock:[NSString stringWithFormat:@"%@", startBlock] :deviceId :callbackId];
     [self setMessageToWrite:messageToWrite :deviceId :callbackId];
     
     [sharedManager updateReaderSettings];
