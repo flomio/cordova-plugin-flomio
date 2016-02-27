@@ -189,7 +189,7 @@ Uses Flomio SDK version 1.9
     readerStatusChange_callbackId = command.callbackId;
 }
 
-- (void)setFlobleConnectedCallback:(CDVInvokedUrlCommand*)command
+- (void)setFlobleConnectCallback:(CDVInvokedUrlCommand*)command
 {
 	flobleConnected_callbackId = command.callbackId;
 }

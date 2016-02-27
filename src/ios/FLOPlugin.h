@@ -30,7 +30,7 @@ Uses Flomio SDK version 1.9
 - (void)stopReader:(CDVInvokedUrlCommand*)command;
 - (void)setReaderStatusChangeCallback:(CDVInvokedUrlCommand*)command;
 - (void)sendApdu:(CDVInvokedUrlCommand*)command;
-- (void)setFlobleConnectedCallback:(CDVInvokedUrlCommand*)command;
+- (void)setFlobleConnectCallback:(CDVInvokedUrlCommand*)command;
 
 // Internal functions (these perform input validation)
 - (BOOL)validateDeviceId:(NSString*)deviceId;
