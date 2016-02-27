@@ -20,6 +20,7 @@ Uses Flomio SDK version 1.9
     didFindATagUUID_callbackId = @"null";
     readerStatusChange_callbackId = @"null";
     apduResponse_callbackId = @"null";
+    flobleConnected_callbackId = @"null";
     readerTable = [NSMutableDictionary dictionary];
     
     // Set SDK configuration and update reader settings
@@ -186,6 +187,11 @@ Uses Flomio SDK version 1.9
 - (void)setReaderStatusChangeCallback:(CDVInvokedUrlCommand *)command
 {
     readerStatusChange_callbackId = command.callbackId;
+}
+
+- (void)setFlobleConnectedCallback:(CDVInvokedUrlCommand*)command
+{
+	flobleConnected_callbackId = command.callbackId;
 }
 
 ////////////////////// INTERNAL FUNCTIONS /////////////////////////
@@ -355,7 +361,9 @@ Uses Flomio SDK version 1.9
 /** Receives the list of connected peripherals */
 - (void)didUpdateConnectedPeripherals:(NSArray *)peripherals
 {
-    connectedPeripherals = peripherals;
+	NSString* deviceId = peripherals[0].identifier;
+	CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Enter a valid reader UID"];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:flobleConnected_callbackId];
 }
 
 /** Receives the UUID of a scanned tag */
