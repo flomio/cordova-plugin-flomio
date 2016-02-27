@@ -362,7 +362,7 @@ Uses Flomio SDK version 1.9
 - (void)didUpdateConnectedPeripherals:(NSArray *)peripherals
 {
 	NSString* deviceId = peripherals[0].identifier;
-	CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Enter a valid reader UID"];
+	CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:deviceId];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:flobleConnected_callbackId];
 }
 
