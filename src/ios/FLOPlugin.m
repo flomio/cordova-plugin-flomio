@@ -397,6 +397,7 @@ Uses Flomio SDK version 1.9
 	dispatch_async(dispatch_get_main_queue(), ^{
         NSString* deviceId = peripherals[0];
 		CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:deviceId];
+		[pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
     	[self.commandDelegate sendPluginResult:pluginResult callbackId:flobleConnected_callbackId];
     });
 }
