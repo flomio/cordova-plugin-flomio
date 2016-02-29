@@ -178,5 +178,22 @@ FLOPlugin.prototype.sendApdu = function(resultCallback, readerUid, apdu)
   );
 }
 
+FLOPlugin.prototype.onFlobleConnect = function(resultCallback)
+{
+  exec(
+    function(readerUid)
+    {
+      resultCallback({readerUid: readerUid});
+    },
+    function(error)
+    {
+      console.log("ERROR: FloPlugin.onFlobleConnect: " + error);
+    },
+    "FLOPlugin",
+    "setFlobleConnectCallback",
+    []
+  );
+}
+
 var floPlugin = new FLOPlugin();
 module.exports = floPlugin;
