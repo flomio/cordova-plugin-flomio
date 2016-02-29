@@ -130,6 +130,8 @@ Uses Flomio SDK version 1.9
 	        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Enter 'FloJack', 'FloBLE-EMV' or 'FloBLE-Plus' only"];
 	        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 	    }
+        
+        [sharedManager startReaders];
 	});
 }
 
@@ -222,8 +224,9 @@ Uses Flomio SDK version 1.9
 /** Set the scan period (in ms) */
 - (void)setScanPeriod:(NSString*)periodString :(NSString*)deviceId :(NSString*)callbackId;
 {
+    periodString = [periodString stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
+    
 	dispatch_async(dispatch_get_main_queue(), ^{
-	    periodString = [periodString stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
 	    if ([[periodString lowercaseString] isEqualToString:@"unchanged"])
 	    {
 	        return;
@@ -292,8 +295,9 @@ Uses Flomio SDK version 1.9
 /** Sets the block to start reading data from on ALL devices */
 - (void)setStartBlock:(NSString *)blockString :(NSString*)deviceId :(NSString *)callbackId
 {
+    blockString = [blockString stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
+    
 	dispatch_async(dispatch_get_main_queue(), ^{
-	    blockString = [blockString stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
 	    if ([[blockString lowercaseString] isEqualToString:@"unchanged"])
 	    {
 	        return;
@@ -320,8 +324,9 @@ Uses Flomio SDK version 1.9
 /** Set the operation state for a specific reader */
 - (void)setOperationState:(NSString *)state :(NSString*)deviceId :(NSString *)callbackId
 {
+    state = [state stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
+    
 	dispatch_async(dispatch_get_main_queue(), ^{
-	    state = [state stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
 	    if ([[state lowercaseString] isEqualToString:@"unchanged"])
 	    {
 	        return;
@@ -390,7 +395,7 @@ Uses Flomio SDK version 1.9
 - (void)didUpdateConnectedPeripherals:(NSArray *)peripherals
 {
 	dispatch_async(dispatch_get_main_queue(), ^{
-		NSString* deviceId = peripherals[0].identifier;
+        NSString* deviceId = peripherals[0];
 		CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:deviceId];
     	[self.commandDelegate sendPluginResult:pluginResult callbackId:flobleConnected_callbackId];
     });
