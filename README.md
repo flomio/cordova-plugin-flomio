@@ -129,9 +129,21 @@ meteor add-platform ios
 	}
 	```
 	
+* `onFlobleConnect(resultCallback)`
+
+	Assign a callback function for when a new FloBLE device connects to the mobile device
+
+	```
+	function resultCallback(result)
+	Object result
+	{
+		String readerUid  // unique ID number of the reader
+	}
+	```
+
 * `startReader(resultCallback, readerUid)`
 
-	Start polling for proximity ID tags with the target reader
+	Start polling for proximity ID tags with a connected **FloJack** reader
 	
 	```
 	function resultCallback(result)
