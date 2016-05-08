@@ -60,7 +60,7 @@ meteor add-platform ios
 
 - Add `-lc++` to "Other Linker Flags" under "Build Settings".
 
-- Goto "Build Settings -> Build Options -> Enable Bitcode" and **disable** bitcode.
+- (optional) Goto "Build Settings -> Build Options -> Enable Bitcode" and **disable** bitcode.
 
 - Manually add the SDK folder to library search paths. "Build Settings -> Search Paths -> User Header Search Paths", double-click and add `$(SRCROOT)/FlomioSDKv1.<X>/include/SDKClasses`.
 
