@@ -62,7 +62,7 @@ meteor add-platform ios
 
 - (optional) Goto "Build Settings -> Build Options -> Enable Bitcode" and **disable** bitcode.
 
-- Manually add the SDK folder to library search paths. "Build Settings -> Search Paths -> User Header Search Paths", double-click and add `$(SRCROOT)/FlomioSDKv1.<X>/include/SDKClasses`.
+- (optional) Manually add the SDK folder to library search paths. "Build Settings -> Search Paths -> User Header Search Paths", double-click and add `$(SRCROOT)/FlomioSDKv1.<X>/include/SDKClasses`.
 
 - Build and run the app on an iOS device.
 
