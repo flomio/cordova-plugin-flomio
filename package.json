@@ -13,10 +13,8 @@
   "keywords": [
     "NFC",
     "BLE",
-    "UHF",
-    "RFID",
-    "Proximity",
-    "ID"
+    "UHF RFID",
+    "Proximity ID"
   ],
   "author": "Richard Grundy",
   "license": "ISC",
