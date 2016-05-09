@@ -2,9 +2,9 @@ var exec = require('cordova/exec');
 /**
  * Constructor
  */
-function FLOPlugin() {}
+function FlomioPlugin() {}
 
-FLOPlugin.prototype.init = function()
+FlomioPlugin.prototype.init = function()
 {
   exec(
     function()  // result handler, response from native method call
@@ -13,15 +13,15 @@ FLOPlugin.prototype.init = function()
     },
     function(error)  // error handler
     {
-      console.log("ERROR: FloPlugin.init: " + error);
+      console.log("ERROR: FlomioPlugin.init: " + error);
     },
-    "FLOPlugin",
+    "FlomioPlugin",
     "init",
     []
   );
 }
 
-FLOPlugin.prototype.selectReaderType = function(readerType)
+FlomioPlugin.prototype.selectReaderType = function(readerType)
 {
   exec(
     function()
@@ -30,15 +30,15 @@ FLOPlugin.prototype.selectReaderType = function(readerType)
     },
     function(error)
     {
-      console.log("ERROR: FloPlugin.selectReaderType: " + error);
+      console.log("ERROR: FlomioPlugin.selectReaderType: " + error);
     },
-    "FLOPlugin",
+    "FlomioPlugin",
     "selectReaderType",
-    [readerType]  // readerType is "FloJack", "FloBLE-EMV" or "FloBLE-Plus" (case insensitive)
+    [readerType]  // readerType is "FloJack-BZR", "FloJack-MSR", "FloBLE-EMV" or "FloBLE-Plus" (case insensitive)
   );
 }
 
-FLOPlugin.prototype.setReaderSettings = function(readerSettings, readerUid)  // readerUid is optional
+FlomioPlugin.prototype.setReaderSettings = function(readerSettings, readerUid)  // readerUid is optional
 {
   if(typeof readerUid === 'undefined')
   {
@@ -72,13 +72,13 @@ FLOPlugin.prototype.setReaderSettings = function(readerSettings, readerUid)  // 
     {
       console.log("ERROR: FloPlugin.setReaderSettings: " + error);
     },
-    "FLOPlugin",
+    "FlomioPlugin",
     "setReaderSettings",
     readerSettingsArray
   );
 }
 
-FLOPlugin.prototype.getReaderSettings = function(resultCallback, readerUid)  // readerUid is optional
+FlomioPlugin.prototype.getReaderSettings = function(resultCallback, readerUid)  // readerUid is optional
 {
   if(typeof readerUid === 'undefined')
   {
@@ -92,15 +92,15 @@ FLOPlugin.prototype.getReaderSettings = function(resultCallback, readerUid)  // 
     },
     function(error)
     {
-      console.log("ERROR: FloPlugin.getReaderSettings: " + error);
+      console.log("ERROR: FlomioPlugin.getReaderSettings: " + error);
     },
-    "FLOPlugin",
+    "FlomioPlugin",
     "getReaderSettings",
     [readerUid]
   );
 }
 
-FLOPlugin.prototype.onReaderStatusChange = function(resultCallback)
+FlomioPlugin.prototype.onReaderStatusChange = function(resultCallback)
 {
   exec(
     function(readerUid, connected, batteryLevel)
@@ -109,15 +109,15 @@ FLOPlugin.prototype.onReaderStatusChange = function(resultCallback)
     },
     function(error)
     {
-      console.log("ERROR: FloPlugin.onReaderStatusChange: " + error);
+      console.log("ERROR: FlomioPlugin.onReaderStatusChange: " + error);
     },
-    "FLOPlugin",
+    "FlomioPlugin",
     "setReaderStatusChangeCallback",
     []
   );
 }
 
-FLOPlugin.prototype.startReader = function(resultCallback, readerUid)  // readerUid is optional
+FlomioPlugin.prototype.startReader = function(resultCallback, readerUid)  // readerUid is optional
 {
   if(typeof readerUid === 'undefined')
   {
@@ -131,15 +131,15 @@ FLOPlugin.prototype.startReader = function(resultCallback, readerUid)  // reader
     },
     function(error)
     {
-      console.log("ERROR: FloPlugin.startReader: " + error);
+      console.log("ERROR: FlomioPlugin.startReader: " + error);
     }, 
-    "FLOPlugin", 
+    "FlomioPlugin", 
     "startReader",
     [readerUid]
   );
 }
 
-FLOPlugin.prototype.stopReader = function(readerUid)  // readerUid is optional
+FlomioPlugin.prototype.stopReader = function(readerUid)  // readerUid is optional
 {
   if(typeof readerUid === 'undefined')
   {
@@ -153,15 +153,15 @@ FLOPlugin.prototype.stopReader = function(readerUid)  // readerUid is optional
     },
     function(error)
     {
-      console.log("ERROR: FloPlugin.stopReader: " + error);
+      console.log("ERROR: FlomioPlugin.stopReader: " + error);
     }, 
-    "FLOPlugin", 
+    "FlomioPlugin", 
     "stopReader",  
     [readerUid]
   );
 }
 
-FLOPlugin.prototype.sendApdu = function(resultCallback, readerUid, apdu)
+FlomioPlugin.prototype.sendApdu = function(resultCallback, readerUid, apdu)
 {
   exec(
     function(responseApdu)
@@ -170,15 +170,15 @@ FLOPlugin.prototype.sendApdu = function(resultCallback, readerUid, apdu)
     },
     function(error)
     {
-      console.log("ERROR: FloPlugin.sendApdu: " + error);
+      console.log("ERROR: FlomioPlugin.sendApdu: " + error);
     },
-    "FLOPlugin",
+    "FlomioPlugin",
     "sendApdu",
     [readerUid, apdu]
   );
 }
 
-FLOPlugin.prototype.onFlobleConnect = function(resultCallback)
+FlomioPlugin.prototype.onFlobleConnect = function(resultCallback)
 {
   exec(
     function(readerUid)
@@ -187,13 +187,13 @@ FLOPlugin.prototype.onFlobleConnect = function(resultCallback)
     },
     function(error)
     {
-      console.log("ERROR: FloPlugin.onFlobleConnect: " + error);
+      console.log("ERROR: FlomioPlugin.onFlobleConnect: " + error);
     },
-    "FLOPlugin",
+    "FlomioPlugin",
     "setFlobleConnectCallback",
     []
   );
 }
 
-var floPlugin = new FLOPlugin();
-module.exports = floPlugin;
+var flomioPlugin = new FlomioPlugin();
+module.exports = flomioPlugin;

@@ -1,14 +1,14 @@
 /*
-FLOPlugin.h
+FlomioPlugin.h
 Uses Flomio SDK version 1.9
 */
 
 #import <Cordova/CDV.h>
 #import "ReaderManager.h"
 
-@interface FLOPlugin : CDVPlugin <ReaderManagerDelegate>
+@interface FlomioPlugin : CDVPlugin <ReaderManagerDelegate>
 {
-    // Flo-reader attributes
+    // Flomio reader attributes
     ReaderManager *sharedManager;
     NSMutableArray* connectedPeripherals;
     
@@ -40,7 +40,7 @@ Uses Flomio SDK version 1.9
 - (void)setStartBlock:(NSString*)blockString :(NSString*)deviceId :(NSString*)callbackId;
 - (void)setMessageToWrite:(NSString*)message :(NSString*)deviceId :(NSString*)callbackId;
 
-// Internal Flo-reader functions
+// Internal Flomio reader functions
 - (void)ReaderManager:(Reader *)reader readerAlert:(UIImageView *)imageView;
 - (void)didUpdateConnectedPeripherals:(NSArray *)peripherals;
 - (void)didFindATagUUID:(NSString *)UUID fromDevice:(NSString *)deviceId;

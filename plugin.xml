@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
-    id="com.flomio.proximityid"
+    id="com.flomio.sdk"
     version="0.1.0">
-    <name>Flomio Proximity ID</name>
-    <description>Operates Flomio's NFC, BLE, and UHF RFID hardware.</description>
+    <name>Flomio SDK Integration</name>
+    <description>Integrates with Flomio SDK to enable NFC, BLE, and UHF RFID reader hardware.</description>
     <!-- ios -->
     <platform name="ios">    
         <config-file target="config.xml" parent="/*">
-            <feature name="FLOPlugin">
-                <param name="ios-package" value="FLOPlugin" /> 
+            <feature name="FlomioPlugin">
+                <param name="ios-package" value="FlomioPlugin" /> 
             </feature>
         </config-file>
-        <js-module src="www/FLOPlugin.js" name="FLOPlugin">
+        <js-module src="www/FlomioPlugin.js" name="FlomioPlugin">
             <clobbers target="floPlugin" />
         </js-module>
-        <header-file src="src/ios/FLOPlugin.h" />
-		<source-file src="src/ios/FLOPlugin.m" />
+        <header-file src="src/ios/FlomioPlugin.h" />
+		<source-file src="src/ios/FlomioPlugin.m" />
     </platform>
 </plugin>

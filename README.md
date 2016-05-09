@@ -1,6 +1,6 @@
 # Flomio Cordova Plugin
 
-Flomio's Proximity ID plugin for Cordova / Meteor
+Flomio's SDK plugin for Cordova / Meteor
 
 *Important:* targeting of specific readers via their UID is not supported, but will be in SDK v2.0. In the mean time, please omit any `readerUid` arguments. This means that **all** readers will be targeted with any functions you call
 
@@ -13,9 +13,9 @@ Flomio's Proximity ID plugin for Cordova / Meteor
 - Create your Cordova or Meteor example app.
 
 ```bash
-cordova create my-plugin-example-app && cd $_
+cordova create flomio-plugin-example-app && cd $_
 --
-meteor create my-plugin-example-app && cd $_
+meteor create flomio-plugin-example-app && cd $_
 ```
 
 - Add the plugin to it.
@@ -23,14 +23,14 @@ meteor create my-plugin-example-app && cd $_
 ```bash
 cordova plugin add https://github.com/flomio/flomio_cordova_plugin.git
 --
-meteor add cordova:com.flomio.proximityid@https://github.com/flomio/flomio_cordova_plugin/tarball/<latest-commit-code>
+meteor add cordova:com.flomio.sdk@https://github.com/flomio/flomio_cordova_plugin/tarball/<latest-commit-code>
 ```
 
 - Register plugin within `config.xml` of your app in Cordova. Meteor takes care of this for you (so skip this step).
 
 ```xml
-<feature name="FLOPlugin">
-    <param name="ios-package" value="FLOPlugin" />
+<feature name="FlomioPlugin">
+    <param name="ios-package" value="FlomioPlugin" />
 </feature>
 ```
 
@@ -41,9 +41,9 @@ function resultCallback(result)
 {
 	console.log(result);
 }
-floPlugin.init();
-floPlugin.selectReaderType("flojack");
-floPlugin.startReader(resultCallback);  // note: reader UID is omitted so all connected devices will start polling
+flomioPlugin.init();
+flomioPlugin.selectReaderType("flojack-msr");
+flomioPlugin.startReader(resultCallback);  // note: reader UID is omitted so all connected devices will start polling
 ```
 
 - Prepare the app.
@@ -60,10 +60,6 @@ meteor add-platform ios
 
 - Add `-lc++` to "Other Linker Flags" under "Build Settings".
 
-- (optional) Goto "Build Settings -> Build Options -> Enable Bitcode" and **disable** bitcode.
-
-- (optional) Manually add the SDK folder to library search paths. "Build Settings -> Search Paths -> User Header Search Paths", double-click and add `$(SRCROOT)/FlomioSDKv1.<X>/include/SDKClasses`.
-
 - Build and run the app on an iOS device.
 
 ## API
@@ -76,9 +72,9 @@ meteor add-platform ios
 	
 * `selectReaderType(readerType)`
 
-	Activates the specified reader type for the current session. Choice of FloJack, FloBLE-EMV or FloBLE-Plus
+	Activates the specified reader type for the current session. Choice of FloJack-BZR, FloJack-MSR, FloBLE-EMV or FloBLE-Plus
 	
-	`String readerType: <"flojack", "floble-emv" or "floble-plus">`
+	`String readerType: <"flojack-bzr", "flojack-msr", "floble-emv" or "floble-plus">`
 	
 **Optional methods**
 
