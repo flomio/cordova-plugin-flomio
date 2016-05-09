@@ -1,12 +1,12 @@
 /*
-FLOPlugin.m
+FlomioPlugin.m
 Uses Flomio SDK version 1.9
 */
 
-#import "FLOPlugin.h"
+#import "FlomioPlugin.h"
 #import <Cordova/CDV.h>
 
-@implementation FLOPlugin
+@implementation FlomioPlugin
 
 /** Initialise the plugin */
 - (void)init:(CDVInvokedUrlCommand*)command
@@ -103,11 +103,16 @@ Uses Flomio SDK version 1.9
     NSString* readerType = [command.arguments objectAtIndex:0];
     readerType = [readerType stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
     [sharedManager.reader suspendScan];  // stop all active readers
-    
-    if ([[readerType lowercaseString] isEqualToString:@"flojack"])
+   
+    if ([[readerType lowercaseString] isEqualToString:@"flojack-bzr"])
     {
-        activeReaderType = @"flojack";
-        [sharedManager setDeviceType:kFlojack];
+        activeReaderType = @"flojack-bzr";
+        [sharedManager setDeviceType:kFlojackBzr];
+    }
+    else if ([[readerType lowercaseString] isEqualToString:@"flojack-msr"])
+    {
+        activeReaderType = @"flojack-msr";
+        [sharedManager setDeviceType:kFlojackMsr];
     }
     else if ([[readerType lowercaseString] isEqualToString:@"floble-emv"])
     {
@@ -331,7 +336,7 @@ Uses Flomio SDK version 1.9
     }
 }
 
-////////////////////// INTERNAL FLO-READER FUNCTIONS /////////////////////////
+////////////////////// INTERNAL FLOMIO READER FUNCTIONS /////////////////////////
 
 /** Called when the app becomes active */
 - (void)active
