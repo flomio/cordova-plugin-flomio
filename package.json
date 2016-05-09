@@ -1,6 +1,6 @@
 {
   "name": "flomio_cordova_plugin",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Flomio SDK integration enables NFC, BLE, and UHF RFID reader hardware.",
   "main": "www/FlomioPlugin.js",
   "scripts": {
