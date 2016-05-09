@@ -107,12 +107,12 @@ Uses Flomio SDK version 1.9
     if ([[readerType lowercaseString] isEqualToString:@"flojack-bzr"])
     {
         activeReaderType = @"flojack-bzr";
-        [sharedManager setDeviceType:kFlojackBzr];
+        [sharedManager setDeviceType:kFlojackBZR];
     }
     else if ([[readerType lowercaseString] isEqualToString:@"flojack-msr"])
     {
         activeReaderType = @"flojack-msr";
-        [sharedManager setDeviceType:kFlojackMsr];
+        [sharedManager setDeviceType:kFlojackMSR];
     }
     else if ([[readerType lowercaseString] isEqualToString:@"floble-emv"])
     {
