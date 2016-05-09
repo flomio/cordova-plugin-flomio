@@ -3,7 +3,7 @@
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
     id="com.flomio.sdk"
     version="0.1.0">
-    <name>Flomio SDK Integration</name>
+    <name>flomio_cordova_plugin</name>
     <description>Integrates with Flomio SDK to enable NFC, BLE, and UHF RFID reader hardware.</description>
     <!-- ios -->
     <platform name="ios">    

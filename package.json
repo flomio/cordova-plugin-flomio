@@ -1,0 +1,27 @@
+{
+  "name": "flomio_cordova_plugin",
+  "version": "1.0.0",
+  "description": "Integrates with Flomio SDK to enable NFC, BLE, and UHF RFID reader hardware.",
+  "main": "www/FlomioPlugin.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/flomio/flomio_cordova_plugin.git"
+  },
+  "keywords": [
+    "NFC",
+    "BLE",
+    "UHF",
+    "RFID",
+    "Proximity",
+    "ID"
+  ],
+  "author": "Richard Grundy",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/flomio/flomio_cordova_plugin/issues"
+  },
+  "homepage": "https://github.com/flomio/flomio_cordova_plugin#readme"
+}
