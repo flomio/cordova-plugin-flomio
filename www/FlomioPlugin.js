@@ -70,7 +70,7 @@ FlomioPlugin.prototype.setReaderSettings = function(readerSettings, readerUid)  
     },
     function(error)
     {
-      console.log("ERROR: FloPlugin.setReaderSettings: " + error);
+      console.log("ERROR: FlomioPlugin.setReaderSettings: " + error);
     },
     "FlomioPlugin",
     "setReaderSettings",

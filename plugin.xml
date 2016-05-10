@@ -28,7 +28,7 @@
             </feature>
         </config-file>
         <js-module src="www/FlomioPlugin.js" name="FlomioPlugin">
-            <clobbers target="floPlugin" />
+            <clobbers target="flomioPlugin" />
         </js-module>
         <header-file src="src/ios/FlomioPlugin.h" />
 		<source-file src="src/ios/FlomioPlugin.m" />
