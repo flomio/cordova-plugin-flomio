@@ -6,6 +6,16 @@
     <name>flomio_cordova_plugin</name>
     <description>Flomio SDK integration enables NFC, BLE, and UHF RFID reader hardware.</description>
     
+    <engines>
+        <engine name="cordova" version=">=6.1.1"/>
+    </engines>
+
+    <asset src="www/FlomioPlugin.js" target="js/FlomioPlugin.js"/>
+
+    <js-module src="www/FlomioPlugin.js" name="FlomioPlugin">
+        <clobbers target="flomioPlugin" />
+    </js-module>
+
     <!-- android -->
     <platform name="android">
         <config-file target="res/xml/config.xml" parent="/*">
@@ -13,10 +23,7 @@
             <param name="android-package" value="com.flomio.plugin.FlomioPlugin"/>
           </feature>
         </config-file>
-        <js-module src="www/FlomioPlugin.js" name="FlomioPlugin">
-            <clobbers target="floPlugin" />
-        </js-module>
-
+        
         <source-file src="src/android/FlomioPlugin.java" target-dir="src/com/flomio/plugin/"/>
     </platform>
 
@@ -27,9 +34,7 @@
                 <param name="ios-package" value="FlomioPlugin" /> 
             </feature>
         </config-file>
-        <js-module src="www/FlomioPlugin.js" name="FlomioPlugin">
-            <clobbers target="flomioPlugin" />
-        </js-module>
+
         <header-file src="src/ios/FlomioPlugin.h" />
 		<source-file src="src/ios/FlomioPlugin.m" />
     </platform>
