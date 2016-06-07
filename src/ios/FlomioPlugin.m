@@ -1,36 +1,29 @@
 /*
-FlomioPlugin.m
-Uses Flomio SDK version 1.9
+ FlomioPlugin.m
+ Uses Flomio SDK version 2.0
 */
 
 #import "FlomioPlugin.h"
-#import <Cordova/CDV.h>
 
 @implementation FlomioPlugin
 
 /** Initialise the plugin */
 - (void)init:(CDVInvokedUrlCommand*)command
 {
-    sharedManager = [ReaderManager sharedManager];
-    sharedManager.delegate = self;
-    [sharedManager startReaders];
+    readerManager = [FmSessionManager sharedManager];
+    readerManager.delegate = self;
     
     // Initialise strings
-    activeReaderType = @"null";
-    didFindATagUUID_callbackId = @"null";
-    readerStatusChange_callbackId = @"null";
-    apduResponse_callbackId = @"null";
-    flobleConnected_callbackId = @"null";
-    readerTable = [NSMutableDictionary dictionary];
+    self->selectedDeviceType = @"null";
+    self->didFindATagUUID_callbackId = @"null";
+    self->readerStatusChange_callbackId = @"null";
+    self->apduResponse_callbackId = @"null";
+    self->deviceConnected_callbackId = @"null";
+    self->readerTable = [NSMutableDictionary dictionary];
     
     // Set SDK configuration and update reader settings
-    sharedManager.deviceEnabled = [NSNumber numberWithBool:YES]; //enable the reader
-    sharedManager.scanPeriod = [NSNumber numberWithInteger:500]; //in ms
-    sharedManager.scanSound = [NSNumber numberWithBool:YES]; //play scan sound
-    sharedManager.operationState = kReadUUID; //kReadDataBlocks or kWriteDataBlocks
-    sharedManager.startBlock = [NSNumber numberWithInteger:8]; //start reading from 4th data block
-    sharedManager.messageToWrite = @"http://flomio.com"; // set a default message to write
-    [sharedManager updateReaderSettings];
+    readerManager.scanPeriod = [NSNumber numberWithInteger:500]; // in ms
+    readerManager.scanSound = [NSNumber numberWithBool:YES]; // play scan sound
     
     // Stop reader scan when the app becomes inactive
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(inactive) name:UIApplicationDidEnterBackgroundNotification object:nil];
@@ -41,113 +34,76 @@ Uses Flomio SDK version 1.9
 /** Update settings for a particular reader */
 - (void)setReaderSettings:(CDVInvokedUrlCommand*)command
 {
-    NSString* deviceId = [command.arguments objectAtIndex:0];
-    if (![self validateDeviceId:deviceId])
-    {
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Enter a valid reader UID"];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-        return;
-    }
-    
-    NSString* scanPeriod = [command.arguments objectAtIndex:1];
-    NSString* scanSound = [command.arguments objectAtIndex:2];
-    NSString* operationState = [command.arguments objectAtIndex:3];
-    NSString* startBlock = [command.arguments objectAtIndex:4];
-    NSString* messageToWrite = [command.arguments objectAtIndex:5];
+    NSString* scanPeriod = [command.arguments objectAtIndex:0];
+    NSString* scanSound = [command.arguments objectAtIndex:1];
     
     NSString* callbackId = command.callbackId;
-    [self setScanPeriod:[NSString stringWithFormat:@"%@", scanPeriod] :deviceId :callbackId];
-    [self toggleScanSound:scanSound :deviceId :callbackId];
-    [self setOperationState:operationState :deviceId :callbackId];
-    [self setStartBlock:[NSString stringWithFormat:@"%@", startBlock] :deviceId :callbackId];
-    [self setMessageToWrite:messageToWrite :deviceId :callbackId];
-    
-    [sharedManager updateReaderSettings];
+    [self setScanPeriod:[NSString stringWithFormat:@"%@", scanPeriod] :callbackId];
+    [self toggleScanSound:scanSound :callbackId];
 }
 
 /** Retrieve settings for a particular reader */
 - (void)getReaderSettings:(CDVInvokedUrlCommand *)command
 {
 	dispatch_async(dispatch_get_main_queue(), ^{
-	    NSString* deviceId = [command.arguments objectAtIndex:0];
-	    if (![self validateDeviceId:deviceId])
-	    {
-	        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Enter a valid reader UID"];
-	        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-	        return;
-	    }
-	    
-	    NSString* operationState;
-	    if (sharedManager.operationState == kReadUUID)
-	    {
-	        operationState = @"read-uid";
-	    }
-	    else if (sharedManager.operationState == kReadUUID)
-	    {
-	        operationState = @"read-data-blocks";
-	    }
-	    else if (sharedManager.operationState == kReadUUID)
-	    {
-	        operationState = @"write-data-blocks";
-	    }
-	    
-	    NSArray* settings = @[sharedManager.scanPeriod, sharedManager.scanSound, operationState, sharedManager.startBlock, sharedManager.messageToWrite];
+	    NSArray* settings = @[self->selectedDeviceType, readerManager.scanPeriod, readerManager.scanSound];
 	    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:settings];
 	    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 	});
 }
 
-/** Stops active readers of the current type then activates readers of the new type */
-- (void)selectReaderType:(CDVInvokedUrlCommand*)command
+/** Stops active readers of the current type then starts readers of the new type */
+- (void)selectDeviceType:(CDVInvokedUrlCommand*)command
 {
-    NSString* readerType = [command.arguments objectAtIndex:0];
-    readerType = [readerType stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
-    [sharedManager.reader suspendScan];  // stop all active readers
-   
-    if ([[readerType lowercaseString] isEqualToString:@"flojack-bzr"])
+    [readerManager stopReaders];
+    NSString* deviceType = [command.arguments objectAtIndex:0];
+    deviceType = [deviceType stringByReplacingOccurrencesOfString:@" " withString:@""]; // remove whitespace
+    
+    if ([[deviceType lowercaseString] isEqualToString:@"flojack-bzr"])
     {
-        activeReaderType = @"flojack-bzr";
-        [sharedManager setDeviceType:kFlojackBZR];
+        self->selectedDeviceType = @"flojack-bzr";
+        readerManager.selectedDeviceType = kFlojackBzr;
     }
-    else if ([[readerType lowercaseString] isEqualToString:@"flojack-msr"])
+    else if ([[deviceType lowercaseString] isEqualToString:@"flojack-msr"])
     {
-        activeReaderType = @"flojack-msr";
-        [sharedManager setDeviceType:kFlojackMSR];
+        self->selectedDeviceType = @"flojack-msr";
+        readerManager.selectedDeviceType = kFlojackMsr;
     }
-    else if ([[readerType lowercaseString] isEqualToString:@"floble-emv"])
+    else if ([[deviceType lowercaseString] isEqualToString:@"floble-emv"])
     {
-        activeReaderType = @"floble-emv";
-        [sharedManager setDeviceType:kFloBleEmv];
+        self->selectedDeviceType = @"floble-emv";
+        readerManager.selectedDeviceType = kFloBleEmv;
     }
-    else if ([[readerType lowercaseString] isEqualToString:@"floble-plus"])
+    else if ([[deviceType lowercaseString] isEqualToString:@"floble-plus"])
     {
-        activeReaderType = @"floble-plus";
-        [sharedManager setDeviceType:kFloBlePlus];
+        self->selectedDeviceType = @"floble-plus";
+        readerManager.selectedDeviceType = kFloBlePlus;
     }
     else
     {
-        activeReaderType = @"null";
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Enter 'FloJack', 'FloBLE-EMV' or 'FloBLE-Plus' only"];
+        self->selectedDeviceType = @"null";
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Enter 'FloJack-BZR', 'FloJack-MSR', 'FloBLE-EMV' or 'FloBLE-Plus' only"];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }
     
-    [sharedManager startReaders];
+    [readerManager startReaders];
 }
 
-/** Starts the reader polling for tags */
+/** Starts readers polling for tags */
 - (void)startReader:(CDVInvokedUrlCommand*)command
 {
-    didFindATagUUID_callbackId = command.callbackId;
+    self->didFindATagUUID_callbackId = command.callbackId;
     NSString* deviceId = [command.arguments objectAtIndex:0];
+    deviceId = [deviceId stringByReplacingOccurrencesOfString:@" " withString:@""]; // remove whitespace
     
-    if ([activeReaderType isEqualToString:@"null"])
+    if ([self->selectedDeviceType isEqualToString:@"null"])
     {
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Select a reader type first"];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:didFindATagUUID_callbackId];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:self->didFindATagUUID_callbackId];
     }
     else if ([[deviceId lowercaseString] isEqualToString:@"all"])
     {
-        [sharedManager.reader startScan];  // start all active readers
+        [readerManager startReaders]; // start all active readers
     }
     else
     {
@@ -155,20 +111,20 @@ Uses Flomio SDK version 1.9
     }
 }
 
-/** Stops the reader polling for tags */
+/** Stops readers polling for tags */
 - (void)stopReader:(CDVInvokedUrlCommand*)command
 {
     NSString* deviceId = [command.arguments objectAtIndex:0];
-    deviceId = [deviceId stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
+    deviceId = [deviceId stringByReplacingOccurrencesOfString:@" " withString:@""]; // remove whitespace
     
-    if ([activeReaderType isEqualToString:@"null"])
+    if ([self->selectedDeviceType isEqualToString:@"null"])
     {
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Select a reader type first"];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }
     else if ([[deviceId lowercaseString] isEqualToString:@"all"])
     {
-        [sharedManager.reader suspendScan];  // stop all active readers
+        [readerManager stopReaders]; // stop all active readers
     }
     else
     {
@@ -180,27 +136,31 @@ Uses Flomio SDK version 1.9
 - (void)sendApdu:(CDVInvokedUrlCommand *)command
 {
     NSString* deviceId = [command.arguments objectAtIndex:0];
+    NSString* apdu = [command.arguments objectAtIndex:1];
+    
     if (![self validateDeviceId:deviceId])
     {
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Enter a valid reader UID"];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Enter a valid device ID"];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-        return;
     }
-    
-    apduResponse_callbackId = command.callbackId;
-    
-    // TODO: send APDU to reader
+    else
+    {
+        self->apduResponse_callbackId = command.callbackId;
+        
+        for (FmDevice *device in self->connectedDevices)
+        {
+            if (device.device == deviceId)
+            {
+                [device sendApduCommand:apdu];
+                break;
+            }
+        }
+    }
 }
 
-/** Set callback for ALL reader status change events */
-- (void)setReaderStatusChangeCallback:(CDVInvokedUrlCommand *)command
+- (void)setDeviceConnectCallback:(CDVInvokedUrlCommand*)command
 {
-    readerStatusChange_callbackId = command.callbackId;
-}
-
-- (void)setFlobleConnectCallback:(CDVInvokedUrlCommand*)command
-{
-	flobleConnected_callbackId = command.callbackId;
+	self->deviceConnected_callbackId = command.callbackId;
 }
 
 ////////////////////// INTERNAL FUNCTIONS /////////////////////////
@@ -215,7 +175,7 @@ Uses Flomio SDK version 1.9
 }
 
 /** Set the scan period (in ms) */
-- (void)setScanPeriod:(NSString*)periodString :(NSString*)deviceId :(NSString*)callbackId;
+- (void)setScanPeriod:(NSString*)periodString :(NSString*)callbackId;
 {
     periodString = [periodString stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
     
@@ -227,7 +187,7 @@ Uses Flomio SDK version 1.9
     int period = [periodString intValue];
     if (period > 0)
     {
-        sharedManager.scanPeriod = [NSNumber numberWithInteger:period];
+        readerManager.scanPeriod = [NSNumber numberWithInteger:period];
     }
     else
     {
@@ -237,9 +197,9 @@ Uses Flomio SDK version 1.9
 }
 
 /** Toggle on/off scan sound */
-- (void)toggleScanSound:(NSString*)toggleString :(NSString*)deviceId :(NSString*)callbackId;
+- (void)toggleScanSound:(NSString*)toggleString :(NSString*)callbackId;
 {
-    NSString* toggle = [toggleString stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
+    NSString* toggle = [toggleString stringByReplacingOccurrencesOfString:@" " withString:@""]; // remove whitespace
     if ([[toggle lowercaseString] isEqualToString:@"unchanged"])
     {
         return;
@@ -247,11 +207,11 @@ Uses Flomio SDK version 1.9
     
     if ([[toggle lowercaseString] isEqualToString:@"true"])
     {
-        sharedManager.scanSound = [NSNumber numberWithBool:YES];
+        readerManager.scanSound = [NSNumber numberWithBool:YES];
     }
     else if ([[toggle lowercaseString] isEqualToString:@"false"])
     {
-        sharedManager.scanSound = [NSNumber numberWithBool:NO];
+        readerManager.scanSound = [NSNumber numberWithBool:NO];
     }
     else
     {
@@ -260,98 +220,74 @@ Uses Flomio SDK version 1.9
     }
 }
 
-/** Sets the default message for ALL devices to write */
-- (void)setMessageToWrite:(NSString *)message :(NSString*)deviceId :(NSString *)callbackId
-{
-    if ([[message lowercaseString] isEqualToString:@"unchanged"])
-    {
-        return;
-    }
-    
-    if (![message isEqualToString:@""])
-    {
-        sharedManager.messageToWrite = message;
-    }
-    else
-    {
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Enter a non-empty message"];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
-    }
-}
-
-/** Sets the block to start reading data from on ALL devices */
-- (void)setStartBlock:(NSString *)blockString :(NSString*)deviceId :(NSString *)callbackId
-{
-    blockString = [blockString stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
-    
-    if ([[blockString lowercaseString] isEqualToString:@"unchanged"])
-    {
-        return;
-    }
-    
-    // TODO: start block input validation
-    
-    NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
-    formatter.numberStyle = NSNumberFormatterDecimalStyle;
-    NSNumber *startBlock = [formatter numberFromString:blockString];
-    
-    if (startBlock != nil)
-    {
-        sharedManager.startBlock = startBlock;
-    }
-    else
-    {
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Enter a non-empty start block"];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
-    }
-}
-
-/** Set the operation state for a specific reader */
-- (void)setOperationState:(NSString *)state :(NSString*)deviceId :(NSString *)callbackId
-{
-    state = [state stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
-    
-    if ([[state lowercaseString] isEqualToString:@"unchanged"])
-    {
-        return;
-    }
-    
-    if ([state isEqualToString:@"read-uid"])
-    {
-        sharedManager.operationState = kReadUUID;
-        
-    }
-    else if ([state isEqualToString:@"read-data-blocks"])
-    {
-        sharedManager.operationState = kReadDataBlocks;
-    }
-    else if ([state isEqualToString:@"write-data-blocks"])
-    {
-        sharedManager.operationState = kWriteDataBlocks;
-    }
-    else
-    {
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Enter a valid operation state"];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
-    }
-}
-
 ////////////////////// INTERNAL FLOMIO READER FUNCTIONS /////////////////////////
 
 /** Called when the app becomes active */
-- (void)active
-{	
-	dispatch_async(dispatch_get_main_queue(), ^{
-    	NSLog(@"App Activated");
-    	[sharedManager getAvailableReader];
-    });
+- (void)active {
+    NSLog(@"App Activated");
 }
 
 /** Called when the app becomes inactive */
-- (void)inactive
+- (void)inactive {
+    NSLog(@"App Inactive");
+}
+
+/** Called when the list of connected devices is updated */
+- (void)didUpdateConnectedDevices:(NSArray *)connectedDevices {
+    self->connectedDevices = connectedDevices;
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSString* deviceId = self->connectedDevices[0];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:deviceId];
+        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:self->deviceConnected_callbackId];
+    });
+}
+
+/** Called when the list of connected BR500 devices is updated */
+- (void)didUpdateConnectedBr500:(NSArray *)peripherals {
+    // TODO: something
+}
+
+/** Receives the UUID of a scanned tag */
+- (void)didFindATagUUID:(NSString *)UUID fromDevice:(NSString *)deviceId withError:(NSError *)error
 {
-	dispatch_async(dispatch_get_main_queue(), ^{
-    	[sharedManager.reader sleep];  // sleep all active readers
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSLog(@"Found tag UUID: %@ from device:%@", UUID, deviceId);
+        
+        // send tag read update to Cordova
+        if (![self->didFindATagUUID_callbackId isEqualToString:@"null"])
+        {
+            NSArray* result = @[deviceId, UUID];
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
+            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:didFindATagUUID_callbackId];
+        }
+    });
+}
+
+/** Receives APDU responses from connected devices */
+- (void)didRespondToApduCommand:(NSString *)response fromDevice:(NSString *)deviceId withError:(NSError *)error{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSLog(@"Received APDU: %@ from device:%@", response, deviceId); //APDU Response
+        
+        // send response to Cordova
+        if (![self->apduResponse_callbackId isEqualToString:@"null"])
+        {
+            NSArray* result = @[deviceId, response];
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
+            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:didFindATagUUID_callbackId];
+        }
+    });
+}
+
+/** Receives error messages from connected devices */
+- (void)didReceiveReaderError:(NSError *)error {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSLog(@"%@", error); // reader error
+        
+        // TODO: send error to Cordova
     });
 }
 
@@ -372,117 +308,6 @@ Uses Flomio SDK version 1.9
     
     imageView.center = [self.viewController.view convertPoint:self.viewController.view.center fromView:self.viewController.view.superview];
     [self.viewController.view addSubview:imageView];
-}
-
-/** Receives the list of connected peripherals */
-- (void)didUpdateConnectedPeripherals:(NSArray *)peripherals
-{
-	dispatch_async(dispatch_get_main_queue(), ^{
-        NSString* deviceId = peripherals[0];
-		CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:deviceId];
-		[pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-    	[self.commandDelegate sendPluginResult:pluginResult callbackId:flobleConnected_callbackId];
-    });
-}
-
-/** Receives the UUID of a scanned tag */
-- (void)didFindATagUUID:(NSString *)UUID fromDevice:(NSString *)deviceId
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        NSLog(@"Found tag UUID: %@ from device:%@",UUID,deviceId);
-        
-        // send tag read update to Cordova
-        if (![didFindATagUUID_callbackId isEqualToString:@"null"])
-        {
-            NSArray* result = @[deviceId, UUID];
-            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
-            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:didFindATagUUID_callbackId];
-        }
-    });
-}
-
-/** Receives data blocks from the active device */
-- (void)didFindDataBlocks:(NSData *)data fromDevice:(NSString *)deviceId
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        //Use the main queue if the UI must be updated with the data or the deviceId
-        NSLog(@"Found data blocks: %@ from device:%@",data,deviceId);
-    });
-}
-
-/** Receives the battery level of the active device */
-- (void)ReaderManager:(Reader *)reader didSendBatteryLevel:(int)level
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        NSString* deviceId = @"deviceId";  // TODO: remove placeholder value
-        
-        // required if this callback is called before isConnected
-        if (![[readerTable allKeys] containsObject:deviceId])
-        {
-            NSMutableDictionary* newDevice = [NSMutableDictionary
-                                              dictionaryWithDictionary:@{
-                                                                         @"connected": [NSNumber numberWithBool:TRUE],
-                                                                         @"batteryLevel": [NSNumber numberWithInt:-1]
-                                                                         }];
-            [readerTable setObject:newDevice forKey:deviceId];
-        }
-        
-        if ([NSNumber numberWithInt:level] != readerTable[deviceId][@"batteryLevel"])  // if battery level has changed
-        {
-            // update battery level in the reader table
-            NSMutableDictionary* device = [readerTable objectForKey:deviceId];
-            [device setObject:[NSNumber numberWithInt:level] forKey:@"batteryLevel"];
-            [readerTable setObject:device forKey:deviceId];
-            
-            // send status update to Cordova
-            if (![readerStatusChange_callbackId isEqualToString:@"null"])
-            {
-                NSArray* result = @[deviceId, readerTable[deviceId][@"connected"], readerTable[deviceId][@"batteryLevel"]];
-                CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
-                [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-                [self.commandDelegate sendPluginResult:pluginResult callbackId:readerStatusChange_callbackId];
-            }
-        }
-    });
-}
-
-/** Receives the active device connect/disconnect */
-- (void)ReaderManager:(Reader *)reader isConnected:(BOOL)connected
-{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        NSString* deviceId = @"deviceId";  // TODO: remove placeholder value
-        BOOL firstConnect = FALSE;
-        
-        // required if this callback is called before didSendBatteryLevel
-        if (![[readerTable allKeys] containsObject:deviceId])
-        {
-            firstConnect = TRUE;
-            NSMutableDictionary* newDevice = [NSMutableDictionary
-                                              dictionaryWithDictionary:@{
-                                                                         @"connected": [NSNumber numberWithBool:connected],
-                                                                         @"batteryLevel": [NSNumber numberWithInt:-1]
-                                                                         }];
-            [readerTable setObject:newDevice forKey:deviceId];
-        }
-        
-        if (([NSNumber numberWithBool:connected] != readerTable[deviceId][@"connected"]) || firstConnect)  // if status has changed or first connection event
-        {
-            // update connection status in the reader table
-            NSMutableDictionary* device = [readerTable objectForKey:deviceId];
-            [device setObject:[NSNumber numberWithBool:connected] forKey:@"connected"];
-            [readerTable setObject:device forKey:deviceId];
-            
-            // send status update to Cordova
-            if (![readerStatusChange_callbackId isEqualToString:@"null"])
-            {
-                NSArray* result = @[deviceId, readerTable[deviceId][@"connected"], readerTable[deviceId][@"batteryLevel"]];
-                CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
-                [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-                [self.commandDelegate sendPluginResult:pluginResult callbackId:readerStatusChange_callbackId];
-            }
-        }
-    });
 }
 
 @end
