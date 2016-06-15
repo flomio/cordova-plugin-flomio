@@ -21,7 +21,7 @@ FlomioPlugin.prototype.init = function()
   );
 }
 
-FlomioPlugin.prototype.selectReaderType = function(readerType)
+FlomioPlugin.prototype.selectDeviceType = function(deviceType)
 {
   exec(
     function()
@@ -30,11 +30,11 @@ FlomioPlugin.prototype.selectReaderType = function(readerType)
     },
     function(error)
     {
-      console.log("ERROR: FlomioPlugin.selectReaderType: " + error);
+      console.log("ERROR: FlomioPlugin.selectDeviceType: " + error);
     },
     "FlomioPlugin",
-    "selectReaderType",
-    [readerType]  // readerType is "FloJack-BZR", "FloJack-MSR", "FloBLE-EMV" or "FloBLE-Plus" (case insensitive)
+    "selectDeviceType",
+    [deviceType]  // deviceType is "FloJack-BZR", "FloJack-MSR", "FloBLE-EMV" or "FloBLE-Plus" (case insensitive)
   );
 }
 
