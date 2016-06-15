@@ -237,10 +237,13 @@
     self->connectedDevices = connectedDevices;
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSString* deviceId = self->connectedDevices[0];
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:deviceId];
-        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:self->deviceConnected_callbackId];
+        if (![self->deviceConnected_callbackId isEqualToString:@"null"])
+        {
+            NSString* deviceId = self->connectedDevices[0];
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:deviceId];
+            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:self->deviceConnected_callbackId];
+        }
     });
 }
 
@@ -250,20 +253,26 @@
 }
 
 /** Receives the UUID of a scanned tag */
-- (void)didFindATagUUID:(NSString *)UUID fromDevice:(NSString *)deviceId withError:(NSError *)error
+- (void)didFindATagUuid:(NSString *)Uuid fromDevice:(NSString *)deviceId withError:(NSError *)error
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSLog(@"Found tag UUID: %@ from device:%@", UUID, deviceId);
+        NSLog(@"Found tag UUID: %@ from device:%@", Uuid, deviceId);
         
         // send tag read update to Cordova
         if (![self->didFindATagUUID_callbackId isEqualToString:@"null"])
         {
-            NSArray* result = @[deviceId, UUID];
+            NSArray* result = @[deviceId, Uuid];
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
             [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:didFindATagUUID_callbackId];
         }
     });
+}
+
+/** The card has entered or left the scan range of the reader */
+- (void)didChangeCardStatus:(NSNumber *)status fromDevice:(NSString *)device
+{
+    
 }
 
 /** Receives APDU responses from connected devices */

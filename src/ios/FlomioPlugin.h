@@ -41,6 +41,7 @@
 - (void)ReaderManager:(Reader *)reader readerAlert:(UIImageView *)imageView;
 - (void)didUpdateConnectedDevices:(NSArray *)connectedDevices;
 - (void)didUpdateConnectedBr500:(NSArray *)peripherals;
-- (void)didFindATagUUID:(NSString *)UUID fromDevice:(NSString *)deviceId withError:(NSError *)error;
+- (void)didFindATagUuid:(NSString *)UUID fromDevice:(NSString *)deviceId withError:(NSError *)error;
+- (void)didChangeCardStatus:(NSNumber *)status fromDevice:(NSString *)device;
 
 @end
