@@ -14,6 +14,7 @@
     NSString* apduResponse_callbackId;
     NSString* deviceConnected_callbackId;
     NSString* cardStatusChange_callbackId;
+    NSInteger numOfDevices;
     
     // Flomio reader attributes
     FmSessionManager *readerManager;
@@ -26,7 +27,7 @@
 - (void)setReaderSettings:(CDVInvokedUrlCommand*)command;
 - (void)getReaderSettings:(CDVInvokedUrlCommand*)command;
 - (void)selectDeviceType:(CDVInvokedUrlCommand*)command;
-- (void)startReader:(CDVInvokedUrlCommand*)command;
+- (void)setTagUidReadCallback:(CDVInvokedUrlCommand*)command;
 - (void)stopReader:(CDVInvokedUrlCommand*)command;
 - (void)sendApdu:(CDVInvokedUrlCommand*)command;
 - (void)setDeviceConnectCallback:(CDVInvokedUrlCommand*)command;

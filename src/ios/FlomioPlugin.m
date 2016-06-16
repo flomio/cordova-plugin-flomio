@@ -19,6 +19,7 @@
     self->apduResponse_callbackId = @"null";
     self->deviceConnected_callbackId = @"null";
     self->cardStatusChange_callbackId = @"null";
+    self->numOfDevices = 0;
     
     // Set SDK configuration and update reader settings
     readerManager.scanPeriod = [NSNumber numberWithInteger:500]; // in ms
@@ -88,28 +89,6 @@
     [readerManager startReaders];
 }
 
-/** Starts readers polling for tags */
-- (void)startReader:(CDVInvokedUrlCommand*)command
-{
-    self->didFindATagUuid_callbackId = command.callbackId;
-    NSString* deviceId = [command.arguments objectAtIndex:0];
-    deviceId = [deviceId stringByReplacingOccurrencesOfString:@" " withString:@""]; // remove whitespace
-    
-    if ([self->selectedDeviceType isEqualToString:@"null"])
-    {
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Select a device type first"];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:self->didFindATagUuid_callbackId];
-    }
-    else if ([[deviceId lowercaseString] isEqualToString:@"all"])
-    {
-        [readerManager startReaders]; // start all active readers
-    }
-    else
-    {
-        // start a specific reader
-    }
-}
-
 /** Stops readers polling for tags */
 - (void)stopReader:(CDVInvokedUrlCommand*)command
 {
@@ -165,6 +144,12 @@
 - (void)setCardStatusChangeCallback:(CDVInvokedUrlCommand*)command
 {
     self->cardStatusChange_callbackId = command.callbackId;
+}
+
+/** Sets callback for tag UID read events */
+- (void)setTagUidReadCallback:(CDVInvokedUrlCommand*)command
+{
+    self->didFindATagUuid_callbackId = command.callbackId;
 }
 
 ////////////////////// INTERNAL FUNCTIONS /////////////////////////
@@ -240,10 +225,17 @@
 - (void)didUpdateConnectedDevices:(NSArray *)connectedDevices {
     self->connectedDevices = connectedDevices;
     
+    BOOL newDeviceConnected = false;
+    if ([self->connectedDevices count] > self->numOfDevices)
+    {
+        newDeviceConnected = true;
+    }
+    self->numOfDevices = [self->connectedDevices count];
+    
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (![self->deviceConnected_callbackId isEqualToString:@"null"])
+        if (![self->deviceConnected_callbackId isEqualToString:@"null"] && newDeviceConnected)
         {
-            NSString* deviceId = self->connectedDevices[0];
+            NSString* deviceId = [[self->connectedDevices objectAtIndex:0] serialNumber];
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:deviceId];
             [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:self->deviceConnected_callbackId];

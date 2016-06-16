@@ -100,28 +100,6 @@ FlomioPlugin.prototype.getReaderSettings = function(resultCallback, deviceId)  /
   );
 }
 
-FlomioPlugin.prototype.startReader = function(resultCallback, deviceId)  // deviceId is optional
-{
-  if(typeof deviceId === 'undefined')
-  {
-    deviceId = "all";
-  }
-
-  exec(
-    function(deviceId, tagUid)
-    {
-      resultCallback({tagUid: tagUid, deviceId: deviceId});
-    },
-    function(error)
-    {
-      console.log("ERROR: FlomioPlugin.startReader: " + error);
-    }, 
-    "FlomioPlugin", 
-    "startReader",
-    [deviceId]
-  );
-}
-
 FlomioPlugin.prototype.stopReader = function(deviceId)  // deviceId is optional
 {
   if(typeof deviceId === 'undefined')
@@ -178,7 +156,7 @@ FlomioPlugin.prototype.onDeviceConnect = function(resultCallback)
   );
 }
 
-FlomioPlugin.prototype.onCardStatusChange = function(resultCallback)
+FlomioPlugin.prototype.onTagStatusChange = function(resultCallback)
 {
   exec(
     function(deviceId, status)
@@ -187,11 +165,28 @@ FlomioPlugin.prototype.onCardStatusChange = function(resultCallback)
     },
     function(error)
     {
-      console.log("ERROR: FlomioPlugin.onCardStatusChange: " + error);
+      console.log("ERROR: FlomioPlugin.onTagStatusChange: " + error);
     },
     "FlomioPlugin",
     "setCardStatusChangeCallback",
     []
+  );
+}
+
+FlomioPlugin.prototype.onTagUidRead = function(resultCallback)
+{
+  exec(
+    function(deviceId, tagUid)
+    {
+      resultCallback({tagUid: tagUid, deviceId: deviceId});
+    },
+    function(error)
+    {
+      console.log("ERROR: FlomioPlugin.onTagUidRead: " + error);
+    }, 
+    "FlomioPlugin", 
+    "setTagUidReadCallback",
+    [deviceId]
   );
 }
 
