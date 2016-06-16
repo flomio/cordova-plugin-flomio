@@ -38,15 +38,15 @@ FlomioPlugin.prototype.selectDeviceType = function(deviceType)
   );
 }
 
-FlomioPlugin.prototype.setReaderSettings = function(readerSettings, readerUid)  // readerUid is optional
+FlomioPlugin.prototype.setReaderSettings = function(readerSettings, deviceId)  // deviceId is optional
 {
-  if(typeof readerUid === 'undefined')
+  if(typeof deviceId === 'undefined')
   {
-    readerUid = "all";
+    deviceId = "all";
   }
 
   var readerSettingsArray = new Array();
-  var keyArray = new Array("scanPeriod", "scanSound", "operationState", "startBlock", "messageToWrite");
+  var keyArray = new Array("scanPeriod", "scanSound");
 
   // convert dictionary to array
   for(index in keyArray)
@@ -61,7 +61,7 @@ FlomioPlugin.prototype.setReaderSettings = function(readerSettings, readerUid)  
     }
   }
 
-  readerSettingsArray.unshift(readerUid);
+  readerSettingsArray.unshift(deviceId);
 
   exec(
     function()
@@ -78,17 +78,17 @@ FlomioPlugin.prototype.setReaderSettings = function(readerSettings, readerUid)  
   );
 }
 
-FlomioPlugin.prototype.getReaderSettings = function(resultCallback, readerUid)  // readerUid is optional
+FlomioPlugin.prototype.getReaderSettings = function(resultCallback, deviceId)  // deviceId is optional
 {
-  if(typeof readerUid === 'undefined')
+  if(typeof deviceId === 'undefined')
   {
-    readerUid = "all";
+    deviceId = "all";
   }
 
   exec(
-    function(scanPeriod, scanSound, operationState, startBlock, messageToWrite)
+    function(scanPeriod, scanSound)
     {
-      resultCallback({scanPeriod: scanPeriod, scanSound: scanSound, operationState: operationState, startBlock: startBlock, messageToWrite: messageToWrite});
+      resultCallback({scanPeriod: scanPeriod, scanSound: scanSound});
     },
     function(error)
     {
@@ -96,38 +96,21 @@ FlomioPlugin.prototype.getReaderSettings = function(resultCallback, readerUid)  
     },
     "FlomioPlugin",
     "getReaderSettings",
-    [readerUid]
+    [deviceId]
   );
 }
 
-FlomioPlugin.prototype.onReaderStatusChange = function(resultCallback)
+FlomioPlugin.prototype.startReader = function(resultCallback, deviceId)  // deviceId is optional
 {
-  exec(
-    function(readerUid, connected, batteryLevel)
-    {
-      resultCallback({readerUid: readerUid, connected: connected, batteryLevel: batteryLevel});
-    },
-    function(error)
-    {
-      console.log("ERROR: FlomioPlugin.onReaderStatusChange: " + error);
-    },
-    "FlomioPlugin",
-    "setReaderStatusChangeCallback",
-    []
-  );
-}
-
-FlomioPlugin.prototype.startReader = function(resultCallback, readerUid)  // readerUid is optional
-{
-  if(typeof readerUid === 'undefined')
+  if(typeof deviceId === 'undefined')
   {
-    readerUid = "all";
+    deviceId = "all";
   }
 
   exec(
-    function(readerUid, tagUid)
+    function(deviceId, tagUid)
     {
-      resultCallback({tagUid: tagUid, readerUid: readerUid});
+      resultCallback({tagUid: tagUid, deviceId: deviceId});
     },
     function(error)
     {
@@ -135,15 +118,15 @@ FlomioPlugin.prototype.startReader = function(resultCallback, readerUid)  // rea
     }, 
     "FlomioPlugin", 
     "startReader",
-    [readerUid]
+    [deviceId]
   );
 }
 
-FlomioPlugin.prototype.stopReader = function(readerUid)  // readerUid is optional
+FlomioPlugin.prototype.stopReader = function(deviceId)  // deviceId is optional
 {
-  if(typeof readerUid === 'undefined')
+  if(typeof deviceId === 'undefined')
   {
-    readerUid = "all";
+    deviceId = "all";
   }
 
   exec(
@@ -157,11 +140,11 @@ FlomioPlugin.prototype.stopReader = function(readerUid)  // readerUid is optiona
     }, 
     "FlomioPlugin", 
     "stopReader",  
-    [readerUid]
+    [deviceId]
   );
 }
 
-FlomioPlugin.prototype.sendApdu = function(resultCallback, readerUid, apdu)
+FlomioPlugin.prototype.sendApdu = function(resultCallback, deviceId, apdu)
 {
   exec(
     function(responseApdu)
@@ -174,23 +157,40 @@ FlomioPlugin.prototype.sendApdu = function(resultCallback, readerUid, apdu)
     },
     "FlomioPlugin",
     "sendApdu",
-    [readerUid, apdu]
+    [deviceId, apdu]
   );
 }
 
-FlomioPlugin.prototype.onFlobleConnect = function(resultCallback)
+FlomioPlugin.prototype.onDeviceConnect = function(resultCallback)
 {
   exec(
-    function(readerUid)
+    function(deviceId)
     {
-      resultCallback({readerUid: readerUid});
+      resultCallback({deviceId: deviceId});
     },
     function(error)
     {
-      console.log("ERROR: FlomioPlugin.onFlobleConnect: " + error);
+      console.log("ERROR: FlomioPlugin.onDeviceConnect: " + error);
     },
     "FlomioPlugin",
-    "setFlobleConnectCallback",
+    "setDeviceConnectCallback",
+    []
+  );
+}
+
+FlomioPlugin.prototype.onCardStatusChange = function(resultCallback)
+{
+  exec(
+    function(deviceId, status)
+    {
+      resultCallback({deviceId: deviceId, status: status});
+    },
+    function(error)
+    {
+      console.log("ERROR: FlomioPlugin.onCardStatusChange: " + error);
+    },
+    "FlomioPlugin",
+    "setCardStatusChangeCallback",
     []
   );
 }

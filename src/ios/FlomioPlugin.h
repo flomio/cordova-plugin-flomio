@@ -8,18 +8,17 @@
 
 @interface FlomioPlugin : CDVPlugin <FmSessionManagerDelegate>
 {
+    // Cordova attributes
+    NSString* selectedDeviceType;
+    NSString* didFindATagUuid_callbackId;
+    NSString* apduResponse_callbackId;
+    NSString* deviceConnected_callbackId;
+    NSString* cardStatusChange_callbackId;
+    
     // Flomio reader attributes
     FmSessionManager *readerManager;
     NSArray* connectedDevices;
     NSMutableArray* connectedPeripherals;
-    
-    // Cordova attributes
-    NSString* selectedDeviceType;
-    NSMutableDictionary* readerTable;
-    NSString* didFindATagUUID_callbackId;
-    NSString* readerStatusChange_callbackId;
-    NSString* apduResponse_callbackId;
-    NSString* deviceConnected_callbackId;
 }
 
 // Cordova functions
@@ -31,6 +30,7 @@
 - (void)stopReader:(CDVInvokedUrlCommand*)command;
 - (void)sendApdu:(CDVInvokedUrlCommand*)command;
 - (void)setDeviceConnectCallback:(CDVInvokedUrlCommand*)command;
+- (void)setCardStatusChangeCallback:(CDVInvokedUrlCommand*)command;
 
 // Internal functions (that also perform input validation)
 - (BOOL)validateDeviceId:(NSString*)deviceId;
@@ -38,10 +38,9 @@
 - (void)toggleScanSound:(NSString*)toggleString :(NSString*)callbackId;
 
 // Internal Flomio reader functions
-- (void)ReaderManager:(Reader *)reader readerAlert:(UIImageView *)imageView;
 - (void)didUpdateConnectedDevices:(NSArray *)connectedDevices;
 - (void)didUpdateConnectedBr500:(NSArray *)peripherals;
 - (void)didFindATagUuid:(NSString *)UUID fromDevice:(NSString *)deviceId withError:(NSError *)error;
-- (void)didChangeCardStatus:(NSNumber *)status fromDevice:(NSString *)device;
+- (void)didChangeCardStatus:(NSNumber *)status fromDevice:(NSString *)deviceId;
 
 @end

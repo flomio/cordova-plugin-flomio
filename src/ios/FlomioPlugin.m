@@ -13,13 +13,13 @@
     readerManager = [FmSessionManager sharedManager];
     readerManager.delegate = self;
     
-    // Initialise strings
+    // Initialise callback ID strings
     self->selectedDeviceType = @"null";
-    self->didFindATagUUID_callbackId = @"null";
+    self->didFindATagUuid_callbackId = @"null";
     self->readerStatusChange_callbackId = @"null";
     self->apduResponse_callbackId = @"null";
     self->deviceConnected_callbackId = @"null";
-    self->readerTable = [NSMutableDictionary dictionary];
+    self->cardStatusChange_callbackId = @"null";
     
     // Set SDK configuration and update reader settings
     readerManager.scanPeriod = [NSNumber numberWithInteger:500]; // in ms
@@ -31,7 +31,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(active) name:UIApplicationDidBecomeActiveNotification object:nil];
 }
 
-/** Update settings for a particular reader */
+/** Update reader settings */
 - (void)setReaderSettings:(CDVInvokedUrlCommand*)command
 {
     NSString* scanPeriod = [command.arguments objectAtIndex:0];
@@ -42,7 +42,7 @@
     [self toggleScanSound:scanSound :callbackId];
 }
 
-/** Retrieve settings for a particular reader */
+/** Retrieve reader settings */
 - (void)getReaderSettings:(CDVInvokedUrlCommand *)command
 {
 	dispatch_async(dispatch_get_main_queue(), ^{
@@ -98,7 +98,7 @@
     
     if ([self->selectedDeviceType isEqualToString:@"null"])
     {
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Select a reader type first"];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Select a device type first"];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:self->didFindATagUUID_callbackId];
     }
     else if ([[deviceId lowercaseString] isEqualToString:@"all"])
@@ -119,7 +119,7 @@
     
     if ([self->selectedDeviceType isEqualToString:@"null"])
     {
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Select a reader type first"];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Select a device type first"];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }
     else if ([[deviceId lowercaseString] isEqualToString:@"all"])
@@ -161,6 +161,11 @@
 - (void)setDeviceConnectCallback:(CDVInvokedUrlCommand*)command
 {
 	self->deviceConnected_callbackId = command.callbackId;
+}
+
+- (void)setCardStatusChangeCallback:(CDVInvokedUrlCommand*)command
+{
+    self->cardStatusChange_callbackId = command.callbackId;
 }
 
 ////////////////////// INTERNAL FUNCTIONS /////////////////////////
@@ -249,7 +254,7 @@
 
 /** Called when the list of connected BR500 devices is updated */
 - (void)didUpdateConnectedBr500:(NSArray *)peripherals {
-    // TODO: something
+    
 }
 
 /** Receives the UUID of a scanned tag */
@@ -259,7 +264,7 @@
         NSLog(@"Found tag UUID: %@ from device:%@", Uuid, deviceId);
         
         // send tag read update to Cordova
-        if (![self->didFindATagUUID_callbackId isEqualToString:@"null"])
+        if (![self->didFindATagUuid_callbackId isEqualToString:@"null"])
         {
             NSArray* result = @[deviceId, Uuid];
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
@@ -269,10 +274,19 @@
     });
 }
 
-/** The card has entered or left the scan range of the reader */
-- (void)didChangeCardStatus:(NSNumber *)status fromDevice:(NSString *)device
+/** A tag has entered or left the scan range of the reader */
+- (void)didChangeCardStatus:(NSNumber *)status fromDevice:(NSString *)deviceId
 {
-    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        // send card status change to Cordova
+        if (![self->cardStatusChange_callbackId isEqualToString:@"null"])
+        {
+            NSArray* result = @[deviceId, status];
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
+            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:cardStatusChange_callbackId];
+        }
+    });
 }
 
 /** Receives APDU responses from connected devices */
@@ -298,25 +312,6 @@
         
         // TODO: send error to Cordova
     });
-}
-
-/** Sets the connected/disconnected image */
-- (void)ReaderManager:(Reader *)reader readerAlert:(UIImageView *)imageView
-{
-    imageView.hidden = NO;
-    imageView.alpha = 1.0f;
-    
-    // Then fades away after 2 seconds (the cross-fade animation will take 0.5s)
-    [UIView animateWithDuration:0.5 delay:2.0 options:0 animations:^{
-        // Animate the alpha value of your imageView from 1.0 to 0.0 here
-        imageView.alpha = 0.0f;
-    } completion:^(BOOL finished) {
-        // Once the animation is completed and the alpha has gone to 0.0, hide the view for good
-        imageView.hidden = YES;
-    }];
-    
-    imageView.center = [self.viewController.view convertPoint:self.viewController.view.center fromView:self.viewController.view.superview];
-    [self.viewController.view addSubview:imageView];
 }
 
 @end
