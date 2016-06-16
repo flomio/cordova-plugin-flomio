@@ -4,7 +4,7 @@ Flomio's SDK plugin for Cordova / Meteor
 
 *Important:* targeting of specific readers via their UID is not supported, but will be in SDK v2.0. In the mean time, please omit any `readerUid` arguments. This means that **all** readers will be targeted with any functions you call
 
-**Requires Flomio SDK version** ***1.9***
+**Requires Flomio SDK version** ***1.9*** [Get yours here.](http://flomio.com/shop/apps/flomio-sdk-basic-turnkey-oem-support/)
 
 ## Installation
 
