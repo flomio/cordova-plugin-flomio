@@ -186,7 +186,7 @@ FlomioPlugin.prototype.onTagUidRead = function(resultCallback)
     }, 
     "FlomioPlugin", 
     "setTagUidReadCallback",
-    [deviceId]
+    []
   );
 }
 
