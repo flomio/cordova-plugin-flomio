@@ -248,7 +248,7 @@
         }
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            if (![self->deviceConnected_callbackId isEqualToString:@"null"] && newDeviceConnected)
+            if (![self->deviceConnectionChange_callbackId isEqualToString:@"null"])
             {
                 NSString* deviceId = [[modifiedDevice objectAtIndex:0] serialNumber];
                 NSArray* result = @[deviceId, status];

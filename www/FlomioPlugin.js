@@ -142,9 +142,9 @@ FlomioPlugin.prototype.sendApdu = function(resultCallback, deviceId, apdu)
 FlomioPlugin.prototype.onDeviceConnectionChange = function(resultCallback)
 {
   exec(
-    function(deviceId)
+    function(deviceId, status)
     {
-      resultCallback({deviceId: deviceId});
+      resultCallback({deviceId: deviceId, status: status});
     },
     function(error)
     {
