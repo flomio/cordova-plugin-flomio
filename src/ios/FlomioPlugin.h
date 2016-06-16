@@ -12,13 +12,12 @@
     NSString* selectedDeviceType;
     NSString* didFindATagUuid_callbackId;
     NSString* apduResponse_callbackId;
-    NSString* deviceConnected_callbackId;
+    NSString* deviceConnectionChange_callbackId;
     NSString* cardStatusChange_callbackId;
-    NSInteger numOfDevices;
     
     // Flomio reader attributes
     FmSessionManager *readerManager;
-    NSArray* connectedDevices;
+    NSArray* connectedDevicesList;
     NSMutableArray* connectedPeripherals;
 }
 
@@ -30,7 +29,7 @@
 - (void)setTagUidReadCallback:(CDVInvokedUrlCommand*)command;
 - (void)stopReader:(CDVInvokedUrlCommand*)command;
 - (void)sendApdu:(CDVInvokedUrlCommand*)command;
-- (void)setDeviceConnectCallback:(CDVInvokedUrlCommand*)command;
+- (void)setDeviceConnectionChangeCallback:(CDVInvokedUrlCommand*)command;
 - (void)setCardStatusChangeCallback:(CDVInvokedUrlCommand*)command;
 
 // Internal functions (that also perform input validation)

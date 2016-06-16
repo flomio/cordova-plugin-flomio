@@ -139,7 +139,7 @@ FlomioPlugin.prototype.sendApdu = function(resultCallback, deviceId, apdu)
   );
 }
 
-FlomioPlugin.prototype.onDeviceConnect = function(resultCallback)
+FlomioPlugin.prototype.onDeviceConnectionChange = function(resultCallback)
 {
   exec(
     function(deviceId)
@@ -148,10 +148,10 @@ FlomioPlugin.prototype.onDeviceConnect = function(resultCallback)
     },
     function(error)
     {
-      console.log("ERROR: FlomioPlugin.onDeviceConnect: " + error);
+      console.log("ERROR: FlomioPlugin.onDeviceConnectionChange: " + error);
     },
     "FlomioPlugin",
-    "setDeviceConnectCallback",
+    "setDeviceConnectionChangeCallback",
     []
   );
 }

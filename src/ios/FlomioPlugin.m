@@ -17,9 +17,8 @@
     self->selectedDeviceType = @"null";
     self->didFindATagUuid_callbackId = @"null";
     self->apduResponse_callbackId = @"null";
-    self->deviceConnected_callbackId = @"null";
+    self->deviceConnectionChange_callbackId = @"null";
     self->cardStatusChange_callbackId = @"null";
-    self->numOfDevices = 0;
     
     // Set SDK configuration and update reader settings
     readerManager.scanPeriod = [NSNumber numberWithInteger:500]; // in ms
@@ -90,7 +89,7 @@
 }
 
 /** Stops readers polling for tags */
-- (void)stopReader:(CDVInvokedUrlCommand*)command
+- (void)stopReaders:(CDVInvokedUrlCommand*)command
 {
     NSString* deviceId = [command.arguments objectAtIndex:0];
     deviceId = [deviceId stringByReplacingOccurrencesOfString:@" " withString:@""]; // remove whitespace
@@ -125,7 +124,7 @@
     {
         self->apduResponse_callbackId = command.callbackId;
         
-        for (FmDevice *device in self->connectedDevices)
+        for (FmDevice *device in self->connectedDevicesList)
         {
             if (device.device == deviceId)
             {
@@ -136,9 +135,9 @@
     }
 }
 
-- (void)setDeviceConnectCallback:(CDVInvokedUrlCommand*)command
+- (void)setDeviceConnectionChangeCallback:(CDVInvokedUrlCommand*)command
 {
-	self->deviceConnected_callbackId = command.callbackId;
+	self->deviceConnectionChange_callbackId = command.callbackId;
 }
 
 - (void)setCardStatusChangeCallback:(CDVInvokedUrlCommand*)command
@@ -223,24 +222,42 @@
 
 /** Called when the list of connected devices is updated */
 - (void)didUpdateConnectedDevices:(NSArray *)connectedDevices {
-    self->connectedDevices = connectedDevices;
-    
-    BOOL newDeviceConnected = false;
-    if ([self->connectedDevices count] > self->numOfDevices)
+    if ([self->connectedDevicesList count] != [connectedDevices count])
     {
-        newDeviceConnected = true;
-    }
-    self->numOfDevices = [self->connectedDevices count];
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (![self->deviceConnected_callbackId isEqualToString:@"null"] && newDeviceConnected)
+        NSMutableSet* old = [NSMutableSet setWithArray:self->connectedDevicesList];
+        NSMutableSet* new = [NSMutableSet setWithArray:connectedDevices];
+        
+        NSMutableSet* intersection = [NSMutableSet setWithSet:old];
+        [intersection intersectSet:new];
+        
+        NSString* status;
+        NSArray* modifiedDevice;
+        
+        if ([new count] > [old count])
         {
-            NSString* deviceId = [[self->connectedDevices objectAtIndex:0] serialNumber];
-            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:deviceId];
-            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:self->deviceConnected_callbackId];
+            [new minusSet:intersection];
+            status = @"Device added";
+            modifiedDevice = [new allObjects];
+            
         }
-    });
+        else if ([old count] > [new count])
+        {
+            [old minusSet:intersection];
+            status = @"Device removed";
+            modifiedDevice = [old allObjects];
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (![self->deviceConnected_callbackId isEqualToString:@"null"] && newDeviceConnected)
+            {
+                NSString* deviceId = [[modifiedDevice objectAtIndex:0] serialNumber];
+                NSArray* result = @[deviceId, status];
+                CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
+                [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+                [self.commandDelegate sendPluginResult:pluginResult callbackId:self->deviceConnectionChange_callbackId];
+            }
+        });
+    }
 }
 
 /** Called when the list of connected BR500 devices is updated */
