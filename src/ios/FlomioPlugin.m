@@ -16,7 +16,6 @@
     // Initialise callback ID strings
     self->selectedDeviceType = @"null";
     self->didFindATagUuid_callbackId = @"null";
-    self->readerStatusChange_callbackId = @"null";
     self->apduResponse_callbackId = @"null";
     self->deviceConnected_callbackId = @"null";
     self->cardStatusChange_callbackId = @"null";
@@ -92,14 +91,14 @@
 /** Starts readers polling for tags */
 - (void)startReader:(CDVInvokedUrlCommand*)command
 {
-    self->didFindATagUUID_callbackId = command.callbackId;
+    self->didFindATagUuid_callbackId = command.callbackId;
     NSString* deviceId = [command.arguments objectAtIndex:0];
     deviceId = [deviceId stringByReplacingOccurrencesOfString:@" " withString:@""]; // remove whitespace
     
     if ([self->selectedDeviceType isEqualToString:@"null"])
     {
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Select a device type first"];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:self->didFindATagUUID_callbackId];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:self->didFindATagUuid_callbackId];
     }
     else if ([[deviceId lowercaseString] isEqualToString:@"all"])
     {
@@ -269,7 +268,7 @@
             NSArray* result = @[deviceId, Uuid];
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
             [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:didFindATagUUID_callbackId];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:didFindATagUuid_callbackId];
         }
     });
 }
@@ -300,7 +299,7 @@
             NSArray* result = @[deviceId, response];
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
             [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:didFindATagUUID_callbackId];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:didFindATagUuid_callbackId];
         }
     });
 }
