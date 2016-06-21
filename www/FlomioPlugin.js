@@ -127,7 +127,7 @@ FlomioPlugin.prototype.onDeviceConnectionChange = function(resultCallback)
   exec(
     function(deviceIdList)
     {
-      resultCallback();
+      resultCallback(deviceIdList);
     },
     function(error)
     {

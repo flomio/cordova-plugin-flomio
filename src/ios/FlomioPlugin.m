@@ -10,24 +10,27 @@
 /** Initialise the plugin */
 - (void)init:(CDVInvokedUrlCommand*)command
 {
-    readerManager = [FmSessionManager sharedManager];
-    readerManager.delegate = self;
+    if (!readerManager)
+    {
+        readerManager = [FmSessionManager sharedManager];
+        readerManager.delegate = self;
     
-    // Initialise callback ID strings
-    self->selectedDeviceType = @"null";
-    self->didFindATagUuid_callbackId = @"null";
-    self->apduResponse_callbackId = @"null";
-    self->deviceConnectionChange_callbackId = @"null";
-    self->cardStatusChange_callbackId = @"null";
+        // Initialise callback ID strings
+        self->selectedDeviceType = @"null";
+        self->didFindATagUuid_callbackId = @"null";
+        self->apduResponse_callbackId = @"null";
+        self->deviceConnectionChange_callbackId = @"null";
+        self->cardStatusChange_callbackId = @"null";
     
-    // Set SDK configuration and update reader settings
-    readerManager.scanPeriod = [NSNumber numberWithInteger:500]; // in ms
-    readerManager.scanSound = [NSNumber numberWithBool:YES]; // play scan sound
+        // Set SDK configuration and update reader settings
+        readerManager.scanPeriod = [NSNumber numberWithInteger:500]; // in ms
+        readerManager.scanSound = [NSNumber numberWithBool:YES]; // play scan sound
     
-    // Stop reader scan when the app becomes inactive
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(inactive) name:UIApplicationDidEnterBackgroundNotification object:nil];
-    // Start reader scan when the app becomes active
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(active) name:UIApplicationDidBecomeActiveNotification object:nil];
+        // Stop reader scan when the app becomes inactive
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(inactive) name:UIApplicationDidEnterBackgroundNotification object:nil];
+        // Start reader scan when the app becomes active
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(active) name:UIApplicationDidBecomeActiveNotification object:nil];
+    }
 }
 
 /** Update reader settings */
@@ -218,7 +221,7 @@
         [deviceIdList addObject:[device serialNumber]];
     }
     
-    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:deviceIdList];
+    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:deviceIdList];
     [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:self->deviceConnectionChange_callbackId];
 }
