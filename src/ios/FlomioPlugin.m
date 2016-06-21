@@ -118,7 +118,7 @@
     
     for (FmDevice *device in self->connectedDevicesList)
     {
-        if ([device serialNumber] == [deviceId uppercaseString])
+        if ([[device serialNumber] isEqualToString:[deviceId uppercaseString]])
         {
             [device sendApduCommand:apdu];
             return;

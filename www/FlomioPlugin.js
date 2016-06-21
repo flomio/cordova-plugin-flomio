@@ -108,9 +108,9 @@ FlomioPlugin.prototype.stopReaders = function()
 FlomioPlugin.prototype.sendApdu = function(resultCallback, deviceId, apdu)
 {
   exec(
-    function(responseApdu)
+    function(deviceId, responseApdu)
     {
-      resultCallback({responseApdu: responseApdu});
+      resultCallback({deviceId: deviceId, responseApdu: responseApdu});
     },
     function(error)
     {
