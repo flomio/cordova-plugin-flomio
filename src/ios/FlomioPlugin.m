@@ -45,7 +45,7 @@
 - (void)getReaderSettings:(CDVInvokedUrlCommand *)command
 {
 	dispatch_async(dispatch_get_main_queue(), ^{
-	    NSArray* settings = @[self->selectedDeviceType, readerManager.scanPeriod, readerManager.scanSound];
+	    NSArray* settings = @[readerManager.scanPeriod, readerManager.scanSound];
 	    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:settings];
 	    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 	});
@@ -91,21 +91,14 @@
 /** Stops readers polling for tags */
 - (void)stopReaders:(CDVInvokedUrlCommand*)command
 {
-    NSString* deviceId = [command.arguments objectAtIndex:0];
-    deviceId = [deviceId stringByReplacingOccurrencesOfString:@" " withString:@""]; // remove whitespace
-    
     if ([self->selectedDeviceType isEqualToString:@"null"])
     {
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Select a device type first"];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }
-    else if ([[deviceId lowercaseString] isEqualToString:@"all"])
-    {
-        [readerManager stopReaders]; // stop all active readers
-    }
     else
     {
-        // stop a specific reader
+        [readerManager stopReaders]; // stop all active readers
     }
 }
 
@@ -115,29 +108,33 @@
     NSString* deviceId = [command.arguments objectAtIndex:0];
     NSString* apdu = [command.arguments objectAtIndex:1];
     
-    if (![self validateDeviceId:deviceId])
+    deviceId = [deviceId stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
+    apdu = [apdu stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
+    
+    self->apduResponse_callbackId = command.callbackId;
+    
+    for (FmDevice *device in self->connectedDevicesList)
     {
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Enter a valid device ID"];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-    }
-    else
-    {
-        self->apduResponse_callbackId = command.callbackId;
-        
-        for (FmDevice *device in self->connectedDevicesList)
+        if ([device serialNumber] == [deviceId uppercaseString])
         {
-            if (device.device == deviceId)
-            {
-                [device sendApduCommand:apdu];
-                break;
-            }
+            [device sendApduCommand:apdu];
+            return;
         }
     }
+    
+    // no matching reader found
+    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Device ID does not match any active reader"];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:self->apduResponse_callbackId];
 }
 
 - (void)setDeviceConnectionChangeCallback:(CDVInvokedUrlCommand*)command
 {
 	self->deviceConnectionChange_callbackId = command.callbackId;
+}
+
+- (void)setBr500ConnectionChangeCallback:(CDVInvokedUrlCommand*)command
+{
+    self->br500ConnectionChange_callbackId = command.callbackId;
 }
 
 - (void)setCardStatusChangeCallback:(CDVInvokedUrlCommand*)command
@@ -152,15 +149,6 @@
 }
 
 ////////////////////// INTERNAL FUNCTIONS /////////////////////////
-
-/** Validates device UIDs */
-- (BOOL)validateDeviceId:(NSString *)deviceId
-{
-    deviceId = [deviceId stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
-    
-    // TODO: input validation
-    return TRUE;
-}
 
 /** Set the scan period (in ms) */
 - (void)setScanPeriod:(NSString*)periodString :(NSString*)callbackId;
@@ -222,47 +210,30 @@
 
 /** Called when the list of connected devices is updated */
 - (void)didUpdateConnectedDevices:(NSArray *)connectedDevices {
-    if ([self->connectedDevicesList count] != [connectedDevices count])
+    self->connectedDevicesList = [connectedDevices mutableCopy];
+    
+    NSMutableArray* deviceIdList = [NSMutableArray array];
+    for (FmDevice *device in connectedDevices)
     {
-        NSMutableSet* old = [NSMutableSet setWithArray:self->connectedDevicesList];
-        NSMutableSet* new = [NSMutableSet setWithArray:connectedDevices];
-        
-        NSMutableSet* intersection = [NSMutableSet setWithSet:old];
-        [intersection intersectSet:new];
-        
-        NSString* status;
-        NSArray* modifiedDevice;
-        
-        if ([new count] > [old count])
-        {
-            [new minusSet:intersection];
-            status = @"Device added";
-            modifiedDevice = [new allObjects];
-            
-        }
-        else if ([old count] > [new count])
-        {
-            [old minusSet:intersection];
-            status = @"Device removed";
-            modifiedDevice = [old allObjects];
-        }
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (![self->deviceConnectionChange_callbackId isEqualToString:@"null"])
-            {
-                NSString* deviceId = [[modifiedDevice objectAtIndex:0] serialNumber];
-                NSArray* result = @[deviceId, status];
-                CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
-                [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-                [self.commandDelegate sendPluginResult:pluginResult callbackId:self->deviceConnectionChange_callbackId];
-            }
-        });
+        [deviceIdList addObject:[device serialNumber]];
     }
+    
+    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:deviceIdList];
+    [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:self->deviceConnectionChange_callbackId];
 }
 
 /** Called when the list of connected BR500 devices is updated */
 - (void)didUpdateConnectedBr500:(NSArray *)peripherals {
+    NSMutableArray* deviceIdList = [NSMutableArray array];
+    for (FmDevice *device in peripherals)
+    {
+        [deviceIdList addObject:[device serialNumber]];
+    }
     
+    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:deviceIdList];
+    [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:self->br500ConnectionChange_callbackId];
 }
 
 /** Receives the UUID of a scanned tag */
@@ -277,7 +248,7 @@
             NSArray* result = @[deviceId, Uuid];
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
             [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:didFindATagUuid_callbackId];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:self->didFindATagUuid_callbackId];
         }
     });
 }
@@ -292,7 +263,7 @@
             NSArray* result = @[deviceId, status];
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
             [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:cardStatusChange_callbackId];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:self->cardStatusChange_callbackId];
         }
     });
 }
@@ -308,7 +279,7 @@
             NSArray* result = @[deviceId, response];
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
             [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:didFindATagUuid_callbackId];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:self->apduResponse_callbackId];
         }
     });
 }
@@ -318,7 +289,9 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         NSLog(@"%@", error); // reader error
         
-        // TODO: send error to Cordova
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:[error localizedDescription]];
+        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:self->didFindATagUuid_callbackId];
     });
 }
 

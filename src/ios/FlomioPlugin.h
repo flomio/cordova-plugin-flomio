@@ -13,12 +13,12 @@
     NSString* didFindATagUuid_callbackId;
     NSString* apduResponse_callbackId;
     NSString* deviceConnectionChange_callbackId;
+    NSString* br500ConnectionChange_callbackId;
     NSString* cardStatusChange_callbackId;
     
     // Flomio reader attributes
     FmSessionManager *readerManager;
-    NSArray* connectedDevicesList;
-    NSMutableArray* connectedPeripherals;
+    NSMutableArray *connectedDevicesList;
 }
 
 // Cordova functions
@@ -27,13 +27,13 @@
 - (void)getReaderSettings:(CDVInvokedUrlCommand*)command;
 - (void)selectDeviceType:(CDVInvokedUrlCommand*)command;
 - (void)setTagUidReadCallback:(CDVInvokedUrlCommand*)command;
-- (void)stopReader:(CDVInvokedUrlCommand*)command;
+- (void)stopReaders:(CDVInvokedUrlCommand*)command;
 - (void)sendApdu:(CDVInvokedUrlCommand*)command;
 - (void)setDeviceConnectionChangeCallback:(CDVInvokedUrlCommand*)command;
+- (void)setBr500ConnectionChangeCallback:(CDVInvokedUrlCommand*)command;
 - (void)setCardStatusChangeCallback:(CDVInvokedUrlCommand*)command;
 
 // Internal functions (that also perform input validation)
-- (BOOL)validateDeviceId:(NSString*)deviceId;
 - (void)setScanPeriod:(NSString*)periodString :(NSString*)callbackId;
 - (void)toggleScanSound:(NSString*)toggleString :(NSString*)callbackId;
 
