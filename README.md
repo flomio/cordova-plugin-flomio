@@ -55,9 +55,9 @@ meteor add-platform ios
 
 - Add `-lc++` and `-ObjC` to "Other Linker Flags" under "Build Settings".
 
-- In "Targets -> <YourAppTarget> -> Build Options", set "Enable Bitcode" to "No"
+- In "Targets -> YourAppTarget -> Build Options", set "Enable Bitcode" to "No"
 
-- In "Targets -> <YourAppTarget> -> General -> Link Binary with Libraries", add "MediaPlayer.framework"
+- In "Targets -> YourAppTarget -> General -> Link Binary with Libraries", add "MediaPlayer.framework"
 
 - Build and run the app on an iOS device.
 
