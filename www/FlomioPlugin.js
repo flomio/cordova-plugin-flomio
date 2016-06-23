@@ -190,7 +190,7 @@ FlomioPlugin.prototype.onTagUidRead = function(resultCallback)
   );
 }
 
-FlomioPlugin.prototype.onNdefDiscovery = function(resultCallback)
+FlomioPlugin.prototype.getDataBlocks = function(resultCallback, deviceId)
 {
   exec(
     function(deviceId, ndef)
@@ -203,7 +203,7 @@ FlomioPlugin.prototype.onNdefDiscovery = function(resultCallback)
     }, 
     "FlomioPlugin", 
     "setNdefDataBlockDiscoveryCallback",
-    []
+    [deviceId]
   );
 }
 

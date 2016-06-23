@@ -11,11 +11,12 @@
     // Cordova attributes
     NSString* selectedDeviceType;
     NSString* didFindATagUuid_callbackId;
-    NSString* apduResponse_callbackId;
     NSString* deviceConnectionChange_callbackId;
     NSString* br500ConnectionChange_callbackId;
     NSString* cardStatusChange_callbackId;
-    NSString* ndefDataBlockDiscovery_callbackId;
+    
+    NSMutableDictionary* apduResponse_callbackIdDict;
+    NSMutableDictionary* ndefDataBlockDiscovery_callbackIdDict;
     
     // Flomio reader attributes
     FmSessionManager* readerManager;
@@ -33,7 +34,7 @@
 - (void)setDeviceConnectionChangeCallback:(CDVInvokedUrlCommand*)command;
 - (void)setBr500ConnectionChangeCallback:(CDVInvokedUrlCommand*)command;
 - (void)setCardStatusChangeCallback:(CDVInvokedUrlCommand*)command;
-- (void)setNdefDataBlockDiscoveryCallback:(CDVInvokedUrlCommand*)command;
+- (void)getDataBlocks:(CDVInvokedUrlCommand*)command;
 
 // Internal functions (that also perform input validation)
 - (void)setScanPeriod:(NSString*)periodString :(NSString*)callbackId;

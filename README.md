@@ -157,9 +157,9 @@ meteor add-platform ios
 	}
 	```
 
-* `onNdefDiscovery(resultCallback)`
+* `getDataBlocks(resultCallback, deviceId)`
 
-	Assign a callback function to fire when NDEF content is discovered on a nearby tag
+	Retrieve NDEF formatted data from a tag in proximity of a specified target device
 
 	```
 	function resultCallback(result)
@@ -167,4 +167,5 @@ meteor add-platform ios
 	{
 		String deviceId,
 		Array ndef  // nested array that contains rows of [NDEF types, NDEF hexadecimal strings]
+	}
 	```

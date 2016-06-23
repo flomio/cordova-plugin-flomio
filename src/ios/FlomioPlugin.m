@@ -18,10 +18,11 @@
         // Initialise callback ID strings
         self->selectedDeviceType = @"null";
         self->didFindATagUuid_callbackId = @"null";
-        self->apduResponse_callbackId = @"null";
         self->deviceConnectionChange_callbackId = @"null";
         self->cardStatusChange_callbackId = @"null";
-        self->ndefDataBlockDiscovery_callbackId = @"null";
+        
+        self->apduResponse_callbackIdDict = [NSMutableDictionary dictionary];
+        self->ndefDataBlockDiscovery_callbackIdDict = [NSMutableDictionary dictionary];
     
         // Set SDK configuration and update reader settings
         readerManager.scanPeriod = [NSNumber numberWithInteger:500]; // in ms
@@ -115,7 +116,7 @@
     deviceId = [deviceId stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
     apdu = [apdu stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
     
-    self->apduResponse_callbackId = command.callbackId;
+    self->apduResponse_callbackIdDict[deviceId] = command.callbackId;
     
     for (FmDevice *device in self->connectedDevicesList)
     {
@@ -128,7 +129,7 @@
     
     // no matching reader found
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Device ID does not match any active reader"];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:self->apduResponse_callbackId];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:self->apduResponse_callbackIdDict[deviceId]];
 }
 
 - (void)setDeviceConnectionChangeCallback:(CDVInvokedUrlCommand*)command
@@ -152,9 +153,23 @@
     self->didFindATagUuid_callbackId = command.callbackId;
 }
 
-- (void)setNdefDataBlockDiscoveryCallback:(CDVInvokedUrlCommand*)command
+- (void)getDataBlocks:(CDVInvokedUrlCommand*)command
 {
-    self->ndefDataBlockDiscovery_callbackId = command.callbackId;
+    NSString* deviceId = [command.arguments objectAtIndex:0];
+    self->ndefDataBlockDiscovery_callbackIdDict[deviceId] = command.callbackId;
+    
+    for (FmDevice *device in self->connectedDevicesList)
+    {
+        if ([[device serialNumber] isEqualToString:[deviceId uppercaseString]])
+        {
+            [device getDataBlocks];
+            return;
+        }
+    }
+    
+    // no matching reader found
+    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Device ID does not match any active reader"];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:self->ndefDataBlockDiscovery_callbackIdDict[deviceId]];
 }
 
 ////////////////////// INTERNAL FUNCTIONS /////////////////////////
@@ -293,12 +308,12 @@
         NSLog(@"Received APDU: %@ from device:%@", response, deviceId); //APDU Response
         
         // send response to Cordova
-        if (![self->apduResponse_callbackId isEqualToString:@"null"])
+        if (self->apduResponse_callbackIdDict[deviceId])
         {
             NSArray* result = @[deviceId, response];
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
             [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:self->apduResponse_callbackId];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:self->apduResponse_callbackIdDict[deviceId]];
         }
     });
 }
@@ -332,12 +347,12 @@
     }
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (![self->ndefDataBlockDiscovery_callbackId isEqualToString:@"null"])
+        if (self->ndefDataBlockDiscovery_callbackIdDict[device])
         {
             NSArray* result = @[device, recordsArray];
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
             [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:self->ndefDataBlockDiscovery_callbackId];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:self->ndefDataBlockDiscovery_callbackIdDict[device]];
         }
     });
 }
