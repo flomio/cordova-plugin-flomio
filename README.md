@@ -156,3 +156,14 @@ meteor add-platform ios
 		String tagUid
 	}
 	```
+
+* `onNdefDiscovery(resultCallback)`
+
+	Assign a callback function to fire when NDEF content is discovered on a nearby tag
+
+	```
+	function resultCallback(result)
+	Object result
+	{
+		String deviceId,
+		Array ndef  // nested array that contains rows of [NDEF types, NDEF hexadecimal strings]

@@ -21,6 +21,7 @@
         self->apduResponse_callbackId = @"null";
         self->deviceConnectionChange_callbackId = @"null";
         self->cardStatusChange_callbackId = @"null";
+        self->ndefDataBlockDiscovery_callbackId = @"null";
     
         // Set SDK configuration and update reader settings
         readerManager.scanPeriod = [NSNumber numberWithInteger:500]; // in ms
@@ -151,6 +152,11 @@
     self->didFindATagUuid_callbackId = command.callbackId;
 }
 
+- (void)setNdefDataBlockDiscoveryCallback:(CDVInvokedUrlCommand*)command
+{
+    self->ndefDataBlockDiscovery_callbackId = command.callbackId;
+}
+
 ////////////////////// INTERNAL FUNCTIONS /////////////////////////
 
 /** Set the scan period (in ms) */
@@ -221,9 +227,14 @@
         [deviceIdList addObject:[device serialNumber]];
     }
     
-    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:deviceIdList];
-    [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:self->deviceConnectionChange_callbackId];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (![self->deviceConnectionChange_callbackId isEqualToString:@"null"])
+        {
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:deviceIdList];
+            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:self->deviceConnectionChange_callbackId];
+        }
+    });
 }
 
 /** Called when the list of connected BR500 devices is updated */
@@ -234,9 +245,14 @@
         [deviceIdList addObject:[device serialNumber]];
     }
     
-    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:deviceIdList];
-    [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:self->br500ConnectionChange_callbackId];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (![self->br500ConnectionChange_callbackId isEqualToString:@"null"])
+        {
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:deviceIdList];
+            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:self->br500ConnectionChange_callbackId];
+        }
+    });
 }
 
 /** Receives the UUID of a scanned tag */
@@ -292,9 +308,37 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         NSLog(@"%@", error); // reader error
         
-        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:[error localizedDescription]];
-        [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-        [self.commandDelegate sendPluginResult:pluginResult callbackId:self->didFindATagUuid_callbackId];
+        if (![self->didFindATagUuid_callbackId isEqualToString:@"null"])
+        {
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:[error localizedDescription]];
+            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:self->didFindATagUuid_callbackId];
+        }
+    });
+}
+
+/** Receives an NDEF data block from a nearby tag **/
+- (void)didFindADataBlockWithNdef:(NdefMessage *)ndef fromDevice:(NSString *)device withError:(NSError *)error
+{
+    NSMutableArray* recordsArray = [NSMutableArray array];
+    
+    for (NdefRecord* record in ndef.ndefRecords)
+    {
+        NSMutableArray* row = [NSMutableArray array];
+        [row addObject:[record typeString]];
+        [row addObject:[record payloadString]];
+        
+        [recordsArray addObject:row];
+    }
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (![self->ndefDataBlockDiscovery_callbackId isEqualToString:@"null"])
+        {
+            NSArray* result = @[device, recordsArray];
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
+            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:self->ndefDataBlockDiscovery_callbackId];
+        }
     });
 }
 

@@ -190,5 +190,22 @@ FlomioPlugin.prototype.onTagUidRead = function(resultCallback)
   );
 }
 
+FlomioPlugin.prototype.onNdefDiscovery = function(resultCallback)
+{
+  exec(
+    function(deviceId, ndef)
+    {
+      resultCallback({ndef: ndef, deviceId: deviceId});
+    },
+    function(error)
+    {
+      console.log("ERROR: FlomioPlugin.onNdefDiscovery: " + error);
+    }, 
+    "FlomioPlugin", 
+    "setNdefDataBlockDiscoveryCallback",
+    []
+  );
+}
+
 var flomioPlugin = new FlomioPlugin();
 module.exports = flomioPlugin;
