@@ -1,6 +1,6 @@
 # Flomio Cordova Plugin for SDK v2.0
 
-Flomio's plugin for Cordova / Meteor, for use with the v2.0 of the Flomio SDK
+Flomio's plugin for Cordova / Meteor, for use with the v2.0 of the Flomio SDK. [Get yours here.](http://flomio.com/shop/apps/flomio-sdk-basic-turnkey-oem-support/)
 
 ## Installation
 
