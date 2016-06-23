@@ -202,7 +202,7 @@ FlomioPlugin.prototype.getDataBlocks = function(resultCallback, deviceId)
       console.log("ERROR: FlomioPlugin.onNdefDiscovery: " + error);
     }, 
     "FlomioPlugin", 
-    "setNdefDataBlockDiscoveryCallback",
+    "getDataBlocks",
     [deviceId]
   );
 }
