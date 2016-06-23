@@ -167,3 +167,4 @@ meteor add-platform ios
 	{
 		String deviceId,
 		Array ndef  // nested array that contains rows of [NDEF types, NDEF hexadecimal strings]
+	```
