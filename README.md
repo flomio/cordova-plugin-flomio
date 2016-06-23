@@ -159,7 +159,8 @@ meteor add-platform ios
 
 * `getDataBlocks(resultCallback, deviceId)`
 
-	Retrieve NDEF formatted data from a tag in proximity of a specified target device
+	Retrieve NDEF formatted data from a tag in proximity of a specified target device.
+	***Currently works with FloBLE devices only***
 
 	```
 	function resultCallback(result)

@@ -155,21 +155,30 @@
 
 - (void)getDataBlocks:(CDVInvokedUrlCommand*)command
 {
-    NSString* deviceId = [command.arguments objectAtIndex:0];
-    self->ndefDataBlockDiscovery_callbackIdDict[deviceId] = command.callbackId;
-    
-    for (FmDevice *device in self->connectedDevicesList)
+    if ([self->selectedDeviceType isEqualToString:@"floble-plus"])
     {
-        if ([[device serialNumber] isEqualToString:[deviceId uppercaseString]])
+        NSString* deviceId = [command.arguments objectAtIndex:0];
+        self->ndefDataBlockDiscovery_callbackIdDict[deviceId] = command.callbackId;
+        
+        for (FmDevice *device in self->connectedDevicesList)
         {
-            [device getDataBlocks];
-            return;
+            if ([[device serialNumber] isEqualToString:[deviceId uppercaseString]])
+            {
+                [device getDataBlocks];
+                return;
+            }
         }
+        
+        // no matching reader found
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Device ID does not match any active reader"];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:self->ndefDataBlockDiscovery_callbackIdDict[deviceId]];
     }
-    
-    // no matching reader found
-    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Device ID does not match any active reader"];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:self->ndefDataBlockDiscovery_callbackIdDict[deviceId]];
+    else
+    {
+        // function currently only supported by FloBLE Plus
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"getDataBlocks is currently supported only by the FloBLE Plus"];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+    }
 }
 
 ////////////////////// INTERNAL FUNCTIONS /////////////////////////
