@@ -9,7 +9,7 @@ FlomioPlugin.prototype.init = function()
   exec(
     function()  // result handler, response from native method call
     {
-      // no result returned
+      // no result 
     },
     function(error)  // error handler
     {
