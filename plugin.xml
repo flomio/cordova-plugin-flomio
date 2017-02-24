@@ -24,7 +24,9 @@
     <platform name="ios">    
         <config-file target="config.xml" parent="/*">
             <feature name="FlomioPlugin">
-                <param name="ios-package" value="FlomioPlugin" /> 
+                <param name="ios-package" value="FlomioPlugin" />
+                <source-file src="src/ios/libSDKClasses.a" framework="true" />
+                <header-file src="src/ios/include" target-dir="src"/>
             </feature>
         </config-file>
         <js-module src="www/FlomioPlugin.js" name="FlomioPlugin">
