@@ -29,7 +29,7 @@
         </config-file>
         <source-file src="src/ios/libSDKClasses.a" framework="true" />
         <header-file src="src/ios/" target-dir="src/ios"/>
-        <preference name="ios-XCBuildConfiguration-HEADER\_SEARCH\_PATHS" value="'$(TARGET_BUILD_DIR)/usr/local/lib/include' '$(OBJROOT)/UninstalledProducts/$(PLATFORM_NAME)/include' '$(BUILT_PRODUCTS_DIR)'" buildType="release" xcconfigEnforce="true" />
+        <preference name="ios-XCBuildConfiguration-Users/scottcondron/Developer/flomio_apps_server/nfc-actions/platforms/ios/NFC_Actions/Plugins/include" value="'$(TARGET_BUILD_DIR)/usr/local/lib/include' '$(OBJROOT)/UninstalledProducts/$(PLATFORM_NAME)/include' '$(BUILT_PRODUCTS_DIR)'" buildType="release" xcconfigEnforce="true" />
         <js-module src="www/FlomioPlugin.js" name="FlomioPlugin">
             <clobbers target="flomioPlugin" />
         </js-module>
