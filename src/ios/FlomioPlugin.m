@@ -10,24 +10,52 @@
 /** Initialise the plugin */
 - (void)init:(CDVInvokedUrlCommand*)command
 {
-    if (!readerManager)
-    {
-        readerManager = [FmSessionManager sharedManager];
-        readerManager.delegate = self;
+    // if (!sharedManager)
+    // {
+    //     sharedManager = [FmSessionManager sharedManager];
+    //     sharedManager.delegate = self;
     
-        // Initialise callback ID strings
-        self->selectedDeviceType = @"null";
-        self->didFindATagUuid_callbackId = @"null";
-        self->deviceConnectionChange_callbackId = @"null";
-        self->cardStatusChange_callbackId = @"null";
+    //     // Initialise callback ID strings
+    //     self->selectedDeviceType = @"null";
+    //     self->didFindATagUuid_callbackId = @"null";
+    //     self->deviceConnectionChange_callbackId = @"null";
+    //     self->cardStatusChange_callbackId = @"null";
         
-        self->apduResponse_callbackIdDict = [NSMutableDictionary dictionary];
-        self->ndefDataBlockDiscovery_callbackIdDict = [NSMutableDictionary dictionary];
+    //     self->apduResponse_callbackIdDict = [NSMutableDictionary dictionary];
+    //     self->ndefDataBlockDiscovery_callbackIdDict = [NSMutableDictionary dictionary];
+    //     // Set SDK configuration and update reader settings
+    //     sharedManager.scanPeriod = [NSNumber numberWithInteger:500]; // in ms
+    //     sharedManager.scanSound = [NSNumber numberWithBool:YES]; // play scan sound
     
-        // Set SDK configuration and update reader settings
-        readerManager.scanPeriod = [NSNumber numberWithInteger:500]; // in ms
-        readerManager.scanSound = [NSNumber numberWithBool:YES]; // play scan sound
+    //     // Stop reader scan when the app becomes inactive
+    //     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(inactive) name:UIApplicationDidEnterBackgroundNotification object:nil];
+    //     // Start reader scan when the app becomes active
+    //     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(active) name:UIApplicationDidBecomeActiveNotification object:nil];
     
+    if (!sharedManager) {
+        // Initialise callback dictionaries
+        didUpdateConnectedDevicesCallbacks = [NSMutableDictionary new];
+        didFindTagWithUuidCallbacks = [NSMutableDictionary new];
+        didFindTagWithDataCallbacks = [NSMutableDictionary new];
+
+        // Initialise flomioSDK
+        sharedManager = [FmSessionManager sharedManager];
+        sharedManager.selectedDeviceType = self.selectedDeviceType; // For FloBLE Plus
+        //kFlojackMsr, kFlojackBzr for audiojack readers
+        sharedManager.delegate = self;
+        sharedManager.specificDeviceId = nil; 
+        //@"RR330-000120" use device id from back of device to only connect to specific device
+        // only for use when "Allow Multiconnect" = @0
+        NSDictionary *configurationDictionary = @{
+            @"Scan Sound" : @1,
+            @"Scan Period" : @1000,
+            @"Reader State" : [NSNumber numberWithInt:kReadUuid], //kReadData for NDEF
+            @"Power Operation" : [NSNumber numberWithInt:kAutoPollingControl], //kBluetoothConnectionControl low power usage
+            @"Transmit Power" : [NSNumber numberWithInt: kHighPower],
+            @"Allow Multiconnect" : @0, //control whether multiple FloBLE devices can connect
+            };
+        [sharedManager setConfiguration: configurationDictionary];
+        [sharedManager createReaders];
         // Stop reader scan when the app becomes inactive
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(inactive) name:UIApplicationDidEnterBackgroundNotification object:nil];
         // Start reader scan when the app becomes active
@@ -35,7 +63,31 @@
     }
 }
 
-/** Update reader settings */
+#pragma mark - Flomio Delegates
+
+/** Called when the list of connected devices is updated */
+- (void)didUpdateConnectedDevices:(NSArray *)connectedDevices {
+    self.connectedDevices = [connectedDevices mutableCopy];
+
+    NSMutableArray* deviceIdList = [NSMutableArray array];
+    for (FmDevice *device in connectedDevices)
+    {
+        [deviceIdList addObject: device.deviceId];
+    }
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (![self.didUpdateConnectedDevicesCallbacks isEqualToString:@"null"])
+        {
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:deviceIdList];
+            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:self->deviceConnectionChange_callbackId];
+        }
+    });
+}
+
+@end
+
+/** Update reader settings 
 - (void)setReaderSettings:(CDVInvokedUrlCommand*)command
 {
     NSString* scanPeriod = [command.arguments objectAtIndex:0];
@@ -45,43 +97,45 @@
     [self setScanPeriod:[NSString stringWithFormat:@"%@", scanPeriod] :callbackId];
     [self toggleScanSound:scanSound :callbackId];
 }
+*/
 
-/** Retrieve reader settings */
+/** Retrieve reader settings 
 - (void)getReaderSettings:(CDVInvokedUrlCommand *)command
 {
 	dispatch_async(dispatch_get_main_queue(), ^{
-	    NSArray* settings = @[readerManager.scanPeriod, readerManager.scanSound];
+	    NSArray* settings = @[sharedManager.scanPeriod, sharedManager.scanSound];
 	    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:settings];
 	    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 	});
 }
+*/
 
-/** Stops active readers of the current type then starts readers of the new type */
+/** Stops active readers of the current type then starts readers of the new type
 - (void)selectDeviceType:(CDVInvokedUrlCommand*)command
 {
-    [readerManager stopReaders];
+    [sharedManager stopReaders];
     NSString* deviceType = [command.arguments objectAtIndex:0];
     deviceType = [deviceType stringByReplacingOccurrencesOfString:@" " withString:@""]; // remove whitespace
     
     if ([[deviceType lowercaseString] isEqualToString:@"flojack-bzr"])
     {
-        self->selectedDeviceType = @"flojack-bzr";
-        readerManager.selectedDeviceType = kFlojackBzr;
+        self.selectedDeviceType = @"flojack-bzr";
+        sharedManager.selectedDeviceType = kFlojackBzr;
     }
     else if ([[deviceType lowercaseString] isEqualToString:@"flojack-msr"])
     {
-        self->selectedDeviceType = @"flojack-msr";
-        readerManager.selectedDeviceType = kFlojackMsr;
+        self.selectedDeviceType = @"flojack-msr";
+        sharedManager.selectedDeviceType = kFlojackMsr;
     }
     else if ([[deviceType lowercaseString] isEqualToString:@"floble-emv"])
     {
-        self->selectedDeviceType = @"floble-emv";
-        readerManager.selectedDeviceType = kFloBleEmv;
+        self.selectedDeviceType = @"floble-emv";
+        sharedManager.selectedDeviceType = kFloBleEmv;
     }
     else if ([[deviceType lowercaseString] isEqualToString:@"floble-plus"])
     {
-        self->selectedDeviceType = @"floble-plus";
-        readerManager.selectedDeviceType = kFloBlePlus;
+        self.selectedDeviceType = @"floble-plus";
+        sharedManager.selectedDeviceType = kFloBlePlus;
     }
     else
     {
@@ -90,10 +144,11 @@
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }
     
-    [readerManager startReaders];
+    [sharedManager startReaders];
 }
+ */
 
-/** Stops readers polling for tags */
+/** Stops readers polling for tags 
 - (void)stopReaders:(CDVInvokedUrlCommand*)command
 {
     if ([self->selectedDeviceType isEqualToString:@"null"])
@@ -103,11 +158,12 @@
     }
     else
     {
-        [readerManager stopReaders]; // stop all active readers
+        [sharedManager stopReaders]; // stop all active readers
     }
 }
+*/
 
-/** Send an APDU to a specific reader */
+/** Send an APDU to a specific reader 
 - (void)sendApdu:(CDVInvokedUrlCommand *)command
 {
     NSString* deviceId = [command.arguments objectAtIndex:0];
@@ -131,7 +187,9 @@
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Device ID does not match any active reader"];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:self->apduResponse_callbackIdDict[deviceId]];
 }
+*/
 
+/* 
 - (void)setDeviceConnectionChangeCallback:(CDVInvokedUrlCommand*)command
 {
 	self->deviceConnectionChange_callbackId = command.callbackId;
@@ -146,8 +204,9 @@
 {
     self->cardStatusChange_callbackId = command.callbackId;
 }
+*/
 
-/** Sets callback for tag UID read events */
+/** Sets callback for tag UID read events 
 - (void)setTagUidReadCallback:(CDVInvokedUrlCommand*)command
 {
     self->didFindATagUuid_callbackId = command.callbackId;
@@ -180,10 +239,11 @@
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }
 }
+*/
 
 ////////////////////// INTERNAL FUNCTIONS /////////////////////////
 
-/** Set the scan period (in ms) */
+/** Set the scan period (in ms) 
 - (void)setScanPeriod:(NSString*)periodString :(NSString*)callbackId;
 {
     periodString = [periodString stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
@@ -196,7 +256,7 @@
     int period = [periodString intValue];
     if (period > 0)
     {
-        readerManager.scanPeriod = [NSNumber numberWithInteger:period];
+        sharedManager.scanPeriod = [NSNumber numberWithInteger:period];
     }
     else
     {
@@ -204,8 +264,9 @@
         [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
     }
 }
+*/
 
-/** Toggle on/off scan sound */
+/** Toggle on/off scan sound 
 - (void)toggleScanSound:(NSString*)toggleString :(NSString*)callbackId;
 {
     NSString* toggle = [toggleString stringByReplacingOccurrencesOfString:@" " withString:@""]; // remove whitespace
@@ -216,11 +277,11 @@
     
     if ([[toggle lowercaseString] isEqualToString:@"true"])
     {
-        readerManager.scanSound = [NSNumber numberWithBool:YES];
+        sharedManager.scanSound = [NSNumber numberWithBool:YES];
     }
     else if ([[toggle lowercaseString] isEqualToString:@"false"])
     {
-        readerManager.scanSound = [NSNumber numberWithBool:NO];
+        sharedManager.scanSound = [NSNumber numberWithBool:NO];
     }
     else
     {
@@ -228,20 +289,23 @@
         [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
     }
 }
+*/
 
 ////////////////////// INTERNAL FLOMIO READER FUNCTIONS /////////////////////////
 
-/** Called when the app becomes active */
+/** Called when the app becomes active 
 - (void)active {
     NSLog(@"App Activated");
 }
+*/
 
-/** Called when the app becomes inactive */
+/** Called when the app becomes inactive
 - (void)inactive {
     NSLog(@"App Inactive");
 }
+ */
 
-/** Called when the list of connected devices is updated */
+/** Called when the list of connected devices is updated 
 - (void)didUpdateConnectedDevices:(NSArray *)connectedDevices {
     self->connectedDevicesList = [connectedDevices mutableCopy];
     
@@ -260,26 +324,9 @@
         }
     });
 }
+*/
 
-/** Called when the list of connected BR500 devices is updated */
-- (void)didUpdateConnectedBr500:(NSArray *)peripherals {
-    NSMutableArray* deviceIdList = [NSMutableArray array];
-    for (FmDevice *device in peripherals)
-    {
-        [deviceIdList addObject:[device serialNumber]];
-    }
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (![self->br500ConnectionChange_callbackId isEqualToString:@"null"])
-        {
-            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:deviceIdList];
-            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:self->br500ConnectionChange_callbackId];
-        }
-    });
-}
-
-/** Receives the UUID of a scanned tag */
+/** Receives the UUID of a scanned tag 
 - (void)didFindATagUuid:(NSString *)Uuid fromDevice:(NSString *)deviceId withError:(NSError *)error
 {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -295,8 +342,9 @@
         }
     });
 }
+*/
 
-/** A tag has entered or left the scan range of the reader */
+/** A tag has entered or left the scan range of the reader 
 - (void)didChangeCardStatus:(NSNumber *)status fromDevice:(NSString *)deviceId
 {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -310,8 +358,9 @@
         }
     });
 }
+*/
 
-/** Receives APDU responses from connected devices */
+/** Receives APDU responses from connected devices 
 - (void)didRespondToApduCommand:(NSString *)response fromDevice:(NSString *)deviceId withError:(NSError *)error{
     dispatch_async(dispatch_get_main_queue(), ^{
         NSLog(@"Received APDU: %@ from device:%@", response, deviceId); //APDU Response
@@ -326,8 +375,9 @@
         }
     });
 }
+*/
 
-/** Receives error messages from connected devices */
+/** Receives error messages from connected devices 
 - (void)didReceiveReaderError:(NSError *)error {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSLog(@"%@", error); // reader error
@@ -340,8 +390,9 @@
         }
     });
 }
+*/
 
-/** Receives an NDEF data block from a nearby tag **/
+/** Receives an NDEF data block from a nearby tag 
 - (void)didFindADataBlockWithNdef:(NdefMessage *)ndef fromDevice:(NSString *)device withError:(NSError *)error
 {
     NSMutableArray* recordsArray = [NSMutableArray array];
@@ -365,5 +416,4 @@
         }
     });
 }
-
-@end
+*/
