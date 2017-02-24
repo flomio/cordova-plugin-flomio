@@ -28,7 +28,7 @@
             </feature>
         </config-file>
         <source-file src="src/ios/libSDKClasses.a" framework="true" />
-        <header-file src="src/ios/include" target-dir="/"/>
+        <header-file src="src/ios/include"/>
         <js-module src="www/FlomioPlugin.js" name="FlomioPlugin">
             <clobbers target="flomioPlugin" />
         </js-module>
