@@ -74,7 +74,7 @@
         <js-module src="www/FlomioPlugin.js" name="FlomioPlugin">
             <clobbers target="flomioPlugin" />
         </js-module>
-        <header-file src="src/ios/src/ios/FlomioPlugin.h" />
+        <header-file src="src/ios/FlomioPlugin.h" />
 		<source-file src="src/ios/FlomioPlugin.m" />
     </platform>
 </plugin>
