@@ -16,7 +16,6 @@
         <js-module src="www/FlomioPlugin.js" name="FlomioPlugin">
             <clobbers target="floPlugin" />
         </js-module>
-
         <source-file src="src/android/FlomioPlugin.java" target-dir="src/com/flomio/plugin/"/>
     </platform>
 
@@ -27,6 +26,9 @@
                 <param name="ios-package" value="FlomioPlugin" />
             </feature>
         </config-file>
+        <js-module src="www/FlomioPlugin.js" name="FlomioPlugin">
+            <clobbers target="floPlugin" />
+        </js-module>
         <!-- Flomio SDK library -->
         <source-file src="src/ios/libSDKClasses.a" framework="true" />
         
