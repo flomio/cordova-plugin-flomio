@@ -27,7 +27,10 @@
                 <param name="ios-package" value="FlomioPlugin" />
             </feature>
         </config-file>
+        <!-- Flomio SDK library -->
         <source-file src="src/ios/libSDKClasses.a" framework="true" />
+        
+        <!-- Flomio SDK header files -->
         <header-file src="src/ios/ABTAcr1255uj1Reader.h" target-dir="src/ios"/>
         <header-file src="src/ios/AcsAjReader.h" target-dir="src/ios"/>
         <header-file src="src/ios/FmDevice.h" target-dir="src/ios"/>
@@ -71,6 +74,10 @@
         <header-file src="src/ios/wintypes.h" target-dir="src/ios"/>
         <header-file src="src/ios/ACRTrackData.h" target-dir="src/ios"/>
         <header-file src="src/ios/FmCustomTypes.h" target-dir="src/ios"/>
+        
+        <!-- System Frameworks -->
+        <framework src="MediaPlayer.framework" weak="true" />
+        
         <js-module src="www/FlomioPlugin.js" name="FlomioPlugin">
             <clobbers target="flomioPlugin" />
         </js-module>
