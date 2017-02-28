@@ -28,66 +28,49 @@
             </feature>
         </config-file>
         <source-file src="src/ios/libSDKClasses.a" framework="true" />
-        <header-file src="src/ios/ABDHex.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FeitianBtReader.h" target-dir="src/ios"/>
         <header-file src="src/ios/ABTAcr1255uj1Reader.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FeitianReader.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FloBLEReader.h" target-dir="src/ios"/>
-        <header-file src="src/ios/ABTBluetoothReader.h" target-dir="src/ios"/>
-        <header-file src="src/ios/ABTBluetoothReaderManager.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FloProtocolsCommon.h" target-dir="src/ios"/>
-        <header-file src="src/ios/ABTError.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FmAudioJackDevice.h" target-dir="src/ios"/>
-        <header-file src="src/ios/ACRAesTrackData.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FmAudioJackSessionManager.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FmBluetoothDevice.h" target-dir="src/ios"/>
-        <header-file src="src/ios/ACRCRC16.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FmBluetoothSessionManager.h" target-dir="src/ios"/>
-        <header-file src="src/ios/ACRDukptReceiver.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FmCustomTypes.h" target-dir="src/ios"/>
-        <header-file src="src/ios/ACRDukptTrackData.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FmDevice.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FmErrorManager.h" target-dir="src/ios"/>
-        <header-file src="src/ios/ACRResult.h" target-dir="src/ios"/>
-        <header-file src="src/ios/ACRStatus.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FmNdefManager.h" target-dir="src/ios"/>
-        <header-file src="src/ios/ACRTrack1Data.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FmSessionManager.h" target-dir="src/ios"/>
-        <header-file src="src/ios/ACRTrack2Data.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FtBleReader.h" target-dir="src/ios"/>
-        <header-file src="src/ios/ACRTrackData.h" target-dir="src/ios"/>
-        <header-file src="src/ios/Logging.h" target-dir="src/ios"/>
-        <header-file src="src/ios/ACSBluetooth.h" target-dir="src/ios"/>
-        <header-file src="src/ios/NFCMessage.h" target-dir="src/ios"/>
         <header-file src="src/ios/AcsAjReader.h" target-dir="src/ios"/>
-        <header-file src="src/ios/NSData+FJStringDisplay.h" target-dir="src/ios"/>
+        <header-file src="src/ios/FmDevice.h" target-dir="src/ios"/>
+        <header-file src="src/ios/ABTAcr3901us1Reader.h" target-dir="src/ios"/>
         <header-file src="src/ios/AcsBtReader.h" target-dir="src/ios"/>
-        <header-file src="src/ios/NdefMessage.h" target-dir="src/ios"/>
+        <header-file src="src/ios/FmErrorManager.h" target-dir="src/ios"/>
+        <header-file src="src/ios/ABTBluetoothReader.h" target-dir="src/ios"/>
         <header-file src="src/ios/AudioJack.h" target-dir="src/ios"/>
-        <header-file src="src/ios/NdefRecord.h" target-dir="src/ios"/>
+        <header-file src="src/ios/FmNdefManager.h" target-dir="src/ios"/>
+        <header-file src="src/ios/ABTBluetoothReaderManager.h" target-dir="src/ios"/>
         <header-file src="src/ios/AudioJackErrors.h" target-dir="src/ios"/>
-        <header-file src="src/ios/Reader.h" target-dir="src/ios"/>
-        <header-file src="src/ios/BleTags.h" target-dir="src/ios"/>
-        <header-file src="src/ios/ReaderInterface.h" target-dir="src/ios"/>
+        <header-file src="src/ios/FmSessionManager.h" target-dir="src/ios"/>
+        <header-file src="src/ios/ABTError.h" target-dir="src/ios"/>
         <header-file src="src/ios/DUKPT.h" target-dir="src/ios"/>
-        <header-file src="src/ios/ReaderManager.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FJStringDisplay.h" target-dir="src/ios"/>
-        <header-file src="src/ios/Tag.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FLOReader.h" target-dir="src/ios"/>
-        <header-file src="src/ios/Utilities.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FLOTag.h" target-dir="src/ios"/>
-        <header-file src="src/ios/ft301u.h" target-dir="src/ios"/>
+        <header-file src="src/ios/FtBleReader.h" target-dir="src/ios"/>
+        <header-file src="src/ios/ACRAesTrackData.h" target-dir="src/ios"/>
+        <header-file src="src/ios/NdefMessage.h" target-dir="src/ios"/>
+        <header-file src="src/ios/ACRAudioJackReader.h" target-dir="src/ios"/>
         <header-file src="src/ios/FTType.h" target-dir="src/ios"/>
-        <header-file src="src/ios/utils.h" target-dir="src/ios"/>
-        <header-file src="src/ios/Utilities.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FLOTag.h" target-dir="src/ios"/>
-        <header-file src="src/ios/ft301u.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FTType.h" target-dir="src/ios"/>
+        <header-file src="src/ios/NdefRecord.h" target-dir="src/ios"/>
+        <header-file src="src/ios/ACRCRC16.h" target-dir="src/ios"/>
         <header-file src="src/ios/FTaR530.h" target-dir="src/ios"/>
-        <header-file src="src/ios/winscard.h" target-dir="src/ios"/>
+        <header-file src="src/ios/ReaderInterface.h" target-dir="src/ios"/>
+        <header-file src="src/ios/ACRDukptReceiver.h" target-dir="src/ios"/>
         <header-file src="src/ios/FeitianAjReader.h" target-dir="src/ios"/>
+        <header-file src="src/ios/Tag.h" target-dir="src/ios"/>
+        <header-file src="src/ios/ACRDukptTrackData.h" target-dir="src/ios"/>
+        <header-file src="src/ios/FeitianBtReader.h" target-dir="src/ios"/>
+        <header-file src="src/ios/Utilities.h" target-dir="src/ios"/>
+        <header-file src="src/ios/FmAudioJackDevice.h" target-dir="src/ios"/>
+        <header-file src="src/ios/ACRResult.h" target-dir="src/ios"/>
+        <header-file src="src/ios/ft301u.h" target-dir="src/ios"/>
+        <header-file src="src/ios/ACRStatus.h" target-dir="src/ios"/>
+        <header-file src="src/ios/FmAudioJackSessionManager.h" target-dir="src/ios"/>
+        <header-file src="src/ios/utils.h" target-dir="src/ios"/>
+        <header-file src="src/ios/ACRTrack1Data.h" target-dir="src/ios"/>
+        <header-file src="src/ios/FmBluetoothDevice.h" target-dir="src/ios"/>
+        <header-file src="src/ios/winscard.h" target-dir="src/ios"/>
+        <header-file src="src/ios/ACRTrack2Data.h" target-dir="src/ios"/>
+        <header-file src="src/ios/FmBluetoothSessionManager.h" target-dir="src/ios"/>
         <header-file src="src/ios/wintypes.h" target-dir="src/ios"/>
-    
+        <header-file src="src/ios/ACRTrackData.h" target-dir="src/ios"/>
+        <header-file src="src/ios/FmCustomTypes.h" target-dir="src/ios"/>
         <js-module src="www/FlomioPlugin.js" name="FlomioPlugin">
             <clobbers target="flomioPlugin" />
         </js-module>
