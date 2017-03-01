@@ -212,5 +212,5 @@ module.exports = {
 //   );
 // }
 
-var flomioPlugin = new FlomioPlugin();
-module.exports = flomioPlugin;
+// var flomioPlugin = new FlomioPlugin();
+// module.exports = flomioPlugin;
