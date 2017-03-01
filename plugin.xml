@@ -5,32 +5,34 @@
     version="1.0.2">
     <name>flomio_cordova_plugin</name>
     <description>Flomio SDK integration enables NFC, BLE, and UHF RFID reader hardware.</description>
-    
-    <js-module src="www/FlomioPlugin.js" name="FlomioPlugin">
-        <clobbers target="flomioPlugin" />
-    </js-module>
 
     <!-- android -->
     <platform name="android">
         <config-file target="res/xml/config.xml" parent="/*">
-          <feature name="FlomioPlugin">
-            <param name="android-package" value="com.flomio.plugin.FlomioPlugin"/>
-          </feature>
+            <feature name="FlomioPlugin">
+                <param name="android-package" value="com.flomio.plugin.FlomioPlugin"/>
+            </feature>
         </config-file>
+        <js-module src="www/flomioPlugin.js" name="FlomioPlugin">
+            <clobbers target="flomioPlugin" />
+        </js-module>
         <source-file src="src/android/FlomioPlugin.java" target-dir="src/com/flomio/plugin/"/>
     </platform>
 
     <!-- ios -->
-    <platform name="ios">    
+    <platform name="ios">
         <config-file target="config.xml" parent="/*">
             <feature name="FlomioPlugin">
                 <param name="ios-package" value="FlomioPlugin" />
             </feature>
         </config-file>
+        <js-module src="www/flomioPlugin.js" name="FlomioPlugin">
+            <clobbers target="flomioPlugin" />
+        </js-module>
 
         <!-- Flomio SDK library -->
         <source-file src="src/ios/libSDKClasses.a" framework="true" />
-        
+
         <!-- Flomio SDK header files -->
         <header-file src="src/ios/FJStringDisplay.h" target-dir="src/ios"/>
         <header-file src="src/ios/ABTAcr1255uj1Reader.h" target-dir="src/ios"/>
@@ -76,19 +78,18 @@
         <header-file src="src/ios/wintypes.h" target-dir="src/ios"/>
         <header-file src="src/ios/ACRTrackData.h" target-dir="src/ios"/>
         <header-file src="src/ios/FmCustomTypes.h" target-dir="src/ios"/>
-        
+
         <!-- System Frameworks -->
         <framework src="MediaPlayer.framework" weak="true" />
         <framework src="libc++.dylib" />
-        
+
         <!-- Request permission to use mircophone -->
         <preference name="MICROPHONE_USAGE_DESCRIPTION" default=" " />
         <config-file target="*-Info.plist" parent="NSMicrophoneUsageDescription">
             <string>$MICROPHONE_USAGE_DESCRIPTION</string>
         </config-file>
 
-        
         <header-file src="src/ios/FlomioPlugin.h" />
-		<source-file src="src/ios/FlomioPlugin.m" />
+        <source-file src="src/ios/FlomioPlugin.m" />
     </platform>
 </plugin>

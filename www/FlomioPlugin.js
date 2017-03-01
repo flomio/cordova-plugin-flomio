@@ -30,21 +30,17 @@ module.exports = {
 //     );
 // }
 
-// FlomioPlugin.prototype.selectDeviceType = function(deviceType)
-// {
-//   exec(
-//     function()
-//     {
-//       // no result returned
-//     },
-//     function(error)
-//     {
-//       console.log("ERROR: FlomioPlugin.selectDeviceType: " + error);
-//     },
-//     "FlomioPlugin",
-//     "selectDeviceType",
-//     [deviceType]  // deviceType is "FloJack-BZR", "FloJack-MSR", "FloBLE-EMV" or "FloBLE-Plus" (case insensitive)
-//   );
+// FlomioPlugin.prototype.selectDeviceType = function(deviceType) {
+//     exec(
+//         function() {
+//             // no result returned
+//         },
+//         function(error) {
+//             console.log("ERROR: FlomioPlugin.selectDeviceType: " + error);
+//         },
+//         "FlomioPlugin",
+//         "selectDeviceType", [deviceType] // deviceType is "FloJack-BZR", "FloJack-MSR", "FloBLE-EMV" or "FloBLE-Plus" (case insensitive)
+//     );
 // }
 
 // FlomioPlugin.prototype.setReaderSettings = function(readerSettings)
