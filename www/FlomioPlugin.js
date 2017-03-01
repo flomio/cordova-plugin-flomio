@@ -2,22 +2,33 @@ var exec = require('cordova/exec');
 /**
  * Constructor
  */
-function FlomioPlugin() {}
+module.exports = {
+    init: function(success, failur) {
+        exec(success, failure, 'FlomioPlugin', 'init', []);
+    },
 
-FlomioPlugin.prototype.init = function() {
-    exec(
-        function() // result handler, response from native method call
-        {
-            // no result 
-        },
-        function(error) // error handler
-        {
-            console.log("ERROR: FlomioPlugin.init: " + error);
-        },
-        "FlomioPlugin",
-        "init", []
-    );
+    selectDeviceType: function(deviceType, success, failur) {
+        exec(success, failure, 'FlomioPlugin', 'selectDeviceType', [deviceType]);
+        // deviceType is "FloJack-BZR", "FloJack-MSR", "FloBLE-EMV" or "FloBLE-Plus" (case insensitive)
+    },
 }
+
+// function FlomioPlugin() {}
+
+// FlomioPlugin.prototype.init = function() {
+//     exec(
+//         function() // result handler, response from native method call
+//         {
+//             // no result 
+//         },
+//         function(error) // error handler
+//         {
+//             console.log("ERROR: FlomioPlugin.init: " + error);
+//         },
+//         "FlomioPlugin",
+//         "init", []
+//     );
+// }
 
 // FlomioPlugin.prototype.selectDeviceType = function(deviceType)
 // {

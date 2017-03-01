@@ -1,7 +1,7 @@
 /*
  FlomioPlugin.h
  Uses Flomio SDK version 2.0
-*/
+ */
 
 #import "FmSessionManager.h"
 #import <Cordova/CDV.h>
@@ -25,10 +25,10 @@
 
 // Cordova functions
 - (void)init:(CDVInvokedUrlCommand*)command;
+- (void)selectDeviceType:(CDVInvokedUrlCommand*)command;
 
 // - (void)setReaderSettings:(CDVInvokedUrlCommand*)command;
 // - (void)getReaderSettings:(CDVInvokedUrlCommand*)command;
-// - (void)selectDeviceType:(CDVInvokedUrlCommand*)command;
 // - (void)setTagUidReadCallback:(CDVInvokedUrlCommand*)command;
 // - (void)stopReaders:(CDVInvokedUrlCommand*)command;
 // - (void)sendApdu:(CDVInvokedUrlCommand*)command;
