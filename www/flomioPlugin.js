@@ -14,8 +14,7 @@ module.exports = {
 
     setConfiguration: (configurationDictionary, success, failure) => {
         var configurationArray = new Array();
-        var keyArray = new Array("scanPeriod", "scanSound");
-
+        var keyArray = new Array("scanPeriod", "scanSound", "readerState", "powerOperation");
         // convert dictionary to array
         for (index in keyArray) {
             if (typeof configurationDictionary[keyArray[index]] === 'undefined') {
@@ -68,5 +67,12 @@ module.exports = {
             (deviceId, tagUid) => { resultCallback({ tagUid: tagUid, deviceId: deviceId }) },
             (failure) => { console.log("ERROR: FlomioPlugin.addTagDiscoveredListener: " + failure) },
             "FlomioPlugin", "setTagDiscoveredCallback", []);
+    },
+
+    addNdefListener: (resultCallback, success, failure) => {
+        exec(
+            (deviceId, tagUid) => { resultCallback({ tagUid: tagUid, deviceId: deviceId }) },
+            (failure) => { console.log("ERROR: FlomioPlugin.addNdefListener: " + failure) },
+            "FlomioPlugin", "addNdefListener", []);
     },
 }
