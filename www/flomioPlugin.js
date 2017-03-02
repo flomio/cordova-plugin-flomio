@@ -36,14 +36,14 @@ module.exports = {
 
         stopReaders: (success, failure) => {
             exec(
-                success,
+                (scanPeriod, scanSound) => { resultCallback({ deviceId: deviceId, responseApdu: responseApdu }) },
                 (failure) => { console.log("ERROR: FlomioPlugin.stopReaders: " + failure) },
                 "FlomioPlugin", "getReaderSettings", []);
         },
 
         sendApdu: (resultCallback, deviceId, apdu, success, failure) => {
             exec(
-                (scanPeriod, scanSound) => { resultCallback({ deviceId: deviceId, responseApdu: responseApdu }) },
+                success,
                 (failure) => { console.log("ERROR: FlomioPlugin.sendApdu: " + failure) },
                 "FlomioPlugin", "sendApdu", [deviceId, apdu]);
         },
