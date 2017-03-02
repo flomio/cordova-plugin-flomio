@@ -12,9 +12,9 @@
     // Cordova attributes
     NSString* selectedDeviceTypeCallbackId;
     NSString* didChangeCardStatusCallbackId;
-    NSMutableDictionary* didUpdateConnectedDevicesCallbacks;
-    NSMutableDictionary* didFindTagWithUuidCallbacks;
-    NSMutableDictionary* didFindTagWithDataCallbacks;
+    NSString* didUpdateConnectedDevicesCallbackId;
+    NSString* didFindTagWithUuidCallbackId;
+    NSString* didFindTagWithDataCallbackId;
     
     // Flomio reader attributes
     FmSessionManager* sharedManager;
@@ -26,6 +26,17 @@
 // Cordova functions
 - (void)init:(CDVInvokedUrlCommand*)command;
 - (void)selectDeviceType:(CDVInvokedUrlCommand*)command;
+- (void)createReaders;
+- (void)startReaders;
+- (void)stopReaders;
+- (void)sleepReaders;
+- (void)startReader:(NSString *)deviceSerialNumber;
+- (void)stopReader:(NSString *)deviceSerialNumber;
+- (void)sleepReader:(NSString *)deviceSerialNumber;
+- (void)setConfiguration:(NSDictionary *)configurationDictionary; //initialize all devices configuration with this
+- (void)setConfiguration:(NSDictionary *)configurationDictionary ofDevice:(NSString *)deviceSerialNumber;
+- (NSDictionary *)getConfigurationOfDevice:(NSString *)deviceSerialNumber;
+- (void)sendApdu:(NSString *)apdu toDevice:(NSString *)deviceSerialNumber;
 
 // - (void)setReaderSettings:(CDVInvokedUrlCommand*)command;
 // - (void)getReaderSettings:(CDVInvokedUrlCommand*)command;
@@ -41,7 +52,7 @@
 - (void)setScanPeriod:(NSString*)periodString :(NSString*)callbackId;
 - (void)toggleScanSound:(NSString*)toggleString :(NSString*)callbackId;
 
-// Internal Flomio reader functions
+// SDK reader delegates
 - (void)didFindTagWithUuid:(NSString *)Uuid fromDevice:(NSString *)deviceId withAtr:(NSString *)Atr withError:(NSError *)error;
 - (void)didFindTagWithData:(NSDictionary *)payload fromDevice:(NSString *)deviceId withAtr:(NSString *)Atr withError:(NSError *)error;
 - (void)didRespondToApduCommand:(NSString *)response fromDevice:(NSString *)serialNumber withError:(NSError *)error;

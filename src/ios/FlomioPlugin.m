@@ -8,36 +8,8 @@
 @implementation FlomioPlugin
 
 /** Initialise the plugin */
-- (void)init:(CDVInvokedUrlCommand*)command
-{
-    // if (!sharedManager)
-    // {
-    //     sharedManager = [FmSessionManager sharedManager];
-    //     sharedManager.delegate = self;
-    
-    //     // Initialise callback ID strings
-    //     self->selectedDeviceType = @"null";
-    //     self->didFindATagUuid_callbackId = @"null";
-    //     self->deviceConnectionChange_callbackId = @"null";
-    //     self->cardStatusChange_callbackId = @"null";
-    
-    //     self->apduResponse_callbackIdDict = [NSMutableDictionary dictionary];
-    //     self->ndefDataBlockDiscovery_callbackIdDict = [NSMutableDictionary dictionary];
-    //     // Set SDK configuration and update reader settings
-    //     sharedManager.scanPeriod = [NSNumber numberWithInteger:500]; // in ms
-    //     sharedManager.scanSound = [NSNumber numberWithBool:YES]; // play scan sound
-    
-    //     // Stop reader scan when the app becomes inactive
-    //     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(inactive) name:UIApplicationDidEnterBackgroundNotification object:nil];
-    //     // Start reader scan when the app becomes active
-    //     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(active) name:UIApplicationDidBecomeActiveNotification object:nil];
-    
-    if (!sharedManager) {
-        // Initialise callback dictionaries
-        didUpdateConnectedDevicesCallbacks = [NSMutableDictionary new];
-        didFindTagWithUuidCallbacks = [NSMutableDictionary new];
-        didFindTagWithDataCallbacks = [NSMutableDictionary new];
-        
+- (void)init:(CDVInvokedUrlCommand*)command {
+    if (!sharedManager) {        
         // Initialise flomioSDK
         sharedManager = [FmSessionManager sharedManager];
         sharedManager.selectedDeviceType = self.selectedDeviceType; // For FloBLE Plus
@@ -67,7 +39,6 @@
 - (void)selectDeviceType:(CDVInvokedUrlCommand*)command {
     NSString* deviceType = [command.arguments objectAtIndex:0];
     deviceType = [deviceType stringByReplacingOccurrencesOfString:@" " withString:@""];
-    
     if ([[deviceType lowercaseString] isEqualToString:@"flojack-bzr"]) {
         self.selectedDeviceType = kFlojackBzr;
     } else if ([[deviceType lowercaseString] isEqualToString:@"flojack-msr"]){
@@ -88,23 +59,76 @@
 
 /** Called when the list of connected devices is updated */
 - (void)didUpdateConnectedDevices:(NSArray *)connectedDevices {
-    //    self.connectedDevices = [connectedDevices mutableCopy];
-    //
-    //    NSMutableArray* deviceIdList = [NSMutableArray array];
-    //    for (FmDevice *device in connectedDevices)
-    //    {
-    //        [deviceIdList addObject: device.deviceId];
-    //    }
-    //
-    //    dispatch_async(dispatch_get_main_queue(), ^{
-    //        if (![self.didUpdateConnectedDevicesCallbacks isEqualToString:@"null"])
-    //        {
-    //            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:deviceIdList];
-    //            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-    //            [self.commandDelegate sendPluginResult:pluginResult callbackId:self->deviceConnectionChange_callbackId];
-    //        }
-    //    });
+    self.connectedDevices = [connectedDevices mutableCopy];
+    NSMutableArray* deviceIdList = [NSMutableArray array];
+    for (FmDevice *device in connectedDevices)
+    {
+        [deviceIdList addObject: device.deviceId];
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (didUpdateConnectedDevicesCallbackId)
+        {
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:deviceIdList];
+            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:didUpdateConnectedDevicesCallbackId];
+        }
+    });
 }
+
+- (void)didFindTagWithUuid:(NSString *)Uuid fromDevice:(NSString *)deviceId withAtr:(NSString *)Atr withError:(NSError *)error{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSLog(@"Found tag UUID: %@ from device:%@", Uuid, deviceId);
+        // send tag read update to Cordova
+        if (didFindTagWithUuidCallbackId) {
+            NSArray* result = @[deviceId, Uuid];
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
+            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:didFindTagWithUuidCallbackId];
+        }
+    });
+}
+
+- (void)didFindTagWithData:(NSDictionary *)payload fromDevice:(NSString *)deviceId withAtr:(NSString *)Atr withError:(NSError *)error{
+
+}
+
+- (void)didRespondToApduCommand:(NSString *)response fromDevice:(NSString *)serialNumber withError:(NSError *)error{
+
+}
+
+- (void)didReceiveReaderError:(NSError *)error{
+    
+}
+
+- (void)didChangeCardStatus:(CardStatus)status fromDevice:(NSString *)device{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        // send card status change to Cordova
+        if (didChangeCardStatusCallbackId){
+            NSArray* result = @[deviceId, status];
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
+            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:didChangeCardStatusCallbackId];
+        }
+    });
+}
+
+
+#pragma mark - CallbackId setters
+
+ - (void)setConnectedDevicesUpdateCallback:(CDVInvokedUrlCommand*)command
+ {
+	didUpdateConnectedDevicesCallbackId = command.callbackId;
+ }
+ 
+ - (void)setCardStatusChangeCallback:(CDVInvokedUrlCommand*)command
+ {
+    didChangeCardStatusCallbackId = command.callbackId;
+ }
+ 
+ - (void)setTagUuidReadCallback:(CDVInvokedUrlCommand*)command
+ {
+    didFindTagWithUuidCallbackId = command.callbackId;
+ }
 
 @end
 
@@ -290,22 +314,7 @@
 
 /** Called when the list of connected devices is updated
  - (void)didUpdateConnectedDevices:(NSArray *)connectedDevices {
- self->connectedDevicesList = [connectedDevices mutableCopy];
  
- NSMutableArray* deviceIdList = [NSMutableArray array];
- for (FmDevice *device in connectedDevices)
- {
- [deviceIdList addObject:[device serialNumber]];
- }
- 
- dispatch_async(dispatch_get_main_queue(), ^{
- if (![self->deviceConnectionChange_callbackId isEqualToString:@"null"])
- {
- CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:deviceIdList];
- [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
- [self.commandDelegate sendPluginResult:pluginResult callbackId:self->deviceConnectionChange_callbackId];
- }
- });
  }
  */
 

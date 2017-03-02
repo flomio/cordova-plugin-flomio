@@ -3,78 +3,67 @@ var exec = require('cordova/exec');
  * Constructor
  */
 module.exports = {
-    init: function(success, failur) {
+    init: function(success, failure) {
         exec(success, failure, 'FlomioPlugin', 'init', []);
     },
 
-    selectDeviceType: function(deviceType, success, failur) {
+    selectDeviceType: function(deviceType, success, failure) {
         exec(success, failure, 'FlomioPlugin', 'selectDeviceType', [deviceType]);
         // deviceType is "FloJack-BZR", "FloJack-MSR", "FloBLE-EMV" or "FloBLE-Plus" (case insensitive)
     },
+
+    setConfiguration: function(configurationDictionary, success, failure) {
+        var configurationArray = new Array();
+        var keyArray = new Array("scanPeriod", "scanSound");
+
+        // convert dictionary to array
+        for (index in keyArray) {
+            if (typeof configurationDictionary[keyArray[index]] === 'undefined') {
+                configurationArray.push("unchanged");
+            } else {
+                configurationArray.push(readerSettings[keyArray[index]]);
+            }
+        }
+        exec(success, error, "FlomioPlugin", "setConfiguration", configurationArray);
+    },
+
+    addConnectedDevicesListener: function(resultCallback) {
+        exec(
+            (deviceIdList) => {
+                resultCallback(deviceIdList);
+            },
+            error, "FlomioPlugin", "setConnectedDevicesUpdateCallback", []);
+    },
+
+    addCardStatusChangeListener: function(resultCallback) {
+        exec(function(deviceId, status) {
+                resultCallback({ deviceId: deviceId, status: status });
+            },
+            function(error) {
+                console.log("ERROR: FlomioPlugin.addCardStatusChangeListener: " + error);
+            },
+            "FlomioPlugin", "setCardStatusChangeCallback", []);
+    },
+
+    //   exec(
+    //     function(deviceId, status)
+    //     {
+    //       resultCallback({deviceId: deviceId, status: status});
+    //     },
+    //     function(error)
+    //     {
+    //       console.log("ERROR: FlomioPlugin.onTagStatusChange: " + error);
+    //     },
+    //     "FlomioPlugin",
+    //     "setCardStatusChangeCallback",
+    //     []
+    //   );
+
+    // addTagDiscoveredListener: function(callback, win, fail) {
+    //     document.addEventListener("tag", callback, false);
+    //     cordova.exec(win, fail, "NfcPlugin", "registerTag", []);
+    // },
 }
-
-// function FlomioPlugin() {}
-
-// FlomioPlugin.prototype.init = function() {
-//     exec(
-//         function() // result handler, response from native method call
-//         {
-//             // no result 
-//         },
-//         function(error) // error handler
-//         {
-//             console.log("ERROR: FlomioPlugin.init: " + error);
-//         },
-//         "FlomioPlugin",
-//         "init", []
-//     );
-// }
-
-// FlomioPlugin.prototype.selectDeviceType = function(deviceType) {
-//     exec(
-//         function() {
-//             // no result returned
-//         },
-//         function(error) {
-//             console.log("ERROR: FlomioPlugin.selectDeviceType: " + error);
-//         },
-//         "FlomioPlugin",
-//         "selectDeviceType", [deviceType] // deviceType is "FloJack-BZR", "FloJack-MSR", "FloBLE-EMV" or "FloBLE-Plus" (case insensitive)
-//     );
-// }
-
-// FlomioPlugin.prototype.setReaderSettings = function(readerSettings)
-// {
-//   var readerSettingsArray = new Array();
-//   var keyArray = new Array("scanPeriod", "scanSound");
-
-//   // convert dictionary to array
-//   for(index in keyArray)
-//   {
-//     if(typeof readerSettings[keyArray[index]] === 'undefined')
-//     {
-//       readerSettingsArray.push("unchanged");
-//     }
-//     else
-//     {
-//       readerSettingsArray.push(readerSettings[keyArray[index]]);
-//     }
-//   }
-
-//   exec(
-//     function()
-//     {
-//       // no result returned
-//     },
-//     function(error)
-//     {
-//       console.log("ERROR: FlomioPlugin.setReaderSettings: " + error);
-//     },
-//     "FlomioPlugin",
-//     "setReaderSettings",
-//     readerSettingsArray
-//   );
-// }
 
 // FlomioPlugin.prototype.getReaderSettings = function(resultCallback)
 // {
@@ -140,23 +129,6 @@ module.exports = {
 //     },
 //     "FlomioPlugin",
 //     "setDeviceConnectionChangeCallback",
-//     []
-//   );
-// }
-
-// FlomioPlugin.prototype.onBr500ConnectionChange = function(resultCallback)
-// {
-//   exec(
-//     function(deviceIdList)
-//     {
-//       resultCallback(deviceIdList);
-//     },
-//     function(error)
-//     {
-//       console.log("ERROR: FlomioPlugin.onBr500ConnectionChange: " + error);
-//     },
-//     "FlomioPlugin",
-//     "setBr500ConnectionChangeCallback",
 //     []
 //   );
 // }
