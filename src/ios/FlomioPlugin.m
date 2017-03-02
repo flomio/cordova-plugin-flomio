@@ -54,6 +54,41 @@
     }
 }
 
+- (void)getConfiguration:(CDVInvokedUrlCommand *)command {
+	dispatch_async(dispatch_get_main_queue(), ^{
+        NSArray* settings = @[sharedManager.scanPeriod, sharedManager.scanSound];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:settings];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+	});
+ }
+
+ - (void)setReaderSettings:(CDVInvokedUrlCommand*)command {
+    NSString* scanPeriod = [command.arguments objectAtIndex:0];
+    NSString* scanSound = [command.arguments objectAtIndex:1];
+    NSString* callbackId = command.callbackId;
+    [self setScanPeriod:[NSString stringWithFormat:@"%@", scanPeriod] :callbackId];
+    [self toggleScanSound:scanSound :callbackId];
+ }
+
+
+/** Send an APDU to a specific reader */
+ - (void)sendApdu:(CDVInvokedUrlCommand *)command {
+    NSString* deviceId = [command.arguments objectAtIndex:0];
+    NSString* apdu = [command.arguments objectAtIndex:1];
+    
+    deviceId = [deviceId stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
+    apdu = [apdu stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
+    
+    self->apduResponse_callbackIdDict[deviceId] = command.callbackId;
+    
+    for (FmDevice *device in self->connectedDevicesList)
+    {
+    if ([[device serialNumber] isEqualToString:[deviceId uppercaseString]])
+    {
+    [device sendApduCommand:apdu];
+    return;
+    }
+ }
 
 #pragma mark - Flomio Delegates
 

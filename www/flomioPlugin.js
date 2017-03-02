@@ -3,51 +3,89 @@ var exec = require('cordova/exec');
  * Constructor
  */
 module.exports = {
-    init: function(success, failure) {
-        exec(success, failure, 'FlomioPlugin', 'init', []);
-    },
+        init: (success, failure) => {
+            exec(success, failure, 'FlomioPlugin', 'init', []);
+        },
 
-    selectDeviceType: function(deviceType, success, failure) {
-        exec(success, failure, 'FlomioPlugin', 'selectDeviceType', [deviceType]);
-        // deviceType is "FloJack-BZR", "FloJack-MSR", "FloBLE-EMV" or "FloBLE-Plus" (case insensitive)
-    },
+        selectDeviceType: (deviceType, success, failure) => {
+            exec(success, failure, 'FlomioPlugin', 'selectDeviceType', [deviceType]);
+            // deviceType is "FloJack-BZR", "FloJack-MSR", "FloBLE-EMV" or "FloBLE-Plus" (case insensitive)
+        },
 
-    setConfiguration: function(configurationDictionary, success, failure) {
-        var configurationArray = new Array();
-        var keyArray = new Array("scanPeriod", "scanSound");
+        setConfiguration: (configurationDictionary, success, failure) => {
+            var configurationArray = new Array();
+            var keyArray = new Array("scanPeriod", "scanSound");
 
-        // convert dictionary to array
-        for (index in keyArray) {
-            if (typeof configurationDictionary[keyArray[index]] === 'undefined') {
-                configurationArray.push("unchanged");
-            } else {
-                configurationArray.push(readerSettings[keyArray[index]]);
+            // convert dictionary to array
+            for (index in keyArray) {
+                if (typeof configurationDictionary[keyArray[index]] === 'undefined') {
+                    configurationArray.push("unchanged");
+                } else {
+                    configurationArray.push(readerSettings[keyArray[index]]);
+                }
             }
-        }
-        exec(success, error, "FlomioPlugin", "setConfiguration", configurationArray);
-    },
+            exec(success, error, "FlomioPlugin", "setConfiguration", configurationArray);
+        },
 
-    addConnectedDevicesListener: function(resultCallback, success, failure) {
-        exec(
-            (deviceIdList) => { resultCallback(deviceIdList) },
-            (failure) => { console.log("ERROR: FlomioPlugin.addConnectedDevicesListener: " + failure) },
-            "FlomioPlugin", "setConnectedDevicesUpdateCallback", []);
-    },
+        getConfiguration: (configurationDictionary, success, failure) => {
+            exec(
+                (scanPeriod, scanSound) => { resultCallback({ scanPeriod: scanPeriod, scanSound: scanSound }) },
+                (failure) => { console.log("ERROR: FlomioPlugin.getConfiguration: " + failure) },
+                "FlomioPlugin", "getReaderSettings", []);
+        },
 
-    addCardStatusChangeListener: function(resultCallback, success, failure) {
-        exec(
-            (deviceId, status) => { resultCallback({ deviceId: deviceId, status: status }) },
-            (failure) => { console.log("ERROR: FlomioPlugin.addCardStatusChangeListener: " + failure) },
-            "FlomioPlugin", "setCardStatusChangeCallback", []);
-    },
+        stopReaders: (success, failure) => {
+            exec(
+                success,
+                (failure) => { console.log("ERROR: FlomioPlugin.stopReaders: " + failure) },
+                "FlomioPlugin", "getReaderSettings", []);
+        },
 
-    addTagDiscoveredListener: function(resultCallback, success, failure) {
-        exec(
-            (deviceId, tagUid) => { resultCallback({ tagUid: tagUid, deviceId: deviceId }) },
-            (failure) => { console.log("ERROR: FlomioPlugin.addTagDiscoveredListener: " + failure) },
-            "FlomioPlugin", "setTagDiscoveredCallback", []);
-    },
-}
+        sendApdu: (resultCallback, deviceId, apdu, success, failure) => {
+            exec(
+                (scanPeriod, scanSound) => { resultCallback({ deviceId: deviceId, responseApdu: responseApdu }) },
+                (failure) => { console.log("ERROR: FlomioPlugin.sendApdu: " + failure) },
+                "FlomioPlugin", "sendApdu", [deviceId, apdu]);
+        },
+
+        // Delegate/Event Listeners
+        addConnectedDevicesListener: (resultCallback, success, failure) => {
+            exec(
+                (deviceIdList) => { resultCallback(deviceIdList) },
+                (failure) => { console.log("ERROR: FlomioPlugin.addConnectedDevicesListener: " + failure) },
+                "FlomioPlugin", "setConnectedDevicesUpdateCallback", []);
+        },
+
+        addTagStatusChangeListener: (resultCallback, success, failure) => {
+            exec(
+                (deviceId, status) => { resultCallback({ deviceId: deviceId, status: status }) },
+                (failure) => { console.log("ERROR: FlomioPlugin.addTagStatusChangeListener: " + failure) },
+                "FlomioPlugin", "setCardStatusChangeCallback", []);
+        },
+
+        addTagDiscoveredListener: (resultCallback, success, failure) => {
+            exec(
+                (deviceId, tagUid) => { resultCallback({ tagUid: tagUid, deviceId: deviceId }) },
+                (failure) => { console.log("ERROR: FlomioPlugin.addTagDiscoveredListener: " + failure) },
+                "FlomioPlugin", "setTagDiscoveredCallback", []);
+        },
+    }
+    // FlomioPlugin.prototype.sendApdu = function(resultCallback, deviceId, apdu)
+    // {
+    //   exec(
+    //     function(deviceId, responseApdu)
+    //     {
+    //       resultCallback({deviceId: deviceId, responseApdu: responseApdu});
+    //     },
+    //     function(error)
+    //     {
+    //       console.log("ERROR: FlomioPlugin.sendApdu: " + error);
+    //     },
+    //     "FlomioPlugin",
+    //     "sendApdu",
+    //     [deviceId, apdu]
+    //   );
+    // }
 
 // FlomioPlugin.prototype.getReaderSettings = function(resultCallback)
 // {

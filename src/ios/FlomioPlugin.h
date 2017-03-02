@@ -26,17 +26,15 @@
 // Cordova functions
 - (void)init:(CDVInvokedUrlCommand*)command;
 - (void)selectDeviceType:(CDVInvokedUrlCommand*)command;
-- (void)createReaders;
-- (void)startReaders;
-- (void)stopReaders;
+- (void)stopReaders:(CDVInvokedUrlCommand*)command;
 - (void)sleepReaders;
-- (void)startReader:(NSString *)deviceSerialNumber;
-- (void)stopReader:(NSString *)deviceSerialNumber;
-- (void)sleepReader:(NSString *)deviceSerialNumber;
-- (void)setConfiguration:(NSDictionary *)configurationDictionary; //initialize all devices configuration with this
+// - (void)stopReader:(NSString *)deviceSerialNumber;
+// - (void)sleepReader:(NSString *)deviceSerialNumber;
+- (void)setConfiguration:(CDVInvokedUrlCommand*)command; //initialize all devices configuration with this
 - (void)setConfiguration:(NSDictionary *)configurationDictionary ofDevice:(NSString *)deviceSerialNumber;
 - (NSDictionary *)getConfigurationOfDevice:(NSString *)deviceSerialNumber;
 - (void)sendApdu:(NSString *)apdu toDevice:(NSString *)deviceSerialNumber;
+
 
 // - (void)setReaderSettings:(CDVInvokedUrlCommand*)command;
 // - (void)getReaderSettings:(CDVInvokedUrlCommand*)command;
