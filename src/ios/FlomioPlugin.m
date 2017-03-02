@@ -64,14 +64,13 @@
 	});
  }
 
- - (void)setReaderSettings:(CDVInvokedUrlCommand*)command {
+ - (void)setConfiguration:(CDVInvokedUrlCommand*)command {
     NSString* scanPeriod = [command.arguments objectAtIndex:0];
     NSString* scanSound = [command.arguments objectAtIndex:1];
     NSString* callbackId = command.callbackId;
     [self setScanPeriod:[NSString stringWithFormat:@"%@", scanPeriod] :callbackId];
     [self toggleScanSound:scanSound :callbackId];
  }
-
 
 /** Send an APDU to a specific reader */
  - (void)sendApdu:(CDVInvokedUrlCommand *)command {
@@ -81,14 +80,12 @@
     deviceId = [deviceId stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
     apdu = [apdu stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
     
-    self->apduResponse_callbackIdDict[deviceId] = command.callbackId;
+    apduResponseDictionary[deviceId] = command.callbackId;
     
-    for (FmDevice *device in self->connectedDevicesList)
-    {
-    if ([[device serialNumber] isEqualToString:[deviceId uppercaseString]])
-    {
-    [device sendApduCommand:apdu];
-    return;
+    for (FmDevice *device in connectedDevicesList) {
+        if ([[device serialNumber] isEqualToString:[deviceId uppercaseString]]) {
+            [device sendApduCommand:apdu];
+        }
     }
  }
 
@@ -165,6 +162,40 @@
  - (void)setTagDiscoveredCallback:(CDVInvokedUrlCommand*)command
  {
     didFindTagWithUuidCallbackId = command.callbackId;
+ }
+
+ #pragma mark - Internal Methods
+
+ /** Set the scan period (in ms) */
+ - (void)setScanPeriod:(NSString*)periodString :(NSString*)callbackId {
+    periodString = [periodString stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
+    if ([[periodString lowercaseString] isEqualToString:@"unchanged"]){
+        return;
+    }
+    int period = [periodString intValue];
+    if (period > 0) {
+        sharedManager.scanPeriod = [NSNumber numberWithInteger:period];
+    } else {
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Scan period must be > 0"];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
+    }
+ }
+
+/** Toggle on/off scan sound */
+ - (void)toggleScanSound:(NSString*)toggleString :(NSString*)callbackId {
+    NSString* toggle = [toggleString stringByReplacingOccurrencesOfString:@" " withString:@""]; // remove whitespace
+    if ([[toggle lowercaseString] isEqualToString:@"unchanged"]) {
+        return;
+    }
+    
+    if ([[toggle lowercaseString] isEqualToString:@"true"]){
+        sharedManager.scanSound = [NSNumber numberWithBool:YES];
+    } else if ([[toggle lowercaseString] isEqualToString:@"false"]) {
+        sharedManager.scanSound = [NSNumber numberWithBool:NO];
+    } else {
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Enter 'true' or 'false' only"];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
+    }
  }
 
 @end

@@ -24,7 +24,7 @@ module.exports = {
                     configurationArray.push(readerSettings[keyArray[index]]);
                 }
             }
-            exec(success, error, "FlomioPlugin", "setConfiguration", configurationArray);
+            exec(success, failure, "FlomioPlugin", "setConfiguration", configurationArray);
         },
 
         getConfiguration: (configurationDictionary, success, failure) => {
