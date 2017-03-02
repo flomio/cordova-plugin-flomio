@@ -38,17 +38,6 @@
 - (void)getConfiguration:(CDVInvokedUrlCommand*)command;
 - (void)sendApdu:(NSString *)apdu toDevice:(NSString *)deviceSerialNumber;
 
-
-// - (void)setReaderSettings:(CDVInvokedUrlCommand*)command;
-// - (void)getReaderSettings:(CDVInvokedUrlCommand*)command;
-// - (void)setTagUidReadCallback:(CDVInvokedUrlCommand*)command;
-// - (void)stopReaders:(CDVInvokedUrlCommand*)command;
-// - (void)sendApdu:(CDVInvokedUrlCommand*)command;
-// - (void)setDeviceConnectionChangeCallback:(CDVInvokedUrlCommand*)command;
-// - (void)setBr500ConnectionChangeCallback:(CDVInvokedUrlCommand*)command;
-// - (void)setCardStatusChangeCallback:(CDVInvokedUrlCommand*)command;
-// - (void)getDataBlocks:(CDVInvokedUrlCommand*)command;
-
 // Internal functions (that also perform input validation)
 - (void)setScanPeriod:(NSString*)periodString :(NSString*)callbackId;
 - (void)toggleScanSound:(NSString*)toggleString :(NSString*)callbackId;

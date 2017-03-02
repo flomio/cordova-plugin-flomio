@@ -123,7 +123,30 @@
 }
 
 - (void)didFindTagWithData:(NSDictionary *)payload fromDevice:(NSString *)deviceId withAtr:(NSString *)Atr withError:(NSError *)error{
-
+    NSMutableArray* recordsArray = [NSMutableArray array];
+    if (payload[@"Raw Data"]){
+        NSMutableArray* row = [NSMutableArray array];
+        [row addObject: payload[@"Raw Data"]];
+        [recordsArray addObject:row];
+        NSLog(@"Found raw data: %@ from device:%@",payload[@"Raw Data"] ,deviceId);
+    }
+    if (payload[@"Ndef"]) {
+        for (NdefRecord* record in ndef.ndefRecords) {
+            NSMutableArray* row = [NSMutableArray array];
+            [row addObject: record.url.absoluteString]
+            [row addObject: record.typeString ];
+            [row addObject: record.payloadString];
+            [recordsArray addObject:row];
+        } 
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (didFindTagWithDataCallbackId) {
+            NSArray* result = @[device, recordsArray];
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
+            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:didFindTagWithDataCallbackId];
+        }
+    });
 }
 
 - (void)didRespondToApduCommand:(NSString *)response fromDevice:(NSString *)serialNumber withError:(NSError *)error{
