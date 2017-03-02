@@ -41,9 +41,9 @@ module.exports = {
                 "FlomioPlugin", "stopReaders", []);
         },
 
-        sendApdu: (resultCallback, deviceId, apdu, success, failure) => {
+        sendApdu: (deviceId, apdu, success, failure) => {
             exec(
-                success,
+                (deviceId, responseApdu) => { resultCallback({ deviceId: deviceId, responseApdu: responseApdu }) },
                 (failure) => { console.log("ERROR: FlomioPlugin.sendApdu: " + failure) },
                 "FlomioPlugin", "sendApdu", [deviceId, apdu]);
         },
