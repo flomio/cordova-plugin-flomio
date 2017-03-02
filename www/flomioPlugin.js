@@ -45,7 +45,7 @@ module.exports = {
         exec(
             (deviceId, tagUid) => { resultCallback({ tagUid: tagUid, deviceId: deviceId }) },
             (failure) => { console.log("ERROR: FlomioPlugin.addTagDiscoveredListener: " + failure) },
-            "FlomioPlugin", "setTagUidReadCallback", []);
+            "FlomioPlugin", "setTagDiscoveredCallback", []);
     },
 }
 

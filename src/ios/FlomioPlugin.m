@@ -125,7 +125,7 @@
     didChangeCardStatusCallbackId = command.callbackId;
  }
  
- - (void)setTagUuidReadCallback:(CDVInvokedUrlCommand*)command
+ - (void)setTagDiscoveredCallback:(CDVInvokedUrlCommand*)command
  {
     didFindTagWithUuidCallbackId = command.callbackId;
  }
