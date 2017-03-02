@@ -9,6 +9,8 @@
 
 /** Initialise the plugin */
 - (void)init:(CDVInvokedUrlCommand*)command {
+    apduResponseDictionary = [NSMutableDictionary new];
+    
     if (!sharedManager) {        
         // Initialise flomioSDK
         sharedManager = [FmSessionManager sharedManager];

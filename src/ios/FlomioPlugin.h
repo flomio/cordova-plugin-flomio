@@ -15,6 +15,8 @@
     NSString* didUpdateConnectedDevicesCallbackId;
     NSString* didFindTagWithUuidCallbackId;
     NSString* didFindTagWithDataCallbackId;
+
+    NSMutableDictionary *apduResponseDictionary;
     
     // Flomio reader attributes
     FmSessionManager* sharedManager;
@@ -31,8 +33,9 @@
 // - (void)stopReader:(NSString *)deviceSerialNumber;
 // - (void)sleepReader:(NSString *)deviceSerialNumber;
 - (void)setConfiguration:(CDVInvokedUrlCommand*)command; //initialize all devices configuration with this
-- (void)setConfiguration:(NSDictionary *)configurationDictionary ofDevice:(NSString *)deviceSerialNumber;
-- (NSDictionary *)getConfigurationOfDevice:(NSString *)deviceSerialNumber;
+// - (void)setConfiguration:(NSDictionary *)configurationDictionary ofDevice:(NSString *)deviceSerialNumber;
+// - (NSDictionary *)getConfigurationOfDevice:(NSString *)deviceSerialNumber;
+- (void)getConfiguration:(CDVInvokedUrlCommand*)command;
 - (void)sendApdu:(NSString *)apdu toDevice:(NSString *)deviceSerialNumber;
 
 
