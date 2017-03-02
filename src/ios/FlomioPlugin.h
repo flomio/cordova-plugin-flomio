@@ -1,6 +1,6 @@
 /*
  FlomioPlugin.h
- Uses Flomio SDK version 2.0
+ Uses Flomio SDK version 2.2
  */
 
 #import "FmSessionManager.h"
@@ -21,6 +21,8 @@
     // Flomio reader attributes
     FmSessionManager* sharedManager;
     NSMutableArray* connectedDevicesList;
+    NSDictionary* configurationDictionary;
+    
 }
 
 @property (nonatomic) DeviceType selectedDeviceType;

@@ -20,7 +20,7 @@ module.exports = {
             if (typeof configurationDictionary[keyArray[index]] === 'undefined') {
                 configurationArray.push("unchanged");
             } else {
-                configurationArray.push(readerSettings[keyArray[index]]);
+                configurationArray.push(configurationDictionary[keyArray[index]]);
             }
         }
         exec(success, failure, "FlomioPlugin", "setConfiguration", configurationArray);

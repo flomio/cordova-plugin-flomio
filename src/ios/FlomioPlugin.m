@@ -1,6 +1,6 @@
 /*
  FlomioPlugin.m
- Uses Flomio SDK version 2.0
+ Uses Flomio SDK version 2.2
  */
 
 #import "FlomioPlugin.h"
@@ -71,23 +71,23 @@
     NSString* scanSound = [command.arguments objectAtIndex:1];
     
     NSString* readerStateString = [command.arguments objectAtIndex:2];
-    NSNumber readerState;
+    NSNumber* readerState;
     if ([[readerStateString lowercaseString] isEqualToString:@"read-data"]){
         readerState = [NSNumber numberWithInt:kReadData];
-    } else ([[readerStateString lowercaseString] isEqualToString:@"read-uuid"]) {
+    } else  { //default to @"read-uuid"
         readerState = [NSNumber numberWithInt:kReadUuid];
     }
 
     NSString* powerOperationString = [command.arguments objectAtIndex:3];
-    NSNumber powerOperation;
+    NSNumber* powerOperation;
     if ([[powerOperationString lowercaseString] isEqualToString:@"bluetooth-connection-control"]){
         powerOperation = [NSNumber numberWithInt:kBluetoothConnectionControl];
-    } else ([[powerOperationString lowercaseString] isEqualToString:@"auto-polling-control"]) {
+    } else { // default to @"auto-polling-control"
         powerOperation = [NSNumber numberWithInt:kAutoPollingControl];
     }
     configurationDictionary = @{
-                                @"Scan Period" : [scanPeriod intValue],
-                                @"Scan Sound" : [scanSound intValue],
+                                @"Scan Period" : [NSNumber numberWithInt:[scanPeriod intValue]],
+                                @"Scan Sound" : [NSNumber numberWithInt:[scanSound intValue]],
                                 @"Reader State" : readerState, //kReadData for NDEF
                                 @"Power Operation" : powerOperation, //kBluetoothConnectionControl low power usage
                                 @"Transmit Power" : [NSNumber numberWithInt: kHighPower],
@@ -156,16 +156,17 @@
         NSLog(@"Found raw data: %@ from device:%@",payload[@"Raw Data"] ,deviceId);
     }
     if (payload[@"Ndef"]) {
+        NdefMessage *ndef = payload[@"Ndef"];
         for (NdefRecord* record in ndef.ndefRecords) {
             NSMutableArray* row = [NSMutableArray array];
-            [row addObject: record.url.absoluteString]
+            [row addObject: record.url.absoluteString];
             [row addObject: record.payloadString];
             [recordsArray addObject:row];
         } 
     }
     dispatch_async(dispatch_get_main_queue(), ^{
         if (didFindTagWithDataCallbackId) {
-            NSArray* result = @[device, recordsArray];
+            NSArray* result = @[deviceId, recordsArray];
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
             [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:didFindTagWithDataCallbackId];
@@ -173,7 +174,7 @@
     });
 }
 
-- (void)didRespondToApduCommand:(NSString *)response fromDevice:(NSString *)serialNumber withError:(NSError *)error{
+- (void)didRespondToApduCommand:(NSString *)response fromDevice:(NSString *)deviceId withError:(NSError *)error{
     dispatch_async(dispatch_get_main_queue(), ^{
         NSLog(@"Received APDU: %@ from device:%@", response, deviceId); //APDU Response
         // send response to Cordova
