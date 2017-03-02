@@ -27,20 +27,21 @@ module.exports = {
         exec(success, error, "FlomioPlugin", "setConfiguration", configurationArray);
     },
 
-    addConnectedDevicesListener: function(resultCallback) {
+    addConnectedDevicesListener: function(resultCallback, success, failure) {
         exec(
             (deviceIdList) => {
                 resultCallback(deviceIdList);
             },
-            error, "FlomioPlugin", "setConnectedDevicesUpdateCallback", []);
+            failure, "FlomioPlugin", "setConnectedDevicesUpdateCallback", []);
     },
 
-    addCardStatusChangeListener: function(resultCallback) {
-        exec(function(deviceId, status) {
+    addCardStatusChangeListener: function(resultCallback, success, failure) {
+
+        exec((deviceId, status) => {
                 resultCallback({ deviceId: deviceId, status: status });
             },
-            function(error) {
-                console.log("ERROR: FlomioPlugin.addCardStatusChangeListener: " + error);
+            (failure) => {
+                console.log("ERROR: FlomioPlugin.addCardStatusChangeListener: " + failure);
             },
             "FlomioPlugin", "setCardStatusChangeCallback", []);
     },

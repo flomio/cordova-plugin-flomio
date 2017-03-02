@@ -59,11 +59,11 @@
 
 /** Called when the list of connected devices is updated */
 - (void)didUpdateConnectedDevices:(NSArray *)connectedDevices {
-    self.connectedDevices = [connectedDevices mutableCopy];
+    connectedDevicesList = [connectedDevices mutableCopy];
     NSMutableArray* deviceIdList = [NSMutableArray array];
     for (FmDevice *device in connectedDevices)
     {
-        [deviceIdList addObject: device.deviceId];
+        [deviceIdList addObject: device.serialNumber];
     }
     dispatch_async(dispatch_get_main_queue(), ^{
         if (didUpdateConnectedDevicesCallbackId)
@@ -100,11 +100,11 @@
     
 }
 
-- (void)didChangeCardStatus:(CardStatus)status fromDevice:(NSString *)device{
+- (void)didChangeCardStatus:(CardStatus)status fromDevice:(NSString *)deviceId{
     dispatch_async(dispatch_get_main_queue(), ^{
         // send card status change to Cordova
         if (didChangeCardStatusCallbackId){
-            NSArray* result = @[deviceId, status];
+            NSArray* result = @[deviceId, [NSNumber numberWithInt:status]];
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
             [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:didChangeCardStatusCallbackId];
