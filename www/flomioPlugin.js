@@ -27,21 +27,21 @@ module.exports = {
             exec(success, failure, "FlomioPlugin", "setConfiguration", configurationArray);
         },
 
-        getConfiguration: (configurationDictionary, success, failure) => {
+        getConfiguration: (resultCallback, configurationDictionary, success, failure) => {
             exec(
                 (scanPeriod, scanSound) => { resultCallback({ scanPeriod: scanPeriod, scanSound: scanSound }) },
                 (failure) => { console.log("ERROR: FlomioPlugin.getConfiguration: " + failure) },
                 "FlomioPlugin", "getConfiguration", []);
         },
 
-        stopReaders: (success, failure) => {
+        stopReaders: (resultCallback, success, failure) => {
             exec(
                 (scanPeriod, scanSound) => { resultCallback({ deviceId: deviceId, responseApdu: responseApdu }) },
                 (failure) => { console.log("ERROR: FlomioPlugin.stopReaders: " + failure) },
                 "FlomioPlugin", "stopReaders", []);
         },
 
-        sendApdu: (deviceId, apdu, success, failure) => {
+        sendApdu: (resultCallback, deviceId, apdu, success, failure) => {
             exec(
                 (deviceId, responseApdu) => { resultCallback({ deviceId: deviceId, responseApdu: responseApdu }) },
                 (failure) => { console.log("ERROR: FlomioPlugin.sendApdu: " + failure) },
