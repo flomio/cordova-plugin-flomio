@@ -29,41 +29,24 @@ module.exports = {
 
     addConnectedDevicesListener: function(resultCallback, success, failure) {
         exec(
-            (deviceIdList) => {
-                resultCallback(deviceIdList);
-            },
-            failure, "FlomioPlugin", "setConnectedDevicesUpdateCallback", []);
+            (deviceIdList) => { resultCallback(deviceIdList) },
+            (failure) => { console.log("ERROR: FlomioPlugin.addConnectedDevicesListener: " + failure) },
+            "FlomioPlugin", "setConnectedDevicesUpdateCallback", []);
     },
 
     addCardStatusChangeListener: function(resultCallback, success, failure) {
-
-        exec((deviceId, status) => {
-                resultCallback({ deviceId: deviceId, status: status });
-            },
-            (failure) => {
-                console.log("ERROR: FlomioPlugin.addCardStatusChangeListener: " + failure);
-            },
+        exec(
+            (deviceId, status) => { resultCallback({ deviceId: deviceId, status: status }) },
+            (failure) => { console.log("ERROR: FlomioPlugin.addCardStatusChangeListener: " + failure) },
             "FlomioPlugin", "setCardStatusChangeCallback", []);
     },
 
-    //   exec(
-    //     function(deviceId, status)
-    //     {
-    //       resultCallback({deviceId: deviceId, status: status});
-    //     },
-    //     function(error)
-    //     {
-    //       console.log("ERROR: FlomioPlugin.onTagStatusChange: " + error);
-    //     },
-    //     "FlomioPlugin",
-    //     "setCardStatusChangeCallback",
-    //     []
-    //   );
-
-    // addTagDiscoveredListener: function(callback, win, fail) {
-    //     document.addEventListener("tag", callback, false);
-    //     cordova.exec(win, fail, "NfcPlugin", "registerTag", []);
-    // },
+    addTagDiscoveredListener: function(resultCallback, success, failure) {
+        exec(
+            (deviceId, tagUid) => { resultCallback({ tagUid: tagUid, deviceId: deviceId }) },
+            (failure) => { console.log("ERROR: FlomioPlugin.addTagDiscoveredListener: " + failure) },
+            "FlomioPlugin", "setTagUidReadCallback", []);
+    },
 }
 
 // FlomioPlugin.prototype.getReaderSettings = function(resultCallback)
