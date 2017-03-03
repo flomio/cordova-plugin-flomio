@@ -73,6 +73,6 @@ module.exports = {
         exec(
             (deviceId, tagUid) => { resultCallback({ tagUid: tagUid, deviceId: deviceId }) },
             (failure) => { console.log("ERROR: FlomioPlugin.addNdefListener: " + failure) },
-            "FlomioPlugin", "addNdefListener", []);
+            "FlomioPlugin", "setNdefDiscoveredCallback", []);
     },
 }

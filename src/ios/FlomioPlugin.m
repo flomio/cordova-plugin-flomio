@@ -212,6 +212,11 @@
  {
     didFindTagWithUuidCallbackId = command.callbackId;
  }
+ 
+ - (void)setNdefDiscoveredCallback:(CDVInvokedUrlCommand*)command
+ {
+    didFindTagWithDataCallbackId = command.callbackId;
+ }
 
  #pragma mark - Internal Methods
 

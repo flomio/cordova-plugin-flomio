@@ -1,6 +1,6 @@
-# Flomio Cordova Plugin for SDK v2.0
+# Flomio Cordova Plugin for SDK v2.2
 
-Flomio's plugin for Cordova / Meteor, for use with the v2.0 of the Flomio SDK. [Get yours here.](http://flomio.com/shop/apps/flomio-sdk-basic-turnkey-oem-support/)
+Flomio's plugin for Cordova / Meteor, for use with the v2.2 of the Flomio SDK. [Get yours here.](http://flomio.com/shop/apps/flomio-sdk-basic-turnkey-oem-support/)
 
 ## Installation
 
@@ -51,45 +51,49 @@ meteor add-platform ios
 
 - Open the generated Xcode project located at `platforms/ios` or with Meteor, `.meteor/local/cordova-build/platforms/ios`.
 
-- Drag and drop the Flomio SDK folder into the project (check "Create groups" and "Add to targets").
-
-- Add `-lc++` and `-ObjC` to "Other Linker Flags" under "Build Settings".
-
-- In "Targets -> YourAppTarget -> Build Options", set "Enable Bitcode" to "No"
-
-- In "Targets -> YourAppTarget -> General -> Link Binary with Libraries", add "MediaPlayer.framework"
-
 - Build and run the app on an iOS device.
 
 ## API
 
 **Required for operation**
 
-* `init()`
-
-	Initialises the plugin, preparing it for first use in the current session
-	
 * `selectDeviceType(deviceType)`
 
 	Activates the specified device type for the current session. Choice of FloJack-BZR, FloJack-MSR, FloBLE-EMV or FloBLE-Plus
 	
 	`String readerType: <"flojack-bzr", "flojack-msr", "floble-emv" or "floble-plus">`
+
+* `init()`
+
+	Initialises the plugin, preparing it for first use in the current session
+	
 	
 **Optional methods**
 
-* `setReaderSettings(readerSettings)`
+* `setConfiguration(configuration)`
 
 	Configures settings for the current session. Both values in `readerSettings` are optional
 	
 	```
-	Object readerSettings
+	Object configuration
 	{
 		int scanPeriod,  // scan period in ms
 		bool scanSound  // toggle scan sound on/off
 	}
+
+	e.g 
+	let configuration = {}
+      configuration = {
+        scanPeriod: 1000,  // scan period in ms
+        scanSound: true,  // toggle scan sound on/off
+        readerState: 'read-data', //read-data or read-uuid
+        powerOperation: 'auto-polling-control'  //bluetooth-connection-control or auto-polling-control
+      }
+
+      flomioPlugin.setConfiguration(configuration);
 	```
 	
-* `getReaderSettings(resultCallback)`
+* `getConfiguration(resultCallback)`
 
 	Retrieves settings for the current session
 	
@@ -122,7 +126,7 @@ meteor add-platform ios
 
 	`String apdu`: APDU command in hexadecimal format (case insensitive, whitespace insensitive)
 
-* `onDeviceConnectionChange(resultCallback)`
+* `addConnectedDevicesListener(resultCallback)`
 
 	Assign a callback function to fire when any device connects or disconnects
 	
@@ -131,7 +135,7 @@ meteor add-platform ios
 	Array deviceIdList  // list of connected device IDs
 	```
 		
-* `onTagStatusChange(resultCallback)`
+* `addTagStatusChangeListener(resultCallback)`
 
 	Assign a callback function to fire when a tag enters or leaves the proximity of any reader
 	
@@ -144,7 +148,7 @@ meteor add-platform ios
 	}
 	```
 
-* `onTagUidRead(resultCallback)`
+* `addTagDiscoveredListener(resultCallback)`
 
 	Assign a callback function to fire when the UID of a tag is found by any reader
 	
@@ -157,16 +161,14 @@ meteor add-platform ios
 	}
 	```
 
-* `getDataBlocks(resultCallback, deviceId)`
+* `addNdefListener(resultCallback)`
 
 	Retrieve NDEF formatted data from a tag in proximity of a specified target device.
-	***Currently works with FloBLE devices only***
-
 	```
 	function resultCallback(result)
 	Object result
 	{
 		String deviceId,
-		Array ndef  // nested array that contains rows of [NDEF types, NDEF hexadecimal strings]
+		Dictionary payload  //Dictionary with keys 'Uuid', 'Raw Data', 'Ndef'
 	}
 	```
