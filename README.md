@@ -184,13 +184,13 @@ meteor add-platform ios
 		       console.log('Raw Data' + returnedData['Raw Data'])
 		     }
 		     if (returnedData['Ndef']){
-		       var ndefMessage = returnedData['Ndef'];
-			for (var i = 0; ndefMessage.length > i; i++) {
-			  var ndefRecord = ndefMessage[i];
-			  for (var key in ndefRecord){
-			    console.log(key + ": " + ndefRecord[key])
-			  }
-			}
+			       var ndefMessage = returnedData['Ndef'];
+				for (var i = 0; ndefMessage.length > i; i++) {
+				  var ndefRecord = ndefMessage[i];
+				  for (var key in ndefRecord){
+				    console.log(key + ": " + ndefRecord[key])
+				  }
+				}
 		     }
 		}	
 	```
