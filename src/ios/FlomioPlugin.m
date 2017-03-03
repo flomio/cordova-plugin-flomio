@@ -148,25 +148,9 @@
 }
 
 - (void)didFindTagWithData:(NSDictionary *)payload fromDevice:(NSString *)deviceId withAtr:(NSString *)Atr withError:(NSError *)error{
-    NSMutableArray* recordsArray = [NSMutableArray array];
-    if (payload[@"Raw Data"]){
-        NSMutableArray* row = [NSMutableArray array];
-        [row addObject: payload[@"Raw Data"]];
-        [recordsArray addObject:row];
-        NSLog(@"Found raw data: %@ from device:%@",payload[@"Raw Data"] ,deviceId);
-    }
-    if (payload[@"Ndef"]) {
-        NdefMessage *ndef = payload[@"Ndef"];
-        for (NdefRecord* record in ndef.ndefRecords) {
-            NSMutableArray* row = [NSMutableArray array];
-            [row addObject: record.url.absoluteString];
-            [row addObject: record.payloadString];
-            [recordsArray addObject:row];
-        } 
-    }
     dispatch_async(dispatch_get_main_queue(), ^{
         if (didFindTagWithDataCallbackId) {
-            NSArray* result = @[deviceId, recordsArray];
+            NSArray* result = @[deviceId, payload];
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
             [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:didFindTagWithDataCallbackId];
