@@ -1,6 +1,8 @@
 # Flomio Cordova Plugin for SDK v2.2
 
-Flomio's plugin for Cordova / Meteor, for use with the v2.2 of the Flomio SDK. [Get yours here.](http://flomio.com/shop/apps/flomio-sdk-basic-turnkey-oem-support/)
+Flomio's plugin for Cordova / Meteor, for use with the v2.2 of the Flomio SDK. [Get yours here.]
+This plugin is only supported for FloBLE Plus Readers.
+(http://flomio.com/shop/apps/flomio-sdk-basic-turnkey-oem-support/)
 
 ## Installation
 
@@ -164,6 +166,8 @@ meteor add-platform ios
 * `addNdefListener(resultCallback)`
 
 	Retrieve NDEF formatted data from a tag in proximity of a specified target device.
+	Configuration must be "read-data" upon initialization.
+	Only supported for FloBLE Plus
 	```
 	function resultCallback(result)
 	Object result
