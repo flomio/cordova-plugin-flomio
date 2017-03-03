@@ -87,7 +87,7 @@
     }
     configurationDictionary = @{
                                 @"Scan Period" : [NSNumber numberWithInt:[scanPeriod intValue]],
-                                @"Scan Sound" : [NSNumber numberWithInt:[scanSound intValue]],
+                                @"Scan Sound" : [NSNumber numberWithBool:scanSound],
                                 @"Reader State" : readerState, //kReadData for NDEF
                                 @"Power Operation" : powerOperation, //kBluetoothConnectionControl low power usage
                                 @"Transmit Power" : [NSNumber numberWithInt: kHighPower],
