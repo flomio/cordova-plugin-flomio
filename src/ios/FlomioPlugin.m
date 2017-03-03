@@ -148,16 +148,15 @@
 }
 
 - (void)didFindTagWithData:(NSDictionary *)payload fromDevice:(NSString *)deviceId withAtr:(NSString *)Atr withError:(NSError *)error{
-        NSMutableDictionary *mutableDictionary;
-  NSMutableDictionary *mutableDictionary = [NSMutableDictionary new];
-    if (payload[@"Uuid"]){
-        mutableDictionary[@"Uuid"] = payload[@"Uuid"];
+    NSMutableDictionary *mutableDictionary = [NSMutableDictionary new];
+    if (thisPayload[@"Uuid"]){
+        mutableDictionary[@"Uuid"] = thisPayload[@"Uuid"];
     }
-    if (payload[@"Raw Data"]){
-        mutableDictionary[@"Raw Data"] = payload[@"Raw Data"];
+    if (thisPayload[@"Raw Data"]){
+        mutableDictionary[@"Raw Data"] = thisPayload[@"Raw Data"];
     }
-    if (payload[@"Ndef"]){
-        NdefMessage *ndef = payload[@"Ndef"];
+    if (thisPayload[@"Ndef"]){
+        NdefMessage *ndef = thisPayload[@"Ndef"];
         NSMutableArray *ndefRecordsArray = [NSMutableArray array];
         for (NdefRecord* record in ndef.ndefRecords) {
             NSMutableDictionary* recordDictionary = [NSMutableDictionary new];
@@ -178,8 +177,9 @@
         mutableDictionary[@"Ndef"] = ndefRecordsArray;
     }
     dispatch_async(dispatch_get_main_queue(), ^{
+        NSDictionary *payload = [NSDictionary dictionaryWithDictionary:mutableDictionary];
         if (didFindTagWithDataCallbackId) {
-            NSArray* result = @[deviceId, [NSDictionary dictionaryWithDictionary:mutableDictionary]];
+            NSArray* result = @[deviceId, payload];
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
             [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:didFindTagWithDataCallbackId];
