@@ -1,8 +1,8 @@
 # Flomio Cordova Plugin for SDK v2.2
 
 Flomio's plugin for Cordova / Meteor, for use with the v2.2 of the Flomio SDK. [Get yours here.]
-This plugin is only supported for FloBLE Plus Readers.
 (http://flomio.com/shop/apps/flomio-sdk-basic-turnkey-oem-support/)
+This plugin is only supported for FloBLE Plus
 
 ## Installation
 
