@@ -231,7 +231,7 @@
 
  #pragma mark - Internal Methods
 
- /** Set the scan period (in ms) */
+ /** NOT USED Set the scan period (in ms) */
  - (void)setScanPeriod:(NSString*)periodString :(NSString*)callbackId {
     periodString = [periodString stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
     if ([[periodString lowercaseString] isEqualToString:@"unchanged"]){
@@ -246,7 +246,7 @@
     }
  }
 
-/** Toggle on/off scan sound */
+/** NOT USED Toggle on/off scan sound */
  - (void)toggleScanSound:(NSString*)toggleString :(NSString*)callbackId {
     NSString* toggle = [toggleString stringByReplacingOccurrencesOfString:@" " withString:@""]; // remove whitespace
     if ([[toggle lowercaseString] isEqualToString:@"unchanged"]) {
