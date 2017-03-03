@@ -176,21 +176,21 @@ meteor add-platform ios
 		flomioPlugin.addNdefListener(this.didFindTagData)
 		
 		didFindTagData(dict){
-		     var returnedData  = dict.payload
-		     if ('Uuid' in returnedData){
-		       console.log('Uuid :' + returnedData['Uuid'])
-		     }
-		     if ('Raw Data' in returnedData){
-		       console.log('Raw Data' + returnedData['Raw Data'])
-		     }
-		     if (returnedData['Ndef']){
-			       var ndefMessage = returnedData['Ndef'];
+			var returnedData  = dict.payload
+			if ('Uuid' in returnedData){
+				console.log('Uuid :' + returnedData['Uuid'])
+			}
+			if ('Raw Data' in returnedData){
+				console.log('Raw Data' + returnedData['Raw Data'])
+			}
+			if (returnedData['Ndef']){
+				var ndefMessage = returnedData['Ndef'];
 				for (var i = 0; ndefMessage.length > i; i++) {
-				  var ndefRecord = ndefMessage[i];
-				  for (var key in ndefRecord){
-				    console.log(key + ": " + ndefRecord[key])
-				  }
+					var ndefRecord = ndefMessage[i];
+					for (var key in ndefRecord){
+						console.log(key + ": " + ndefRecord[key])
+					}
 				}
-		     }
+			}
 		}	
 	```
