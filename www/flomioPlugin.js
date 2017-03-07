@@ -71,7 +71,7 @@ module.exports = {
 
     addNdefListener: (resultCallback, success, failure) => {
         exec(
-            (deviceId, payload) => { resultCallback({ deviceId: deviceId, payload: payload }) },
+            (deviceId, payload) => { resultCallback({ payload: payload, deviceId: deviceId }) },
             (failure) => { console.log("ERROR: FlomioPlugin.addNdefListener: " + failure) },
             "FlomioPlugin", "setNdefDiscoveredCallback", []);
     },

@@ -32,10 +32,6 @@
         }
         [sharedManager setConfiguration: configurationDictionary];
         [sharedManager createReaders];
-        // Stop reader scan when the app becomes inactive
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(inactive) name:UIApplicationDidEnterBackgroundNotification object:nil];
-        // Start reader scan when the app becomes active
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(active) name:UIApplicationDidBecomeActiveNotification object:nil];
     }
 }
 
@@ -147,7 +143,7 @@
     });
 }
 
-- (void)didFindTagWithData:(NSDictionary *)payload fromDevice:(NSString *)deviceId withAtr:(NSString *)Atr withError:(NSError *)error{
+- (void)didFindTagWithData:(NSDictionary *)thisPayload fromDevice:(NSString *)deviceId withAtr:(NSString *)Atr withError:(NSError *)error{
     NSMutableDictionary *mutableDictionary = [NSMutableDictionary new];
     if (thisPayload[@"Uuid"]){
         mutableDictionary[@"Uuid"] = thisPayload[@"Uuid"];

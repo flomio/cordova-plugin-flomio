@@ -84,9 +84,12 @@
         <framework src="libc++.dylib" />
 
         <!-- Request permission to use mircophone -->
-        <preference name="MICROPHONE_USAGE_DESCRIPTION" default=" " />
-        <config-file target="*-Info.plist" parent="NSMicrophoneUsageDescription">
-            <string>$MICROPHONE_USAGE_DESCRIPTION</string>
+       <config-file target="*-Info.plist" parent="NSMicrophoneUsageDescription">
+            <string>This app requires microphone access to function properly.</string>
+        </config-file>
+
+        <config-file target="*-Info.plist" parent="NSBluetoothPeripheralUsageDescription">
+            <string>This app requires bluetooth access to function properly.</string>
         </config-file>
 
         <header-file src="src/ios/FlomioPlugin.h" />
