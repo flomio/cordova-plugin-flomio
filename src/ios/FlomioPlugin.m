@@ -115,20 +115,42 @@
 /** Called when the list of connected devices is updated */
 - (void)didUpdateConnectedDevices:(NSArray *)connectedDevices {
     connectedDevicesList = [connectedDevices mutableCopy];
-    NSMutableArray* deviceIdList = [NSMutableArray array];
+    NSMutableArray* devices = [NSMutableArray array];
     for (FmDevice *device in connectedDevices)
     {
-        [deviceIdList addObject: device.serialNumber];
+        NSMutableDictionary *deviceDictionary = [NSMutableDictionary new];
+        deviceDictionary[@"Device ID"] = device.serialNumber;
+        deviceDictionary[@"Battery Level"] = [NSNumber numberWithUnsignedLong: (unsigned long)device.batteryLevel];
+        deviceDictionary[@"Hardware Revision"] = device.hardwareRevision;
+        deviceDictionary[@"Firmware Revision"] = device.firmwareRevision;
+        deviceDictionary[@"Communication Status"] = [NSNumber numberWithInt: device.communicationStatus];
+        [devices addObject: deviceDictionary];
     }
     dispatch_async(dispatch_get_main_queue(), ^{
         if (didUpdateConnectedDevicesCallbackId)
         {
-            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:deviceIdList];
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:devices];
             [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:didUpdateConnectedDevicesCallbackId];
         }
     });
 }
+
+- (void)didFindTagWithUuid:(NSString *)Uuid fromDevice:(NSString *)deviceId withAtr:(NSString *)Atr withError:(NSError *)error{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSLog(@"Found tag UUID: %@ from device:%@", Uuid, deviceId);
+        // send tag read update to Cordova
+        if (didFindTagWithUuidCallbackId) {
+            NSArray* result = @[deviceId, Uuid];
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
+            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:didFindTagWithUuidCallbackId];
+        }
+    });
+}
+
+
+
 
 - (void)didFindTagWithUuid:(NSString *)Uuid fromDevice:(NSString *)deviceId withAtr:(NSString *)Atr withError:(NSError *)error{
     dispatch_async(dispatch_get_main_queue(), ^{
