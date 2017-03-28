@@ -15,6 +15,7 @@
     NSString* didUpdateConnectedDevicesCallbackId;
     NSString* didFindTagWithUuidCallbackId;
     NSString* didFindTagWithDataCallbackId;
+    NSString* didWriteNdefCallbackId;
 
     NSMutableDictionary *apduResponseDictionary;
     

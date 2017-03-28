@@ -5,13 +5,16 @@
 
 #import "FlomioPlugin.h"
 
-@implementation FlomioPlugin
+@implementation FlomioPlugin {
+    BOOL muteDataCallbacks;
+}
 
 /** Initialise the plugin */
 - (void)init:(CDVInvokedUrlCommand*)command {
+    muteDataCallbacks = NO;
     apduResponseDictionary = [NSMutableDictionary new];
     
-    if (!sharedManager) {        
+    if (!sharedManager) {
         // Initialise flomioSDK
         sharedManager = [FmSessionManager sharedManager];
         sharedManager.selectedDeviceType = self.selectedDeviceType; // For FloBLE Plus
@@ -21,14 +24,14 @@
         //@"RR330-000120" use device id from back of device to only connect to specific device
         // only for use when "Allow Multiconnect" = @0
         if(!configurationDictionary){
-           configurationDictionary = @{
-                                                  @"Scan Sound" : @1,
-                                                  @"Scan Period" : @1000,
-                                                  @"Reader State" : [NSNumber numberWithInt:kReadUuid], //kReadData for NDEF
-                                                  @"Power Operation" : [NSNumber numberWithInt:kAutoPollingControl], //kBluetoothConnectionControl low power usage
-                                                  @"Transmit Power" : [NSNumber numberWithInt: kHighPower],
-                                                  @"Allow Multiconnect" : @0, //control whether multiple FloBLE devices can connect
-                                                  };
+            configurationDictionary = @{
+                                        @"Scan Sound" : @1,
+                                        @"Scan Period" : @1000,
+                                        @"Reader State" : [NSNumber numberWithInt:kReadUuid], //kReadData for NDEF
+                                        @"Power Operation" : [NSNumber numberWithInt:kAutoPollingControl], //kBluetoothConnectionControl low power usage
+                                        @"Transmit Power" : [NSNumber numberWithInt: kHighPower],
+                                        @"Allow Multiconnect" : @0, //control whether multiple FloBLE devices can connect
+                                        };
         }
         [sharedManager setConfiguration: configurationDictionary];
         [sharedManager createReaders];
@@ -55,14 +58,14 @@
 }
 
 - (void)getConfiguration:(CDVInvokedUrlCommand *)command {
-	dispatch_async(dispatch_get_main_queue(), ^{
+    dispatch_async(dispatch_get_main_queue(), ^{
         NSArray* settings = @[sharedManager.scanPeriod, sharedManager.scanSound];
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:settings];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-	});
- }
+    });
+}
 
- - (void)setConfiguration:(CDVInvokedUrlCommand*)command {
+- (void)setConfiguration:(CDVInvokedUrlCommand*)command {
     NSString* scanPeriod = [command.arguments objectAtIndex:0];
     NSString* scanSound = [command.arguments objectAtIndex:1];
     
@@ -73,7 +76,7 @@
     } else  { //default to @"read-uuid"
         readerState = [NSNumber numberWithInt:kReadUuid];
     }
-
+    
     NSString* powerOperationString = [command.arguments objectAtIndex:3];
     NSNumber* powerOperation;
     if ([[powerOperationString lowercaseString] isEqualToString:@"bluetooth-connection-control"]){
@@ -91,10 +94,10 @@
                                 };
     NSString* callbackId = command.callbackId;
     [sharedManager setConfiguration:configurationDictionary];
- }
+}
 
 /** Send an APDU to a specific reader */
- - (void)sendApdu:(CDVInvokedUrlCommand *)command {
+- (void)sendApdu:(CDVInvokedUrlCommand *)command {
     NSString* deviceId = [command.arguments objectAtIndex:0];
     NSString* apdu = [command.arguments objectAtIndex:1];
     
@@ -108,7 +111,66 @@
             [device sendApduCommand:apdu];
         }
     }
- }
+}
+
+- (void)write:(CDVInvokedUrlCommand *)command {
+    int currentPage;
+    int positionInEncodedString = 0; //offset between position in encodedDataString and data block in tag
+    
+    didWriteNdefCallbackId = command.callbackId;
+    muteDataCallbacks = YES;
+    NSString* deviceId = [command.arguments objectAtIndex:0];
+    deviceId = [deviceId stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
+
+    NSString* encodedDataString = [command.arguments objectAtIndex:1];
+    encodedDataString = [encodedDataString stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
+    NSString *encodedHexStringWithTLVValues = [self addTLVValues:encodedDataString];
+    while (encodedHexStringWithTLVValues.length % 8 != 0){
+        encodedHexStringWithTLVValues = [encodedHexStringWithTLVValues stringByAppendingString:@"0"];
+    }
+    for (FmDevice *device in connectedDevicesList) {
+        if ([[device serialNumber] isEqualToString:[deviceId uppercaseString]]) {
+            for (currentPage = 4; currentPage*4 <= encodedHexStringWithTLVValues.length; currentPage+=1){
+                NSUInteger length = encodedHexStringWithTLVValues.length;
+                NSLog(@"currentPage*4: %d", currentPage*4 );
+                NSLog(@"length %lu", (unsigned long)length);
+                NSLog(@"currentPage: %@", [NSString stringWithFormat:@"%02X", currentPage]);
+                NSString *next4BytesToWrite = [encodedHexStringWithTLVValues substringWithRange:NSMakeRange(positionInEncodedString, 8)];
+                NSLog(@"next4BytesToWrite: %@", next4BytesToWrite);
+                NSString *apdu = [NSString stringWithFormat: @"FF D6 00 %02X 04 %@",currentPage, next4BytesToWrite];
+                positionInEncodedString+=8;
+                int64_t delayInSeconds = 0.1;
+                dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+                dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+                    [device sendApduCommand:apdu];
+                });
+                if ([next4BytesToWrite containsString:@"fe"]){
+                    muteDataCallbacks = NO;
+                    return;
+                }
+            }
+        }
+    }
+    muteDataCallbacks = NO;
+    
+    /*
+     NSArray* result = @[deviceId, encodedDataString];
+     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
+     [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+     [self.commandDelegate sendPluginResult:pluginResult callbackId:apduResponseDictionary[deviceId]];
+     */
+}
+
+- (NSString *)addTLVValues: (NSString *)hexString {
+    NSLog(@"encodedDataString: %@", hexString);
+    NSString *tagString = @"03"; //null values and tag
+    NSString *length = [NSString stringWithFormat:@"%02lX", hexString.length/2];
+    NSLog(@"lenght: %@", length);
+    NSString *terminator = @"fe";
+    NSString *encodedHexStringWithTLVValues = [NSString stringWithFormat:@"%@%@%@%@",tagString,length,hexString,terminator];
+    NSLog(@"encodedHexStringWithTLVValues: %@", encodedHexStringWithTLVValues);
+    return encodedHexStringWithTLVValues;
+}
 
 #pragma mark - Flomio Delegates
 
@@ -135,22 +197,6 @@
         }
     });
 }
-
-- (void)didFindTagWithUuid:(NSString *)Uuid fromDevice:(NSString *)deviceId withAtr:(NSString *)Atr withError:(NSError *)error{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        NSLog(@"Found tag UUID: %@ from device:%@", Uuid, deviceId);
-        // send tag read update to Cordova
-        if (didFindTagWithUuidCallbackId) {
-            NSArray* result = @[deviceId, Uuid];
-            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
-            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:didFindTagWithUuidCallbackId];
-        }
-    });
-}
-
-
-
 
 - (void)didFindTagWithUuid:(NSString *)Uuid fromDevice:(NSString *)deviceId withAtr:(NSString *)Atr withError:(NSError *)error{
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -200,10 +246,15 @@
             NSArray* result = @[deviceId, payload];
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
             [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:didFindTagWithDataCallbackId];
+            if (muteDataCallbacks) {
+                return;
+            } else {
+                [self.commandDelegate sendPluginResult:pluginResult callbackId:didFindTagWithDataCallbackId];
+            }
         }
     });
 }
+//setTagWrittenCallback
 
 - (void)didRespondToApduCommand:(NSString *)response fromDevice:(NSString *)deviceId withError:(NSError *)error{
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -245,30 +296,32 @@
 
 #pragma mark - CallbackId setters
 
- - (void)setConnectedDevicesUpdateCallback:(CDVInvokedUrlCommand*)command
- {
-	didUpdateConnectedDevicesCallbackId = command.callbackId;
- }
- 
- - (void)setCardStatusChangeCallback:(CDVInvokedUrlCommand*)command
- {
+- (void)setConnectedDevicesUpdateCallback:(CDVInvokedUrlCommand*)command
+{
+    didUpdateConnectedDevicesCallbackId = command.callbackId;
+}
+
+- (void)setCardStatusChangeCallback:(CDVInvokedUrlCommand*)command
+{
     didChangeCardStatusCallbackId = command.callbackId;
- }
- 
- - (void)setTagDiscoveredCallback:(CDVInvokedUrlCommand*)command
- {
+}
+
+- (void)setTagDiscoveredCallback:(CDVInvokedUrlCommand*)command
+{
     didFindTagWithUuidCallbackId = command.callbackId;
- }
- 
- - (void)setNdefDiscoveredCallback:(CDVInvokedUrlCommand*)command
- {
+}
+
+- (void)setNdefDiscoveredCallback:(CDVInvokedUrlCommand*)command
+{
     didFindTagWithDataCallbackId = command.callbackId;
- }
+}
 
- #pragma mark - Internal Methods
 
- /** NOT USED Set the scan period (in ms) */
- - (void)setScanPeriod:(NSString*)periodString :(NSString*)callbackId {
+
+#pragma mark - Internal Methods
+
+/** NOT USED Set the scan period (in ms) */
+- (void)setScanPeriod:(NSString*)periodString :(NSString*)callbackId {
     periodString = [periodString stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
     if ([[periodString lowercaseString] isEqualToString:@"unchanged"]){
         return;
@@ -280,10 +333,10 @@
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Scan period must be > 0"];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
     }
- }
+}
 
 /** NOT USED Toggle on/off scan sound */
- - (void)toggleScanSound:(NSString*)toggleString :(NSString*)callbackId {
+- (void)toggleScanSound:(NSString*)toggleString :(NSString*)callbackId {
     NSString* toggle = [toggleString stringByReplacingOccurrencesOfString:@" " withString:@""]; // remove whitespace
     if ([[toggle lowercaseString] isEqualToString:@"unchanged"]) {
         return;
@@ -297,6 +350,6 @@
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Enter 'true' or 'false' only"];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
     }
- }
+}
 
-@end 
+@end

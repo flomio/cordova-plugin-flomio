@@ -2,11 +2,9 @@ var exec = require('cordova/exec');
 /**
  * Constructor
  */
-var exports = module.exports;
-exports.flomioPlugin = {
+module.exports = {
     init: (success, failure) => {
         exec(success, failure, 'FlomioPlugin', 'init', []);
-        console.log('init: (success, failure) =')
     },
 
     selectDeviceType: (deviceType, success, failure) => {
@@ -78,18 +76,22 @@ exports.flomioPlugin = {
             "FlomioPlugin", "setNdefDiscoveredCallback", []);
     },
 
-    writeNdef: (resultCallback, ndef) => {
-        var encodedNdef = ndef.encodeMessage(ndef)
-        console.log("encodedNdef: " + encodedNdef)
-        this.write(resultCallback, encodedNdef)
+    writeNdef: function(resultCallback, deviceId, ndefMessage) {
+        var bytes = ndef.encodeMessage(ndefMessage)
+        console.log('bytes')
+        console.log(bytes)
+        var hexString = util.bytesToHexString(bytes)
+        console.log('hexString')
+        console.log(hexString)
+        this.write(resultCallback, deviceId, hexString)
     },
 
-    write: (resultCallback, encodedBytes, success, failure) => {
+    write: (resultCallback, deviceId, dataHexString, success, failure) => {
         exec(
             (deviceId, payload) => { resultCallback({ payload: payload, deviceId: deviceId }) },
-            (failure) => { console.log("ERROR: FlomioPlugin.addNdefListener: " + failure) },
-            "FlomioPlugin", "setNdefDiscoveredCallback", [deviceId, encodedBytes]);
-    }
+            (failure) => { console.log("ERROR: FlomioPlugin.write: " + failure) },
+            "FlomioPlugin", "write", [deviceId, dataHexString]);
+    },
 }
 
 /**
@@ -140,13 +142,13 @@ var ndef = {
 
         // convert strings to arrays
         if (!(type instanceof Array)) {
-            type = nfc.stringToBytes(type);
+            type = util.stringToBytes(type);
         }
         if (!(id instanceof Array)) {
-            id = nfc.stringToBytes(id);
+            id = util.stringToBytes(id);
         }
         if (!(payload instanceof Array)) {
-            payload = nfc.stringToBytes(payload);
+            payload = util.stringToBytes(payload);
         }
 
         return {
@@ -220,7 +222,7 @@ var ndef = {
      */
     mimeMediaRecord: function(mimeType, payload, id) {
         if (!id) { id = []; }
-        return ndef.record(ndef.TNF_MIME_MEDIA, nfc.stringToBytes(mimeType), id, payload);
+        return ndef.record(ndef.TNF_MIME_MEDIA, util.stringToBytes(mimeType), id, payload);
     },
 
     /**
@@ -614,9 +616,9 @@ var util = {
             if (typeof(type) === 'string') {
                 recordType = type;
             } else {
-                recordType = nfc.bytesToString(type);
+                recordType = util.bytesToString(type);
             }
-            return (nfc.bytesToString(record.type) === recordType);
+            return (util.bytesToString(record.type) === recordType);
         }
         return false;
     }
@@ -699,14 +701,14 @@ var uriHelper = {
     }
 };
 
-exports.ndef = ndef;
-exports.util = util;
+module.exports.ndef = ndef;
+module.exports.util = util;
 
 // textHelper and uriHelper aren't exported, add a property
 ndef.uriHelper = uriHelper;
 ndef.textHelper = textHelper;
 
 // create aliases
-nfc.bytesToString = util.bytesToString;
-nfc.stringToBytes = util.stringToBytes;
-nfc.bytesToHexString = util.bytesToHexString;
+// util.bytesToString = util.bytesToString;
+// util.stringToBytes = util.stringToBytes;
+// util.bytesToHexString = util.bytesToHexString;
