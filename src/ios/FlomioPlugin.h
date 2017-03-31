@@ -27,6 +27,8 @@
 }
 
 @property (nonatomic) DeviceType selectedDeviceType;
+@property (nonatomic) NSString *specificDeviceId;
+
 
 // Cordova functions
 - (void)init:(CDVInvokedUrlCommand*)command;

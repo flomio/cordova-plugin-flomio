@@ -5,22 +5,18 @@
 
 #import "FlomioPlugin.h"
 
-@implementation FlomioPlugin {
-    BOOL muteDataCallbacks;
-}
+@implementation FlomioPlugin
 
 /** Initialise the plugin */
 - (void)init:(CDVInvokedUrlCommand*)command {
-    muteDataCallbacks = NO;
     apduResponseDictionary = [NSMutableDictionary new];
     
     if (!sharedManager) {
         // Initialise flomioSDK
         sharedManager = [FmSessionManager sharedManager];
-        sharedManager.selectedDeviceType = self.selectedDeviceType; // For FloBLE Plus
-        //kFlojackMsr, kFlojackBzr for audiojack readers
+        sharedManager.selectedDeviceType = self.selectedDeviceType; 
         sharedManager.delegate = self;
-        sharedManager.specificDeviceId = nil;
+        sharedManager.specificDeviceId = self.specificDeviceId;
         //@"RR330-000120" use device id from back of device to only connect to specific device
         // only for use when "Allow Multiconnect" = @0
         if(!configurationDictionary){
@@ -56,6 +52,16 @@
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }
 }
+    
+- (void)selectSpecificDeviceId:(CDVInvokedUrlCommand*)command {
+    if (command) {
+        NSString *deviceId = [command.arguments objectAtIndex:0];
+        if (deviceId.length > 6){ //can cause problems if not
+            self.specificDeviceId = [deviceId stringByReplacingOccurrencesOfString:@" " withString:@""];
+        }
+    }
+}
+
 
 - (void)getConfiguration:(CDVInvokedUrlCommand *)command {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -112,13 +118,25 @@
         }
     }
 }
+    
+- (void)sleepReaders:(CDVInvokedUrlCommand *)command {
+    [sharedManager sleepReaders];
+}
+    
+- (void)startReaders:(CDVInvokedUrlCommand *)command {
+    [sharedManager startReaders];
+}
+    
+- (void)stopReaders:(CDVInvokedUrlCommand *)command {
+    [sharedManager stopReaders];
+}
 
 - (void)write:(CDVInvokedUrlCommand *)command {
     int currentPage;
     int positionInEncodedString = 0; //offset between position in encodedDataString and data block in tag
     
     didWriteNdefCallbackId = command.callbackId;
-    muteDataCallbacks = YES;
+   // muteDataCallbacks = YES;
     NSString* deviceId = [command.arguments objectAtIndex:0];
     deviceId = [deviceId stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
 
@@ -129,6 +147,9 @@
         encodedHexStringWithTLVValues = [encodedHexStringWithTLVValues stringByAppendingString:@"0"];
     }
     for (FmDevice *device in connectedDevicesList) {
+        BOOL isCorrectDeviceId = [[device serialNumber] isEqualToString:[deviceId uppercaseString]];
+        NSLog(@"isCorrectDeviceId: %@", [NSNumber numberWithBool:isCorrectDeviceId]);
+
         if ([[device serialNumber] isEqualToString:[deviceId uppercaseString]]) {
             for (currentPage = 4; currentPage*4 <= encodedHexStringWithTLVValues.length; currentPage+=1){
                 NSUInteger length = encodedHexStringWithTLVValues.length;
@@ -145,19 +166,16 @@
                     [device sendApduCommand:apdu];
                 });
                 if ([next4BytesToWrite containsString:@"fe"]){
-                    muteDataCallbacks = NO;
                     return;
                 }
             }
         }
     }
-    muteDataCallbacks = NO;
-    
     /*
-     NSArray* result = @[deviceId, encodedDataString];
-     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
-     [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-     [self.commandDelegate sendPluginResult:pluginResult callbackId:apduResponseDictionary[deviceId]];
+    NSArray* result = @[deviceId, encodedDataString];
+    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
+    [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:didWriteNdefCallbackId];
      */
 }
 
@@ -246,11 +264,7 @@
             NSArray* result = @[deviceId, payload];
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
             [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-            if (muteDataCallbacks) {
-                return;
-            } else {
-                [self.commandDelegate sendPluginResult:pluginResult callbackId:didFindTagWithDataCallbackId];
-            }
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:didFindTagWithDataCallbackId];
         }
     });
 }

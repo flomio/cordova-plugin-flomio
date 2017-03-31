@@ -12,6 +12,11 @@ module.exports = {
         // deviceType is "FloJack-BZR", "FloJack-MSR", "FloBLE-EMV" or "FloBLE-Plus" (case insensitive)
     },
 
+    selectSpecificDeviceId: (specificDeviceId, success, failure) => {
+        exec(success, failure, 'FlomioPlugin', 'selectSpecificDeviceId', [specificDeviceId]);
+        // deviceType is "FloJack-BZR", "FloJack-MSR", "FloBLE-EMV" or "FloBLE-Plus" (case insensitive)
+    },
+
     setConfiguration: (configurationDictionary, success, failure) => {
         var configurationArray = new Array();
         var keyArray = new Array("scanPeriod", "scanSound", "readerState", "powerOperation");
@@ -35,9 +40,23 @@ module.exports = {
 
     stopReaders: (resultCallback, success, failure) => {
         exec(
-            (scanPeriod, scanSound) => { resultCallback({ deviceId: deviceId, responseApdu: responseApdu }) },
+            (scanPeriod, scanSound) => { resultCallback({ deviceId: deviceId }) },
             (failure) => { console.log("ERROR: FlomioPlugin.stopReaders: " + failure) },
             "FlomioPlugin", "stopReaders", []);
+    },
+
+    sleepReaders: (resultCallback, success, failure) => {
+        exec(
+            () => {},
+            (failure) => { console.log("ERROR: FlomioPlugin.sleepReaders: " + failure) },
+            "FlomioPlugin", "sleepReaders", []);
+    },
+
+    startReaders: (resultCallback, success, failure) => {
+        exec(
+            () => {},
+            (failure) => { console.log("ERROR: FlomioPlugin.startReaders: " + failure) },
+            "FlomioPlugin", "startReaders", []);
     },
 
     sendApdu: (resultCallback, deviceId, apdu, success, failure) => {
