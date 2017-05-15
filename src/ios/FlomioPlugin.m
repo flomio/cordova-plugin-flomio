@@ -13,24 +13,17 @@
     
     if (!sharedManager) {
         // Initialise flomioSDK
-        sharedManager = [FmSessionManager sharedManager];
-        sharedManager.selectedDeviceType = self.selectedDeviceType; 
+        FmConfiguration *defaultConfiguration = [[FmConfiguration alloc] init];
+        defaultConfiguration.deviceType = kFloBlePlus;
+        defaultConfiguration.transmitPower = kHighPower;
+        defaultConfiguration.scanSound = @YES;
+        defaultConfiguration.scanPeriod = @1000;
+        //    defaultConfiguration.tagDiscovery = k
+        defaultConfiguration.powerOperation = kAutoPollingControl; //, kBluetoothConnectionControl for low power usage
+        defaultConfiguration.allowMultiConnect = @NO;
+        defaultConfiguration.specificDeviceId = nil; //@"RR330-000120";
+        sharedManager = [[FmSessionManager flomioMW] initWithConfiguration:defaultConfiguration];
         sharedManager.delegate = self;
-        sharedManager.specificDeviceId = self.specificDeviceId;
-        //@"RR330-000120" use device id from back of device to only connect to specific device
-        // only for use when "Allow Multiconnect" = @0
-        if(!configurationDictionary){
-            configurationDictionary = @{
-                                        @"Scan Sound" : @1,
-                                        @"Scan Period" : @1000,
-                                        @"Reader State" : [NSNumber numberWithInt:kReadUuid], //kReadData for NDEF
-                                        @"Power Operation" : [NSNumber numberWithInt:kAutoPollingControl], //kBluetoothConnectionControl low power usage
-                                        @"Transmit Power" : [NSNumber numberWithInt: kHighPower],
-                                        @"Allow Multiconnect" : @0, //control whether multiple FloBLE devices can connect
-                                        };
-        }
-        [sharedManager setConfiguration: configurationDictionary];
-        [sharedManager createReaders];
     }
 }
 
@@ -192,20 +185,17 @@
 
 #pragma mark - Flomio Delegates
 
-/** Called when the list of connected devices is updated */
-- (void)didUpdateConnectedDevices:(NSArray *)connectedDevices {
-    connectedDevicesList = [connectedDevices mutableCopy];
+/** Called when any info from any device is updated */
+- (void)didChangeStatus:(NSString *)readerSerialNumber withConfiguration:(FmConfiguration *)configuration andBatteryLevel:(NSNumber *)batteryLevel andCommunicationStatus:(CommunicationStatus)communicationStatus withFirmwareRevision:(NSString *)firmwareRev withHardwareRevision:(NSString *)hardwareRev{
+    
     NSMutableArray* devices = [NSMutableArray array];
-    for (FmDevice *device in connectedDevices)
-    {
-        NSMutableDictionary *deviceDictionary = [NSMutableDictionary new];
-        deviceDictionary[@"Device ID"] = device.serialNumber;
-        deviceDictionary[@"Battery Level"] = [NSNumber numberWithUnsignedLong: (unsigned long)device.batteryLevel];
-        deviceDictionary[@"Hardware Revision"] = device.hardwareRevision;
-        deviceDictionary[@"Firmware Revision"] = device.firmwareRevision;
-        deviceDictionary[@"Communication Status"] = [NSNumber numberWithInt: device.communicationStatus];
-        [devices addObject: deviceDictionary];
-    }
+    NSMutableDictionary *deviceDictionary = [NSMutableDictionary new];
+    deviceDictionary[@"Device ID"] = readerSerialNumber;
+    deviceDictionary[@"Battery Level"] = [NSNumber numberWithUnsignedLong: (unsigned long)batteryLevel];
+    deviceDictionary[@"Hardware Revision"] = hardwareRev;
+    deviceDictionary[@"Firmware Revision"] = firmwareRev;
+    deviceDictionary[@"Communication Status"] = [NSNumber numberWithInt: communicationStatus];
+    [devices addObject: deviceDictionary];
     dispatch_async(dispatch_get_main_queue(), ^{
         if (didUpdateConnectedDevicesCallbackId)
         {
@@ -216,72 +206,60 @@
     });
 }
 
-- (void)didFindTagWithUuid:(NSString *)Uuid fromDevice:(NSString *)deviceId withAtr:(NSString *)Atr withError:(NSError *)error{
+- (void)didFindTag:(FmTag *)tag fromDevice:(NSString *)deviceId{
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSLog(@"Found tag UUID: %@ from device:%@", Uuid, deviceId);
+        NSLog(@"Found tag UUID: %@ from device:%@", tag.uuid, deviceId);
         // send tag read update to Cordova
         if (didFindTagWithUuidCallbackId) {
-            NSArray* result = @[deviceId, Uuid];
+            NSArray* result = @[deviceId, tag.uuid, tag.atr];
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
             [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:didFindTagWithUuidCallbackId];
         }
     });
+
 }
 
-- (void)didFindTagWithData:(NSDictionary *)thisPayload fromDevice:(NSString *)deviceId withAtr:(NSString *)Atr withError:(NSError *)error{
-    NSMutableDictionary *mutableDictionary = [NSMutableDictionary new];
-    if (thisPayload[@"Uuid"]){
-        mutableDictionary[@"Uuid"] = thisPayload[@"Uuid"];
-    }
-    if (thisPayload[@"Raw Data"]){
-        mutableDictionary[@"Raw Data"] = thisPayload[@"Raw Data"];
-    }
-    if (thisPayload[@"Ndef"]){
-        NdefMessage *ndef = thisPayload[@"Ndef"];
-        NSMutableArray *ndefRecordsArray = [NSMutableArray array];
-        for (NdefRecord* record in ndef.ndefRecords) {
-            NSMutableDictionary* recordDictionary = [NSMutableDictionary new];
-            if (record.url.absoluteString){
-                recordDictionary[@"Url"] = record.url.absoluteString;
-            }
-            if (record.payloadString){
-                recordDictionary[@"Payload"] = record.payloadString;
-            }
-            if (record.typeString){
-                recordDictionary[@"Type"] = record.typeString;
-            }
-            if (record.theIdString){
-                recordDictionary[@"Id"] = record.theIdString;
-            }
-            [ndefRecordsArray addObject:recordDictionary];
-        }
-        mutableDictionary[@"Ndef"] = ndefRecordsArray;
-    }
-    dispatch_async(dispatch_get_main_queue(), ^{
-        NSDictionary *payload = [NSDictionary dictionaryWithDictionary:mutableDictionary];
-        if (didFindTagWithDataCallbackId) {
-            NSArray* result = @[deviceId, payload];
-            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
-            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:didFindTagWithDataCallbackId];
-        }
-    });
-}
+//- (void)didFindTagWithData:(NSDictionary *)thisPayload fromDevice:(NSString *)deviceId withAtr:(NSString *)Atr withError:(NSError *)error{
+//    NSMutableDictionary *mutableDictionary = [NSMutableDictionary new];
+//    if (thisPayload[@"Uuid"]){
+//        mutableDictionary[@"Uuid"] = thisPayload[@"Uuid"];
+//    }
+//    if (thisPayload[@"Raw Data"]){
+//        mutableDictionary[@"Raw Data"] = thisPayload[@"Raw Data"];
+//    }
+//    if (thisPayload[@"Ndef"]){
+//        NdefMessage *ndef = thisPayload[@"Ndef"];
+//        NSMutableArray *ndefRecordsArray = [NSMutableArray array];
+//        for (NdefRecord* record in ndef.ndefRecords) {
+//            NSMutableDictionary* recordDictionary = [NSMutableDictionary new];
+//            if (record.url.absoluteString){
+//                recordDictionary[@"Url"] = record.url.absoluteString;
+//            }
+//            if (record.payloadString){
+//                recordDictionary[@"Payload"] = record.payloadString;
+//            }
+//            if (record.typeString){
+//                recordDictionary[@"Type"] = record.typeString;
+//            }
+//            if (record.theIdString){
+//                recordDictionary[@"Id"] = record.theIdString;
+//            }
+//            [ndefRecordsArray addObject:recordDictionary];
+//        }
+//        mutableDictionary[@"Ndef"] = ndefRecordsArray;
+//    }
+//    dispatch_async(dispatch_get_main_queue(), ^{
+//        NSDictionary *payload = [NSDictionary dictionaryWithDictionary:mutableDictionary];
+//        if (didFindTagWithDataCallbackId) {
+//            NSArray* result = @[deviceId, payload];
+//            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
+//            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+//            [self.commandDelegate sendPluginResult:pluginResult callbackId:didFindTagWithDataCallbackId];
+//        }
+//    });
+//}
 //setTagWrittenCallback
-
-- (void)didRespondToApduCommand:(NSString *)response fromDevice:(NSString *)deviceId withError:(NSError *)error{
-    dispatch_async(dispatch_get_main_queue(), ^{
-        NSLog(@"Received APDU: %@ from device:%@", response, deviceId); //APDU Response
-        // send response to Cordova
-        if (apduResponseDictionary[deviceId]) {
-            NSArray* result = @[deviceId, response];
-            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
-            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:apduResponseDictionary[deviceId]];
-        }
-    });
-}
 
 - (void)didReceiveReaderError:(NSError *)error{
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -325,12 +303,10 @@
     didFindTagWithUuidCallbackId = command.callbackId;
 }
 
-- (void)setNdefDiscoveredCallback:(CDVInvokedUrlCommand*)command
-{
-    didFindTagWithDataCallbackId = command.callbackId;
-}
-
-
+//- (void)setNdefDiscoveredCallback:(CDVInvokedUrlCommand*)command
+//{
+//    didFindTagWithDataCallbackId = command.callbackId;
+//}
 
 #pragma mark - Internal Methods
 
