@@ -11,7 +11,6 @@
 #import <Foundation/Foundation.h>
 #import "NdefRecord.h"
 
-
 // Represents an NDEF (NFC Data Exchange Format) data message that contains one or more NdefRecords.
 // An NDEF message includes "records" that can contain different sets of data, such as MIME-type media,
 // a URI, or one of the supported RTD types (see NdefRecord).
@@ -37,7 +36,6 @@
 - (NSData *)asByteBuffer;
 
 + (NdefMessage *)createURIWithString:(NSString *)uriString;
-
 
 @end
 

@@ -125,7 +125,6 @@ static __unused NSArray *kUriPrefixMap = nil;
 @property(nonatomic, readonly) NSString *theIdString;
 @property(nonatomic, readonly) NSString *payloadString;
 
-
 - (id)initWithTnf:(short)tnf andType:(NSData *)type andId:(NSData *)theId andPayload:(NSData *)payload;
 - (id)initWithTnf:(short)tnf andType:(NSData *)type andId:(NSData *)theId andPayload:(NSData *)payload andFlags:(NSData *)flags;
 - (NSData *)asByteBuffer;

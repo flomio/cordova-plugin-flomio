@@ -10,13 +10,10 @@
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
 #import <AudioToolbox/AudioToolbox.h>
+#import "FmCustomTypes.h"
 #include "utils.h"
-#import "Tag.h"
-#import "FmAudioJackDevice.h"
 #import <CommonCrypto/CommonCrypto.h>
-
-#import "FmBluetoothDevice.h"
-#import "NdefMessage.h"
+#import "FmReader.h"
 
 typedef NS_ENUM(NSInteger, bzrDispatchTimerCommands) {
     bzrStartTimer,
@@ -24,22 +21,11 @@ typedef NS_ENUM(NSInteger, bzrDispatchTimerCommands) {
     bzrInitializeTimer
 };
 
-@protocol FeitianAjReaderDelegate<NSObject>;
-
-@required
-
-@optional
-
-- (void)didReceiveReaderError:(NSError *)error;
-- (void)didFindTagWithUuid:(NSString *)Uuid fromDevice:(NSString *)deviceId withAtr:(NSString *)Atr withError:(NSError *)error;
-- (void)didFindTagWithData:(NSDictionary *)payload fromDevice:(NSString *)deviceId withAtr:(NSString *)Atr withError:(NSError *)error;
-- (void)didChangeCardStatus:(CardStatus)status fromDevice:(NSString *)device;
-- (void)continueWithInitialization:(BOOL)isBzr;
+@protocol FeitianAjReaderDelegate <FmReaderDelegate>;
 
 @end
 
-
-@interface FeitianAjReader : NSObject <FTaR530Delegate, AVAudioPlayerDelegate> {
+@interface FeitianAjReader : FmReader <FTaR530Delegate, AVAudioPlayerDelegate> {
 
     BOOL isRequestingUuid;
     BOOL registry_mode;
@@ -55,38 +41,27 @@ typedef NS_ENUM(NSInteger, bzrDispatchTimerCommands) {
     
     NSString *newMasterKey;
     NSString *oldMasterKey;
-    
-    //semaphores
-    dispatch_semaphore_t sem;
-
 }
 
-+ (instancetype)sharedInstanceWithParent:(id)parent;
-
-- (id)initWithParent:(id)parent;
++ (instancetype)initSharedInstanceWithParent:(id)parent andConfiguration:(FmConfiguration *)confuration;
 - (void)transmitCommandApdu:(NSString *)sendApdu;
+- (void)getDeviceInfo;
 - (void)getUuid;
 - (void)getData;
+- (void)startReader;
 - (void)stopReader;
 - (void)reset;
-- (void)sleep;
-- (void)startScan;
-- (void)determineIfConnected;
+- (void)setConfiguration:(FmConfiguration *)configuration;
 
 @property (nonatomic, strong) id<FeitianAjReaderDelegate> delegate;
 
-@property (readonly) Tag *tag;
-@property (readonly, strong) NSString *serialNumber;
-
+//@property (readonly) Tag *tag;
+@property(nonatomic, copy) void (^completionBlock)(NSString *);
 @property (nonatomic) BOOL routeInProcess;
 @property (nonatomic, assign) BOOL isProLicensed;
-@property (nonatomic, assign) ReaderStateType readerState;
+@property (nonatomic, assign) TagDiscovery tagDiscovery;
 
 @property (nonatomic, strong) dispatch_source_t timerSource;
-@property (nonatomic, strong) FmAudioJackDevice *device;
-
-@property (nonatomic, strong) NSString *firmwareRevision;
-@property (nonatomic, strong) NSString *hardwareRevision;
 
 @property (nonatomic, strong) NSNumber *scanPeriod;
 @property (nonatomic, strong) NSNumber *scanSound;
@@ -95,5 +70,3 @@ typedef NS_ENUM(NSInteger, bzrDispatchTimerCommands) {
 @property (nonatomic, strong) NSString *scannedCardType;
 
 @end
-
-

@@ -9,12 +9,12 @@
 #import <Foundation/Foundation.h>
 
 typedef NS_ENUM(NSInteger, DeviceType) {
+    kDeviceTypeDefault,
     kFlojackBzr,
     kFlojackMsr,
-    kFlojackAny,
     kFloBleEmv,
     kFloBlePlus,
-    kFloBleMini,
+    kuGrokit,
 };
 
 typedef NS_ENUM(NSInteger, CommunicationStatus) {
@@ -35,8 +35,8 @@ typedef NS_ENUM(NSInteger, NdefState) {
 };
 
 typedef NS_ENUM(NSInteger, CardType) {
-    kUnknown,
-    kMifareUltralight,
+    kCardTypeDefault,
+    kMifareType2,
     kMifareClassic1k,
     kMifareType4,
     kMifareDesfire2kEv1, //read data not supported
@@ -44,15 +44,13 @@ typedef NS_ENUM(NSInteger, CardType) {
 
 };
 
-
 typedef NS_ENUM(NSInteger, CardStatus) {
     kNotPresent,
     kPresent,
     kReadingData
 };
 
-
-typedef NS_ENUM(NSInteger, ReaderStateType) {
+typedef NS_ENUM(NSInteger, TagDiscovery) {
     kReadUuid,
     kReadData,
     kWriteData
