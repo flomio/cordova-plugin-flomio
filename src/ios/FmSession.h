@@ -37,13 +37,13 @@
 
 @optional
 
-- (void)didGetDeviceInfoWith:(NSString *)serialNumber withFirmwareRevision:(NSString *)firmwareRev withHardwareRevision:(NSString *)hardwareRev;
-- (void)didGetLicenseInfo:(NSString *)serialNumber withStatus:(BOOL)isRegistered;
+- (void)didGetDeviceInfoWith:(NSString *)deviceUuid withFirmwareRevision:(NSString *)firmwareRev withHardwareRevision:(NSString *)hardwareRev;
+- (void)didGetLicenseInfo:(NSString *)deviceUuid withStatus:(BOOL)isRegistered;
 - (void)didReceiveReaderError:(NSError *)error;
 - (void)didGetResponseApdu:(NSString *)responseApdu;
 - (void)didChangeCardStatus:(CardStatus)status fromDevice:(NSString *)device;
 - (void)didChangeStatus:(NSString *)device andBatteryLevel:(NSUInteger)batteryLevel andCommunicationStatus:(CommunicationStatus)communicationStatus;
-- (void)didFindTag:(FmTag *)tag fromDevice:(NSString *)deviceId;
+- (void)didFindTag:(FmTag *)tag fromDevice:(NSString *)deviceUuid;
 
 @end
 
@@ -63,7 +63,7 @@
 @property (nonatomic, assign) CommunicationStatus communicationStatus;
 @property (nonatomic) NSUInteger batteryLevel;
 @property (nonatomic, strong) FmReader *reader;
-@property (nonatomic, strong) NSString *serialNumber;
+@property (nonatomic, strong) NSString *deviceUuid;
 @property (nonatomic, strong) NSString *firmwareRevision;
 @property (nonatomic, strong) NSString *hardwareRevision;
 @property (nonatomic, assign) BOOL isProLicensed;

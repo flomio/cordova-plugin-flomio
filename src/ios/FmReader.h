@@ -30,7 +30,7 @@
 - (void)didGetBatteryLevel:(NSInteger)batteryLevel;
 - (void)didGetCommunicationStatus:(CommunicationStatus)communicationStatus;
 - (void)didChangeCardStatus:(CardStatus)status fromDevice:(NSString *)device;
-- (void)didGetDeviceInfoWith:(NSString *)serialNumber withFirmwareRevision:(NSString *)firmwareRev withHardwareRevision:(NSString *)hardwareRev;
+- (void)didGetDeviceInfoWith:(NSString *)deviceUuid withFirmwareRevision:(NSString *)firmwareRev withHardwareRevision:(NSString *)hardwareRev;
 - (void)didReceiveReaderError:(NSError *)error;
 
 @end
@@ -40,7 +40,7 @@
 @property (nonatomic, strong) id<FmReaderDelegate> delegate;
 @property (nonatomic, assign) DeviceType type;
 @property (nonatomic) NSUInteger batteryLevel;
-@property (nonatomic, strong) NSString *serialNumber;
+@property (nonatomic, strong) NSString *deviceUuid;
 @property (nonatomic, strong) NSString *hardwareRevision;
 @property (nonatomic, strong) NSString *firmwareRevision;
 
@@ -49,6 +49,7 @@
 @property (nonatomic, strong) NSString *currentUuid;
 @property (nonatomic, strong) NSString *currentApdu;
 @property (nonatomic, strong) NSString *currentResponse;
+@property (nonatomic, strong) NSString *apduRequestUuid;
 @property (nonatomic, strong) FmApduTransceiver *apduTransceiver;
 
 //These methods which must be overwritten by subclassess

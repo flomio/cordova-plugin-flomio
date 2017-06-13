@@ -34,7 +34,6 @@
         <source-file src="src/ios/libSDKClasses.a" framework="true" />
 
         <!-- Flomio SDK header files -->
-        <header-file src="src/ios/ABDHex.h" target-dir="src/ios"/>
         <header-file src="src/ios/ABTAcr1255uj1Reader.h" target-dir="src/ios"/>
         <header-file src="src/ios/ABTAcr3901us1Reader.h" target-dir="src/ios"/>
         <header-file src="src/ios/ABTBluetoothReader.h" target-dir="src/ios"/>
@@ -50,36 +49,23 @@
         <header-file src="src/ios/ACRTrack1Data.h" target-dir="src/ios"/>
         <header-file src="src/ios/ACRTrack2Data.h" target-dir="src/ios"/>
         <header-file src="src/ios/ACRTrackData.h" target-dir="src/ios"/>
-        <header-file src="src/ios/ACSBluetooth.h" target-dir="src/ios"/>
         <header-file src="src/ios/AcsAjReader.h" target-dir="src/ios"/>
         <header-file src="src/ios/AcsBtReader.h" target-dir="src/ios"/>
         <header-file src="src/ios/AudioJack.h" target-dir="src/ios"/>
         <header-file src="src/ios/AudioJackErrors.h" target-dir="src/ios"/>
-        <header-file src="src/ios/BleTags.h" target-dir="src/ios"/>
         <header-file src="src/ios/DUKPT.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FJStringDisplay.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FLOReader.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FLOTag.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FTType.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FTaR530.h" target-dir="src/ios"/>
         <header-file src="src/ios/FeitianAjReader.h" target-dir="src/ios"/>
         <header-file src="src/ios/FeitianBtReader.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FeitianReader.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FloBLEReader.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FloNotifications.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FloProtocolsCommon.h" target-dir="src/ios"/>
+        <header-file src="src/ios/FJStringDisplay.h" target-dir="src/ios"/>
         <header-file src="src/ios/FlomioBtReader.h" target-dir="src/ios"/>
+        <header-file src="src/ios/FlomioPlugin.h" target-dir="src/ios"/>
+        <header-file src="src/ios/FlomioPlugin.m" target-dir="src/ios"/>
         <header-file src="src/ios/FmApduTransceiver.h" target-dir="src/ios"/>
         <header-file src="src/ios/FmAudioJackConnectionsManager.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FmAudioJackDevice.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FmAudioJackSessionManager.h" target-dir="src/ios"/>
         <header-file src="src/ios/FmBluetoothConnectionsManager.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FmBluetoothDevice.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FmBluetoothSessionManager.h" target-dir="src/ios"/>
         <header-file src="src/ios/FmConfiguration.h" target-dir="src/ios"/>
         <header-file src="src/ios/FmConnectionsManager.h" target-dir="src/ios"/>
         <header-file src="src/ios/FmCustomTypes.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FmDevice.h" target-dir="src/ios"/>
         <header-file src="src/ios/FmErrorManager.h" target-dir="src/ios"/>
         <header-file src="src/ios/FmNdefManager.h" target-dir="src/ios"/>
         <header-file src="src/ios/FmReader.h" target-dir="src/ios"/>
@@ -89,16 +75,16 @@
         <header-file src="src/ios/FmTagInventory.h" target-dir="src/ios"/>
         <header-file src="src/ios/FmType2Tag.h" target-dir="src/ios"/>
         <header-file src="src/ios/FmType4Tag.h" target-dir="src/ios"/>
+        <header-file src="src/ios/ft301u.h" target-dir="src/ios"/>
+        <header-file src="src/ios/FTaR530.h" target-dir="src/ios"/>
         <header-file src="src/ios/FtBleReader.h" target-dir="src/ios"/>
-        <header-file src="src/ios/Logging.h" target-dir="src/ios"/>
-        <header-file src="src/ios/NFCMessage.h" target-dir="src/ios"/>
-        <header-file src="src/ios/NSData+FJStringDisplay.h" target-dir="src/ios"/>
+        <header-file src="src/ios/FTType.h" target-dir="src/ios"/>
         <header-file src="src/ios/NdefMessage.h" target-dir="src/ios"/>
         <header-file src="src/ios/NdefRecord.h" target-dir="src/ios"/>
-        <header-file src="src/ios/Reader.h" target-dir="src/ios"/>
         <header-file src="src/ios/ReaderInterface.h" target-dir="src/ios"/>
-        <header-file src="src/ios/ReaderManager.h" target-dir="src/ios"/>
-        <header-file src="src/ios/Tag.h" target-dir="src/ios"/>
+        <header-file src="src/ios/Ugi_antennaTuning.h" target-dir="src/ios"/>
+        <header-file src="src/ios/Ugi_firmwareUpdate.h" target-dir="src/ios"/>
+        <header-file src="src/ios/Ugi_regions.h" target-dir="src/ios"/>
         <header-file src="src/ios/Ugi.h" target-dir="src/ios"/>
         <header-file src="src/ios/UgiButton.h" target-dir="src/ios"/>
         <header-file src="src/ios/UgiConfigurationDelegate.h" target-dir="src/ios"/>
@@ -109,8 +95,8 @@
         <header-file src="src/ios/UgiInventory.h" target-dir="src/ios"/>
         <header-file src="src/ios/UgiInventoryDelegate.h" target-dir="src/ios"/>
         <header-file src="src/ios/UgiJson.h" target-dir="src/ios"/>
-        <header-file src="src/ios/UgiRfMicron.h" target-dir="src/ios"/>
         <header-file src="src/ios/UgiRfidConfiguration.h" target-dir="src/ios"/>
+        <header-file src="src/ios/UgiRfMicron.h" target-dir="src/ios"/>
         <header-file src="src/ios/UgiStatusImageView.h" target-dir="src/ios"/>
         <header-file src="src/ios/UgiSwiftBridgingHeader.h" target-dir="src/ios"/>
         <header-file src="src/ios/UgiTag.h" target-dir="src/ios"/>
@@ -121,16 +107,12 @@
         <header-file src="src/ios/UgiUiUtil.h" target-dir="src/ios"/>
         <header-file src="src/ios/UgiUtil.h" target-dir="src/ios"/>
         <header-file src="src/ios/UgiViewController.h" target-dir="src/ios"/>
-        <header-file src="src/ios/Ugi_antennaTuning.h" target-dir="src/ios"/>
-        <header-file src="src/ios/Ugi_firmwareUpdate.h" target-dir="src/ios"/>
-        <header-file src="src/ios/Ugi_regions.h" target-dir="src/ios"/>
-        <header-file src="src/ios/Utilities.h" target-dir="src/ios"/>
-        <header-file src="src/ios/ft301u.h" target-dir="src/ios"/>
         <header-file src="src/ios/uGrokitAjReader.h" target-dir="src/ios"/>
+        <header-file src="src/ios/Utilities.h" target-dir="src/ios"/>
         <header-file src="src/ios/utils.h" target-dir="src/ios"/>
         <header-file src="src/ios/winscard.h" target-dir="src/ios"/>
         <header-file src="src/ios/wintypes.h" target-dir="src/ios"/>
-
+        
         <!-- System Frameworks -->
         <framework src="MediaPlayer.framework" weak="true" />
         <framework src="libc++.dylib" />

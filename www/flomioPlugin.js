@@ -60,10 +60,15 @@ module.exports = {
     },
 
     sendApdu: (resultCallback, deviceId, apdu, success, failure) => {
-        exec(
-            (deviceId, responseApdu) => { resultCallback({ deviceId: deviceId, responseApdu: responseApdu }) },
-            (failure) => { console.log("ERROR: FlomioPlugin.sendApdu: " + failure) },
-            "FlomioPlugin", "sendApdu", [deviceId, apdu]);
+        return new Promise((resolve, reject) => {
+            exec(
+                (deviceId, responseApdu) => {
+                    resultCallback({ deviceId: deviceId, responseApdu: responseApdu })
+                    resolve(responseApdu)
+                },
+                (failure) => { console.log("ERROR: FlomioPlugin.sendApdu: " + failure) },
+                "FlomioPlugin", "sendApdu", [deviceId, apdu]);
+        });
     },
 
     // Delegate/Event Listeners
@@ -88,30 +93,127 @@ module.exports = {
             "FlomioPlugin", "setTagDiscoveredCallback", []);
     },
 
-    addNdefListener: (resultCallback, success, failure) => {
-        exec(
-            (deviceId, payload) => { resultCallback({ payload: payload, deviceId: deviceId }) },
-            (failure) => { console.log("ERROR: FlomioPlugin.addNdefListener: " + failure) },
-            "FlomioPlugin", "setNdefDiscoveredCallback", []);
+    readNdef: function(resultCallback, deviceId) {
+        var fullResponse = ""
+        var apdus = []
+        for (let page = 4; page < 16; page += 4) {
+            let n = ""
+            page > 16 ? n = "" + page.toString(16) : n = "0" + page.toString(16)
+            var apdu = 'FFB000' + n + '10'
+
+            function success() {}
+            //store each sendApdu promise
+            apdus.push(this.sendApdu(success, deviceId, apdu).then((responseApdu) => {
+                console.log("response apdu: " + responseApdu);
+                fullResponse = fullResponse.concat(responseApdu.slice(0, -5))
+            }, (err) => {
+                console.error(err);
+            }))
+        }
+
+        //send all apdus and capture result
+        Promise.all(apdus).then(function() {
+            console.log('fullResponse: ' + fullResponse)
+        }, reason => {
+            console.log(reason)
+        });
     },
 
     writeNdef: function(resultCallback, deviceId, ndefMessage) {
+        console.log('writeNdef')
+        console.log(deviceId)
         var bytes = ndef.encodeMessage(ndefMessage)
-        console.log('bytes')
-        console.log(bytes)
+        console.log('bytes' + bytes)
         var hexString = util.bytesToHexString(bytes)
-        console.log('hexString')
-        console.log(hexString)
+        console.log('hexString' + hexString)
         this.write(resultCallback, deviceId, hexString)
     },
 
     write: (resultCallback, deviceId, dataHexString, success, failure) => {
-        exec(
-            (deviceId, payload) => { resultCallback({ payload: payload, deviceId: deviceId }) },
-            (failure) => { console.log("ERROR: FlomioPlugin.write: " + failure) },
-            "FlomioPlugin", "write", [deviceId, dataHexString]);
+        // var apdus = []
+        // var hex = ndef.tlvEncodeNdef(dataHexString)
+        // const apduStrings = ndef.makeWriteApdus(hex, 4)
+        // function success() {}
+        // console.log(deviceId)
+        // this.sendApdu(success, deviceId, 'FFD60000040313').then((responseApdu) => {
+        //     console.log("response apdu: " + responseApdu);
+        //     // fullResponse = fullResponse.concat(responseApdu.slice(0, -5))
+        // }, (err) => {
+        //     console.error(err);
+        // })
+        // // for (let i = 0; i < apduStrings.length; i += 1) {
+        // //     function success() {}
+        // //     //store each sendApdu promise
+        // //     console.log('apduStrings[i]' + apduStrings[i])
+        // //     var apdu = apduStrings[i];
+        // //     apdus.push()
+        // // }
+
+        // //send all apdus and capture result
+        // Promise.all(apdus).then(function() {
+        //     console.log('finished writing: ')
+        // }, reason => {
+        //     console.log(reason)
+        // });
+        var fullResponse = ""
+        var apdus = []
+        for (let page = 4; page < 16; page += 4) {
+            let n = ""
+            page > 16 ? n = "" + page.toString(16) : n = "0" + page.toString(16)
+            var apdu = 'FFB000' + n + '10'
+
+            function success() {}
+            //store each sendApdu promise
+            apdus.push(this.sendApdu(success, deviceId, apdu).then((responseApdu) => {
+                console.log("response apdu: " + responseApdu);
+                fullResponse = fullResponse.concat(responseApdu.slice(0, -5))
+            }, (err) => {
+                console.error(err);
+            }))
+        }
+
+        //send all apdus and capture result
+        Promise.all(apdus).then(function() {
+            console.log('fullResponse: ' + fullResponse)
+        }, reason => {
+            console.log(reason)
+        });
     },
 }
+
+// export function tlvEncodeNdef (message: Buffer) {
+//   // Add the ndef message type
+//   const buffers: Buffer[] = [new Buffer([0x03])]
+//   const length = message.length
+//   if (length <= 0xFE) {
+//     buffers.push(new Buffer([length]))
+//   } else {
+//     const length = Buffer.alloc(3)
+//     length.writeUInt8(0xff, 0)
+//     length.writeUInt16BE(message.length, 1)
+//     buffers.push(length)
+//   }
+//   buffers.push(message)
+//   // Add the terminator
+//   buffers.push(new Buffer([0xFE]))
+//   return Buffer.concat(buffers)
+// }
+
+// export function createWriteApdus (tagType: string, data: Buffer) {
+//   assert.equal(tagType, 'mifareUltralight')
+//   const slices = makeSlices(data, 4)
+//   const userDataPageStarts = 4 //
+//   return slices.map((slice, ix) => {
+//     if (slice.length < 4) {
+//       slice = Buffer.concat([slice, Buffer.alloc(4 - slice.length)])
+//     }
+//     return Buffer.concat([
+//       new Buffer([0xFF, 0xD6, 0x00, userDataPageStarts + ix, 4]),
+//       slice
+//     ])
+//   })
+//     .map(b => b.toString('hex'))
+// }
 
 /**
  * See https://github.com/chariotsolutions/phonegap-nfc/blob/master/www/phonegap-nfc.js
@@ -493,6 +595,33 @@ var ndef = {
                 break;
         }
         return value;
+    },
+
+    makeWriteApdus: function(dataHexString) {
+        var apdusStrings = []
+        const slices = textHelper.makeSlices(dataHexString, 4)
+        apdusStrings = slices.map((slice, i) => {
+            slice = slice.padEnd(4, '0') //pads end of string if not 4 chars long
+            let page = i * 4;
+            let n = page.toString(16);
+            n = n.padStart(2, '0');
+            var apdu = 'FFD600' + n + '04' + slice;
+            return apdu;
+        })
+        return apdusStrings;
+    },
+
+    tlvEncodeNdef: function(message) {
+        // Add the ndef message type
+        console.log('tlvEncodeNdef')
+        const ndefType = '03'
+        const length = message.length / 2
+        var lengthString = length.toString(16);
+        lengthString = lengthString.padStart(2, '0')
+            // Add the ndef message terminator
+        const terminator = 'FE'
+        console.log('ndefType + length + message + terminator' + ndefType + length + message + terminator)
+        return ndefType + length + message + terminator
     }
 
 };
@@ -640,7 +769,7 @@ var util = {
             return (util.bytesToString(record.type) === recordType);
         }
         return false;
-    }
+    },
 
 };
 
@@ -670,6 +799,14 @@ var textHelper = {
         encoded.unshift(lang.length);
 
         return encoded;
+    },
+
+    makeSlices: function(data, pageSize) {
+        const result = []
+        for (let i = 0; i < data.length; i += pageSize) {
+            result.push(data.slice(i, i + pageSize))
+        }
+        return result
     }
 
 };
@@ -717,7 +854,8 @@ var uriHelper = {
         encoded.unshift(protocolCode);
 
         return encoded;
-    }
+    },
+
 };
 
 module.exports.ndef = ndef;

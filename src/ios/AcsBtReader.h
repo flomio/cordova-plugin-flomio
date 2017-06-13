@@ -54,7 +54,7 @@
 @property (nonatomic, assign) BOOL isProLicensed;
 @property (nonatomic, strong) id<AcsBtReaderDelegate> delegate;
 @property (nonatomic, strong) CBPeripheral *peripheral;
-@property (nonatomic, strong) NSMutableArray *acceptedSerialNumbers;
+@property (nonatomic, strong) NSMutableArray *accepteddeviceUuids;
 @property (nonatomic, assign) CommunicationStatus communicationStatus;
 //configuration
 @property (nonatomic, assign) TagDiscovery tagDiscovery;
