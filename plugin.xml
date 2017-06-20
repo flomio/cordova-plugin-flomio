@@ -30,6 +30,7 @@
             <clobbers target="flomioPlugin" />
         </js-module>
 
+
         <!-- Flomio SDK library -->
         <source-file src="src/ios/libSDKClasses.a" framework="true" />
 
@@ -58,8 +59,6 @@
         <header-file src="src/ios/FeitianBtReader.h" target-dir="src/ios"/>
         <header-file src="src/ios/FJStringDisplay.h" target-dir="src/ios"/>
         <header-file src="src/ios/FlomioBtReader.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FlomioPlugin.h" target-dir="src/ios"/>
-        <header-file src="src/ios/FlomioPlugin.m" target-dir="src/ios"/>
         <header-file src="src/ios/FmApduTransceiver.h" target-dir="src/ios"/>
         <header-file src="src/ios/FmAudioJackConnectionsManager.h" target-dir="src/ios"/>
         <header-file src="src/ios/FmBluetoothConnectionsManager.h" target-dir="src/ios"/>
@@ -112,7 +111,10 @@
         <header-file src="src/ios/utils.h" target-dir="src/ios"/>
         <header-file src="src/ios/winscard.h" target-dir="src/ios"/>
         <header-file src="src/ios/wintypes.h" target-dir="src/ios"/>
-        
+        <!--<header-file src="src/ios/NFC_ActionsLight.entitlements" target-dir="src/ios"/>-->
+        <header-file src="src/ios/FlomioPlugin.h" target-dir="src/ios"/>
+        <source-file src="src/ios/FlomioPlugin.m" target-dir="src/ios"/>
+    
         <!-- System Frameworks -->
         <framework src="MediaPlayer.framework" weak="true" />
         <framework src="libc++.dylib" />
@@ -126,7 +128,13 @@
             <string>This app requires bluetooth access to function properly.</string>
         </config-file>
 
-        <header-file src="src/ios/FlomioPlugin.h" />
-        <source-file src="src/ios/FlomioPlugin.m" />
+        <config-file target="*-Info.plist" parent="com.apple.developer.nfc.readersession.formats">
+            <array>
+		            <string>NDEF</string>
+	          </array>
+        </config-file>
+        <config-file target="*-Info.plist" parent="NFCReaderUsageDescription">
+		    <string>to the tag</string>
+        </config-file>
     </platform>
 </plugin>

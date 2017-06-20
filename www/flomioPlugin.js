@@ -93,6 +93,13 @@ module.exports = {
             "FlomioPlugin", "setTagDiscoveredCallback", []);
     },
 
+    addNdefListener: function(resultCallback, success, failure) { //ios 11
+        exec(
+            (ndefMessage) => { resultCallback({ ndefMessage: ndefMessage }) },
+            (failure) => { console.log("ERROR: FlomioPlugin.addNdefListener: " + failure) },
+            "FlomioPlugin", "setNdefDiscoveredCallback", []);
+    },
+
     readNdef: function(resultCallback, deviceId) {
         var fullResponse = ""
         var apdus = []
@@ -114,6 +121,7 @@ module.exports = {
         //send all apdus and capture result
         Promise.all(apdus).then(function() {
             console.log('fullResponse: ' + fullResponse)
+            resultCallback(fullResponse);
         }, reason => {
             console.log(reason)
         });
@@ -162,9 +170,9 @@ module.exports = {
             page > 16 ? n = "" + page.toString(16) : n = "0" + page.toString(16)
             var apdu = 'FFB000' + n + '10'
 
-            function success() {}
+            function didRespond() {}
             //store each sendApdu promise
-            apdus.push(this.sendApdu(success, deviceId, apdu).then((responseApdu) => {
+            apdus.push(this.sendApdu(didRespond, deviceId, apdu).then((responseApdu) => {
                 console.log("response apdu: " + responseApdu);
                 fullResponse = fullResponse.concat(responseApdu.slice(0, -5))
             }, (err) => {

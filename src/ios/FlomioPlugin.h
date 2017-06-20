@@ -1,12 +1,14 @@
 /*
  FlomioPlugin.h
- Uses Flomio SDK version 2.2
+ Uses Flomio SDK version 2.3
  */
 
 #import "FmSessionManager.h"
+#import <CoreNFC/CoreNFC.h>
+#import <AVFoundation/AVFoundation.h>
 #import <Cordova/CDV.h>
 
-@interface FlomioPlugin : CDVPlugin <FmSessionManagerDelegate>
+@interface FlomioPlugin : CDVPlugin <FmSessionManagerDelegate, NFCNDEFReaderSessionDelegate>
 {
     
     // Cordova attributes
@@ -14,21 +16,19 @@
     NSString* didChangeCardStatusCallbackId;
     NSString* didUpdateConnectedDevicesCallbackId;
     NSString* didFindTagWithUuidCallbackId;
-    NSString* didFindTagWithDataCallbackId;
-    NSString* didWriteNdefCallbackId;
-
-    NSMutableDictionary *apduResponseDictionary;
+    NSString* didDetectNDEFsCallbackId;
     
     // Flomio reader attributes
     FmSessionManager* sharedManager;
-    NSMutableArray* connectedDevicesList;
+//    NSMutableArray* connectedDevicesList;
+    NSString *deviceUuid;
     NSDictionary* configurationDictionary;
     
 }
 
 @property (nonatomic) DeviceType selectedDeviceType;
-@property (nonatomic) NSString *specificDeviceId;
-
+@property (strong, nonatomic) NSString *specificDeviceUuid;
+@property (strong, nonatomic) NFCNDEFReaderSession *session;
 
 // Cordova functions
 - (void)init:(CDVInvokedUrlCommand*)command;
