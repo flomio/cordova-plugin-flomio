@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
-    id="com.flomio.sdk"
+    id="flomio_cordova_plugin"
     version="1.0.2">
     <name>flomio_cordova_plugin</name>
     <description>Flomio SDK integration enables NFC, BLE, and UHF RFID reader hardware.</description>
