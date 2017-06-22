@@ -120,8 +120,20 @@ module.exports = {
 
         //send all apdus and capture result
         Promise.all(apdus).then(function() {
-            console.log('fullResponse: ' + fullResponse)
+            // console.log('fullResponse: ' + fullResponse)
             resultCallback(fullResponse);
+            fullResponse = fullResponse.replace(/\s/g, "") //remove spaces
+            if (fullResponse.substring(0, 2) === '03') {
+                var i = fullResponse.indexOf("FE");
+                console.log('index fe: ' + i)
+                fullResponse = fullResponse.substring(3, i)
+                console.log('fullResponse: ' + fullResponse)
+                var data = util.stringToBytes(fullResponse)
+                console.log('data: ' + data)
+                console.log('fullResponse before fe: ' + fullResponse)
+                const resp = ndef.decodeMessage(data)
+                console.log('resp: ' + JSON.stringify(resp))
+            }
         }, reason => {
             console.log(reason)
         });
@@ -187,6 +199,18 @@ module.exports = {
             console.log(reason)
         });
     },
+
+    launchNativeNfc: (resultCallback, success, failure) => {
+        return new Promise((resolve, reject) => {
+            exec(
+                () => {
+                    resultCallback()
+                    resolve()
+                },
+                (failure) => { console.log("ERROR: FlomioPlugin.sendApdu: " + failure) },
+                "FlomioPlugin", "launchNativeNfc", []);
+        });
+    }
 }
 
 // export function tlvEncodeNdef (message: Buffer) {

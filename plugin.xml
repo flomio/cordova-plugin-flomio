@@ -111,13 +111,15 @@
         <header-file src="src/ios/utils.h" target-dir="src/ios"/>
         <header-file src="src/ios/winscard.h" target-dir="src/ios"/>
         <header-file src="src/ios/wintypes.h" target-dir="src/ios"/>
-        <!--<header-file src="src/ios/NFC_ActionsLight.entitlements" target-dir="src/ios"/>-->
+
         <header-file src="src/ios/FlomioPlugin.h" target-dir="src/ios"/>
         <source-file src="src/ios/FlomioPlugin.m" target-dir="src/ios"/>
     
         <!-- System Frameworks -->
         <framework src="MediaPlayer.framework" weak="true" />
         <framework src="libc++.dylib" />
+
+        <resource-file src="src/ios/NFC_Actions.entitlements" />
 
         <!-- Request permission to use mircophone -->
        <config-file target="*-Info.plist" parent="NSMicrophoneUsageDescription">

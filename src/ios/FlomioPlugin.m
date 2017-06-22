@@ -27,7 +27,6 @@
         sharedManager = [[FmSessionManager flomioMW] initWithConfiguration:defaultConfiguration];
         sharedManager.delegate = self;
     }
-    [self startNfc];
 }
 
 /** Stops active readers of the current type then starts readers of the new type */
@@ -47,6 +46,14 @@
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Enter 'FloJack-BZR', 'FloJack-MSR', 'FloBLE-EMV' or 'FloBLE-Plus' only"];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }
+}
+
+- (void )launchNativeNfc:(CDVInvokedUrlCommand*)command {
+    [self startNfc];
+    NSArray* result = @[deviceUuid, @""];
+    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
+    [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
     
 - (void)selectSpecificDeviceId:(CDVInvokedUrlCommand*)command {
@@ -199,7 +206,7 @@
     NSMutableArray* devices = [NSMutableArray array];
     NSMutableDictionary *deviceDictionary = [NSMutableDictionary new];
     deviceDictionary[@"Device ID"] = deviceUuid;
-    deviceDictionary[@"Battery Level"] = [NSNumber numberWithUnsignedLong: (unsigned long)batteryLevel];
+    deviceDictionary[@"Battery Level"] = batteryLevel;
     deviceDictionary[@"Hardware Revision"] = hardwareRev;
     deviceDictionary[@"Firmware Revision"] = firmwareRev;
     deviceDictionary[@"Communication Status"] = [NSNumber numberWithInt: communicationStatus];
@@ -293,6 +300,10 @@
     });
 }
 
+- (void)didGetLicenseInfo:(NSString *)deviceUuid withStatus:(BOOL)isRegistered {
+
+}
+
 
 #pragma mark - CallbackId setters
 
@@ -330,12 +341,14 @@
 
 - (void) readerSession:(nonnull NFCNDEFReaderSession *)session didDetectNDEFs:(nonnull NSArray<NFCNDEFMessage *> *)messages {
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSArray *jsonNdef = [self ndefToJson: messages[0]]; //need to change to add multiple messages returned
-        if (didDetectNDEFsCallbackId){
-            NSLog(@"result : %@", jsonNdef);
-            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:jsonNdef];
-            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:didDetectNDEFsCallbackId];
+        if (messages[0]){
+            NSArray *jsonNdef = [self ndefToJson: messages[0]]; //need to change to add multiple messages returned
+            if (didDetectNDEFsCallbackId){
+                NSLog(@"result : %@", jsonNdef);
+                CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:jsonNdef];
+                [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+                [self.commandDelegate sendPluginResult:pluginResult callbackId:didDetectNDEFsCallbackId];
+            }
         }
     });
 }
