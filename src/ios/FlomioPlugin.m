@@ -5,11 +5,35 @@
 
 #import "FlomioPlugin.h"
 
+static inline char itoh(int i) {
+    if (i > 9) return 'A' + (i - 10);
+    return '0' + i;
+}
+
+NSString * NSDataToHex(NSData *data) {
+    NSUInteger i, len;
+    unsigned char *buf, *bytes;
+
+    len = data.length;
+    bytes = (unsigned char*)data.bytes;
+    buf = malloc(len*2);
+
+    for (i=0; i<len; i++) {
+        buf[i*2] = itoh((bytes[i] >> 4) & 0xF);
+        buf[i*2+1] = itoh(bytes[i] & 0xF);
+    }
+
+    return [[NSString alloc] initWithBytesNoCopy:buf
+                                          length:len*2
+                                        encoding:NSASCIIStringEncoding
+                                    freeWhenDone:YES];
+}
+
 @implementation FlomioPlugin
 
 /** Initialise the plugin */
 - (void)init:(CDVInvokedUrlCommand*)command {
-    
+
     if (!sharedManager) {
         // Initialise flomioSDK
         FmConfiguration *defaultConfiguration = [[FmConfiguration alloc] init];
@@ -55,7 +79,7 @@
     [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
-    
+
 - (void)selectSpecificDeviceId:(CDVInvokedUrlCommand*)command {
     if (command) {
         NSString *deviceId = [command.arguments objectAtIndex:0];
@@ -69,7 +93,7 @@
 - (void)getConfiguration:(CDVInvokedUrlCommand *)command {
     dispatch_async(dispatch_get_main_queue(), ^{
 //        FmConfiguration *config = [sharedManager getConfiguration:deviceUuid];
-        
+
 //        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:settings];
 //        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     });
@@ -78,7 +102,7 @@
 - (void)setConfiguration:(CDVInvokedUrlCommand*)command {
     NSString* scanPeriod = [command.arguments objectAtIndex:0];
     NSString* scanSound = [command.arguments objectAtIndex:1];
-    
+
     NSString* powerOperationString = [command.arguments objectAtIndex:3];
     NSNumber* powerOperation;
     if ([[powerOperationString lowercaseString] isEqualToString:@"bluetooth-connection-control"]){
@@ -98,7 +122,7 @@
     configuration.scanPeriod = [NSNumber numberWithInt:[scanPeriod intValue]];
     configuration.powerOperation = kHighPower;
     [sharedManager setConfiguration:configuration];
-                                
+
     NSString* callbackId = command.callbackId;
 }
 
@@ -106,10 +130,10 @@
 - (void)sendApdu:(CDVInvokedUrlCommand *)command {
     NSString* deviceUuid = [command.arguments objectAtIndex:0];
     NSString* apdu = [command.arguments objectAtIndex:1];
-    
+
     deviceUuid = [deviceUuid stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
     apdu = [apdu stringByReplacingOccurrencesOfString:@" " withString:@""];  // remove whitespace
-    
+
     [sharedManager sendApdu:apdu  toDevice:deviceUuid success:^(NSString *response) {
         NSLog(@"command: %@, response: %@", apdu, response);
         if (response.length > 1){
@@ -125,15 +149,15 @@
         }
     }];
 }
-    
+
 - (void)sleepReaders:(CDVInvokedUrlCommand *)command {
     [sharedManager sleepReaders];
 }
-    
+
 - (void)startReaders:(CDVInvokedUrlCommand *)command {
     [sharedManager startReaders];
 }
-    
+
 - (void)stopReaders:(CDVInvokedUrlCommand *)command {
     [sharedManager stopReaders];
 }
@@ -201,8 +225,8 @@
 
 /** Called when any info from any device is updated */
 - (void)didChangeStatus:(NSString *)deviceUuid withConfiguration:(FmConfiguration *)configuration andBatteryLevel:(NSNumber *)batteryLevel andCommunicationStatus:(CommunicationStatus)communicationStatus withFirmwareRevision:(NSString *)firmwareRev withHardwareRevision:(NSString *)hardwareRev{
-    
-    
+
+
     NSMutableArray* devices = [NSMutableArray array];
     NSMutableDictionary *deviceDictionary = [NSMutableDictionary new];
     deviceDictionary[@"Device ID"] = deviceUuid;
@@ -279,7 +303,7 @@
 - (void)didReceiveReaderError:(NSError *)error{
     dispatch_async(dispatch_get_main_queue(), ^{
         NSLog(@"%@", error); // reader error
-        
+
         if (didFindTagWithUuidCallbackId) {
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:[error localizedDescription]];
             [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
@@ -334,7 +358,7 @@
         self.session = [[NFCNDEFReaderSession alloc] initWithDelegate:self queue:nil invalidateAfterFirstRead:YES];
         [self.session beginSession];
 //    }];
-        
+
 }
 
 // NFCNDEFReaderSessionDelegate delegates
@@ -345,7 +369,7 @@
             NSArray *jsonNdef = [self ndefToJson: messages[0]]; //need to change to add multiple messages returned
             if (didDetectNDEFsCallbackId){
                 NSLog(@"result : %@", jsonNdef);
-                CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:jsonNdef];
+                CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:jsonNdef];
                 [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
                 [self.commandDelegate sendPluginResult:pluginResult callbackId:didDetectNDEFsCallbackId];
             }
@@ -360,15 +384,17 @@
 
 - (NSArray *)ndefToJson:(NFCNDEFMessage *)message {
     NSMutableArray *ndefMessage = [[NSMutableArray alloc] init];
-    NSMutableDictionary *recordDict = [[NSMutableDictionary alloc] init];
+    
     for (NFCNDEFPayload *record in message.records){
-        NSString *tnf = [self tnfToString:record.typeNameFormat];
-        recordDict[@"id"] = record.identifier.description;
-        recordDict[@"type"] = record.type.description;
-        recordDict[@"payload"] =  record.payload.description;
-        recordDict[@"tnf"] = tnf;
+        NSMutableDictionary *recordDict = [[NSMutableDictionary alloc] init];
+
+        recordDict[@"id"] =  NSDataToHex(record.identifier);
+        recordDict[@"type"] =  NSDataToHex(record.type);
+        recordDict[@"payload"] =   NSDataToHex(record.payload);
+        recordDict[@"tnf"] = [NSNumber numberWithInt:(int)record.typeNameFormat];
         [ndefMessage addObject:recordDict];
     }
+    // Make immutable copy of the mutable array
     NSArray *array = [ndefMessage copy];
     return array;
 }

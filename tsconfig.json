@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+      "module": "commonjs",
+      "moduleResolution": "node",
+      "lib": [
+        "es2015",
+        "dom"
+      ],
+      "target": "es5",
+      "importHelpers": false,
+      "noImplicitAny": false,
+      "sourceMap": false,
+      "outDir": ".",
+      "listFiles": true,
+      "types" : ["node"],
+      "baseUrl": "."
+  },
+  "files": ["www/flomioPlugin.ts"]
+}
