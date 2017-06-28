@@ -3041,6 +3041,9 @@ process.umask = function() { return 0; };
 var _this = this;
 var exec = __webpack_require__(3);
 var ndef = __webpack_require__(2);
+function noop() {
+    // empty
+}
 /**
  * Constructor
  */
@@ -3050,63 +3053,92 @@ module.exports = {
     },
     selectDeviceType: function (deviceType, success, failure) {
         exec(success, failure, 'FlomioPlugin', 'selectDeviceType', [deviceType]);
-        // deviceType is "FloJack-BZR", "FloJack-MSR", "FloBLE-EMV" or "FloBLE-Plus" (case insensitive)
+        // deviceType is "FloJack-BZR", "FloJack-MSR", "FloBLE-EMV" or
+        // "FloBLE-Plus" (case insensitive)
     },
     selectSpecificDeviceId: function (specificDeviceId, success, failure) {
         exec(success, failure, 'FlomioPlugin', 'selectSpecificDeviceId', [specificDeviceId]);
-        // deviceType is "FloJack-BZR", "FloJack-MSR", "FloBLE-EMV" or "FloBLE-Plus" (case insensitive)
+        // deviceType is "FloJack-BZR", "FloJack-MSR", "FloBLE-EMV" or
+        // "FloBLE-Plus" (case insensitive)
     },
     setConfiguration: function (configurationDictionary, success, failure) {
-        var configurationArray = new Array();
-        var keyArray = new Array("scanPeriod", "scanSound", "readerState", "powerOperation");
+        var configurationArray = [];
+        var keyArray = ['scanPeriod', 'scanSound', 'readerState', 'powerOperation'];
         // convert dictionary to array
         for (var index in keyArray) {
             if (typeof configurationDictionary[keyArray[index]] === 'undefined') {
-                configurationArray.push("unchanged");
+                configurationArray.push('unchanged');
             }
             else {
                 configurationArray.push(configurationDictionary[keyArray[index]]);
             }
         }
-        exec(success, failure, "FlomioPlugin", "setConfiguration", configurationArray);
+        exec(success, failure, 'FlomioPlugin', 'setConfiguration', configurationArray);
     },
     getConfiguration: function (resultCallback, configurationDictionary, success, failure) {
-        exec(function (scanPeriod, scanSound) { resultCallback({ scanPeriod: scanPeriod, scanSound: scanSound }); }, function (failure) { console.log("ERROR: FlomioPlugin.getConfiguration: " + failure); }, "FlomioPlugin", "getConfiguration", []);
+        exec(function (scanPeriod, scanSound) {
+            resultCallback({ scanPeriod: scanPeriod, scanSound: scanSound });
+        }, function (failure) {
+            console.log('ERROR: FlomioPlugin.getConfiguration: ' + failure);
+        }, 'FlomioPlugin', 'getConfiguration', []);
     },
     stopReaders: function (resultCallback, success, failure) {
         exec(
         // TODO: deviceId
-        function (scanPeriod, scanSound) { resultCallback({ deviceId: undefined }); }, function (failure) { console.log("ERROR: FlomioPlugin.stopReaders: " + failure); }, "FlomioPlugin", "stopReaders", []);
+        function (scanPeriod, scanSound) {
+            resultCallback({ deviceId: undefined });
+        }, function (failure) {
+            console.log('ERROR: FlomioPlugin.stopReaders: ' + failure);
+        }, 'FlomioPlugin', 'stopReaders', []);
     },
     sleepReaders: function (resultCallback, success, failure) {
-        exec(function () { }, function (failure) { console.log("ERROR: FlomioPlugin.sleepReaders: " + failure); }, "FlomioPlugin", "sleepReaders", []);
+        exec(noop, function (failure) {
+            console.log('ERROR: FlomioPlugin.sleepReaders: ' + failure);
+        }, 'FlomioPlugin', 'sleepReaders', []);
     },
     startReaders: function (resultCallback, success, failure) {
-        exec(function () { }, function (failure) { console.log("ERROR: FlomioPlugin.startReaders: " + failure); }, "FlomioPlugin", "startReaders", []);
+        exec(noop, function (failure) {
+            console.log('ERROR: FlomioPlugin.startReaders: ' + failure);
+        }, 'FlomioPlugin', 'startReaders', []);
     },
     sendApdu: function (resultCallback, deviceId, apdu, success, failure) {
         return new Promise(function (resolve, reject) {
             exec(function (deviceId, responseApdu) {
                 resultCallback({ deviceId: deviceId, responseApdu: responseApdu });
                 resolve(responseApdu);
-            }, function (failure) { console.log("ERROR: FlomioPlugin.sendApdu: " + failure); }, "FlomioPlugin", "sendApdu", [deviceId, apdu]);
+            }, function (failure) {
+                console.log('ERROR: FlomioPlugin.sendApdu: ' + failure);
+            }, 'FlomioPlugin', 'sendApdu', [deviceId, apdu]);
         });
     },
     // Delegate/Event Listeners
     addConnectedDevicesListener: function (resultCallback, success, failure) {
-        exec(function (deviceIdList) { resultCallback(deviceIdList); }, function (failure) { console.log("ERROR: FlomioPlugin.addConnectedDevicesListener: " + failure); }, "FlomioPlugin", "setConnectedDevicesUpdateCallback", []);
+        exec(function (deviceIdList) {
+            resultCallback(deviceIdList);
+        }, function (failure) {
+            console.log('ERROR: FlomioPlugin.addConnectedDevicesListener: ' + failure);
+        }, 'FlomioPlugin', 'setConnectedDevicesUpdateCallback', []);
     },
     addTagStatusChangeListener: function (resultCallback, success, failure) {
-        exec(function (deviceId, status) { resultCallback({ deviceId: deviceId, status: status }); }, function (failure) { console.log("ERROR: FlomioPlugin.addTagStatusChangeListener: " + failure); }, "FlomioPlugin", "setCardStatusChangeCallback", []);
+        exec(function (deviceId, status) {
+            resultCallback({ deviceId: deviceId, status: status });
+        }, function (failure) {
+            console.log('ERROR: FlomioPlugin.addTagStatusChangeListener: ' + failure);
+        }, 'FlomioPlugin', 'setCardStatusChangeCallback', []);
     },
     addTagDiscoveredListener: function (resultCallback, success, failure) {
-        exec(function (deviceId, tagUid, tagAtr) { resultCallback({ tagUid: tagUid, tagAtr: tagAtr, deviceId: deviceId }); }, function (failure) { console.log("ERROR: FlomioPlugin.addTagDiscoveredListener: " + failure); }, "FlomioPlugin", "setTagDiscoveredCallback", []);
+        exec(function (deviceId, tagUid, tagAtr) {
+            resultCallback({ tagUid: tagUid, tagAtr: tagAtr, deviceId: deviceId });
+        }, function (failure) {
+            console.log('ERROR: FlomioPlugin.addTagDiscoveredListener: ' + failure);
+        }, 'FlomioPlugin', 'setTagDiscoveredCallback', []);
     },
     addNdefListener: function (resultCallback, success, failure) {
         function hexToBytes(hex) {
             var bytes = [];
-            for (var c = 0; c < hex.length; c += 2)
+            for (var c = 0; c < hex.length; c += 2) {
                 bytes.push(parseInt(hex.substr(c, 2), 16));
+            }
             return bytes;
         }
         function formatRecord(record) {
@@ -3118,31 +3150,32 @@ module.exports = {
         exec(function (ndefMessage) {
             console.log('ndefMessage', ndefMessage);
             resultCallback({ ndefMessage: ndefMessage.map(formatRecord) });
-        }, function (failure) { console.log("ERROR: FlomioPlugin.addNdefListener: " + failure); }, "FlomioPlugin", "setNdefDiscoveredCallback", []);
+        }, function (failure) {
+            console.log('ERROR: FlomioPlugin.addNdefListener: ' + failure);
+        }, 'FlomioPlugin', 'setNdefDiscoveredCallback', []);
     },
     readNdef: function (resultCallback, deviceId) {
-        var fullResponse = "";
+        var fullResponse = '';
         var apdus = [];
         for (var page = 4; page < 16; page += 4) {
-            var n = "";
-            page > 16 ? n = "" + page.toString(16) : n = "0" + page.toString(16);
+            var n = '';
+            page > 16 ? n = '' + page.toString(16) : n = '0' + page.toString(16);
             var apdu = 'FFB000' + n + '10';
-            function success() { }
-            //store each sendApdu promise
-            apdus.push(this.sendApdu(success, deviceId, apdu).then(function (responseApdu) {
-                console.log("response apdu: " + responseApdu);
+            // store each sendApdu promise
+            apdus.push(this.sendApdu(noop, deviceId, apdu).then(function (responseApdu) {
+                console.log('response apdu: ' + responseApdu);
                 fullResponse = fullResponse.concat(responseApdu.slice(0, -5));
             }, function (err) {
                 console.error(err);
             }));
         }
-        //send all apdus and capture result
+        // send all apdus and capture result
         Promise.all(apdus).then(function () {
             // console.log('fullResponse: ' + fullResponse)
             resultCallback(fullResponse);
-            fullResponse = fullResponse.replace(/\s/g, ""); //remove spaces
+            fullResponse = fullResponse.replace(/\s/g, ''); // remove spaces
             if (fullResponse.substring(0, 2) === '03') {
-                var i = fullResponse.indexOf("FE");
+                var i = fullResponse.indexOf('FE');
                 console.log('index fe: ' + i);
                 fullResponse = fullResponse.substring(3, i);
                 console.log('fullResponse: ' + fullResponse);
@@ -3171,41 +3204,34 @@ module.exports = {
         // const apduStrings = ndef.makeWriteApdus(hex, 4)
         // function success() {}
         // console.log(deviceId)
-        // this.sendApdu(success, deviceId, 'FFD60000040313').then((responseApdu) => {
-        //     console.log("response apdu: " + responseApdu);
-        //     // fullResponse = fullResponse.concat(responseApdu.slice(0, -5))
-        // }, (err) => {
-        //     console.error(err);
-        // })
-        // // for (let i = 0; i < apduStrings.length; i += 1) {
-        // //     function success() {}
-        // //     //store each sendApdu promise
-        // //     console.log('apduStrings[i]' + apduStrings[i])
-        // //     var apdu = apduStrings[i];
-        // //     apdus.push()
-        // // }
+        // this.sendApdu(success, deviceId, 'FFD60000040313').then((responseApdu)
+        // => { console.log("response apdu: " + responseApdu); // fullResponse =
+        // fullResponse.concat(responseApdu.slice(0, -5)) }, (err) => {
+        // console.error(err); }) // for (let i = 0; i < apduStrings.length; i +=
+        // 1) { //     function success() {} //     //store each sendApdu promise
+        // //     console.log('apduStrings[i]' + apduStrings[i]) //     var apdu =
+        // apduStrings[i]; //     apdus.push() // }
         // //send all apdus and capture result
         // Promise.all(apdus).then(function() {
         //     console.log('finished writing: ')
         // }, reason => {
         //     console.log(reason)
         // });
-        var fullResponse = "";
+        var fullResponse = '';
         var apdus = [];
         for (var page = 4; page < 16; page += 4) {
-            var n = "";
-            page > 16 ? n = "" + page.toString(16) : n = "0" + page.toString(16);
+            var n = '';
+            page > 16 ? n = '' + page.toString(16) : n = '0' + page.toString(16);
             var apdu = 'FFB000' + n + '10';
-            function didRespond() { }
-            //store each sendApdu promise
-            apdus.push(_this.sendApdu(didRespond, deviceId, apdu).then(function (responseApdu) {
-                console.log("response apdu: " + responseApdu);
+            // store each sendApdu promise
+            apdus.push(_this.sendApdu(noop, deviceId, apdu).then(function (responseApdu) {
+                console.log('response apdu: ' + responseApdu);
                 fullResponse = fullResponse.concat(responseApdu.slice(0, -5));
             }, function (err) {
                 console.error(err);
             }));
         }
-        //send all apdus and capture result
+        // send all apdus and capture result
         Promise.all(apdus).then(function () {
             console.log('fullResponse: ' + fullResponse);
         }, function (reason) {
@@ -3217,7 +3243,9 @@ module.exports = {
             exec(function () {
                 resultCallback();
                 resolve();
-            }, function (failure) { console.log("ERROR: FlomioPlugin.sendApdu: " + failure); }, "FlomioPlugin", "launchNativeNfc", []);
+            }, function (failure) {
+                console.log('ERROR: FlomioPlugin.sendApdu: ' + failure);
+            }, 'FlomioPlugin', 'launchNativeNfc', []);
         });
     }
 };
@@ -3254,14 +3282,14 @@ module.exports = {
 //     .map(b => b.toString('hex'))
 // }
 /**
- * See https://github.com/chariotsolutions/phonegap-nfc/blob/master/www/phonegap-nfc.js
+ * See
+ * https://github.com/chariotsolutions/phonegap-nfc/blob/master/www/phonegap-nfc.js
  * Below is from Phonegap-nfc to encode and decode ndef messages
  */
 ndef.makeWriteApdus = function (dataHexString) {
-    var apdusStrings = [];
     var slices = textHelper.makeSlices(dataHexString, 4);
-    apdusStrings = slices.map(function (slice, i) {
-        slice = slice.padEnd(4, '0'); //pads end of string if not 4 chars long
+    var apdusStrings = slices.map(function (slice, i) {
+        slice = slice.padEnd(4, '0'); // pads end of string if not 4 chars long
         var page = i * 4;
         var n = page.toString(16);
         n = n.padStart(2, '0');
@@ -3292,7 +3320,7 @@ var util = {
         hex = i.toString(16);
         // zero padding
         if (hex.length === 1) {
-            hex = "0" + hex;
+            hex = '0' + hex;
         }
         return hex;
     },
@@ -3305,13 +3333,18 @@ var util = {
         }
     },
     bytesToString: function (bytes) {
-        // based on http://ciaranj.blogspot.fr/2007/11/utf8-characters-encoding-in-javascript.html
-        var result = "";
-        var i, c, c1, c2, c3;
+        // based on
+        // http://ciaranj.blogspot.fr/2007/11/utf8-characters-encoding-in-javascript.html
+        var result = '';
+        var i;
+        var c;
+        var c1;
+        var c2;
+        var c3;
         i = c = c1 = c2 = c3 = 0;
         // Perform byte-order check.
         if (bytes.length >= 3) {
-            if ((bytes[0] & 0xef) == 0xef && (bytes[1] & 0xbb) == 0xbb && (bytes[2] & 0xbf) == 0xbf) {
+            if ((bytes[0] & 0xef) === 0xef && (bytes[1] & 0xbb) === 0xbb && (bytes[2] & 0xbf) === 0xbf) {
                 // stream has a BOM at the start, skip over
                 i = 3;
             }
@@ -3324,7 +3357,7 @@ var util = {
             }
             else if ((c > 191) && (c < 224)) {
                 if (i + 1 >= bytes.length) {
-                    throw "Un-expected encoding error, UTF-8 stream truncated, or incorrect";
+                    throw new Error('Un-expected encoding error, UTF-8 stream truncated, or incorrect');
                 }
                 c2 = bytes[i + 1] & 0xff;
                 result += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
@@ -3332,7 +3365,7 @@ var util = {
             }
             else {
                 if (i + 2 >= bytes.length || i + 1 >= bytes.length) {
-                    throw "Un-expected encoding error, UTF-8 stream truncated, or incorrect";
+                    throw new Error('Un-expected encoding error, UTF-8 stream truncated, or incorrect');
                 }
                 c2 = bytes[i + 1] & 0xff;
                 c3 = bytes[i + 2] & 0xff;
@@ -3342,11 +3375,12 @@ var util = {
         }
         return result;
     },
-    stringToBytes: function (string) {
-        // based on http://ciaranj.blogspot.fr/2007/11/utf8-characters-encoding-in-javascript.html
+    stringToBytes: function (str) {
+        // based on
+        // http://ciaranj.blogspot.fr/2007/11/utf8-characters-encoding-in-javascript.html
         var bytes = [];
-        for (var n = 0; n < string.length; n++) {
-            var c = string.charCodeAt(n);
+        for (var n = 0; n < str.length; n++) {
+            var c = str.charCodeAt(n);
             if (c < 128) {
                 bytes[bytes.length] = c;
             }
@@ -3363,7 +3397,9 @@ var util = {
         return bytes;
     },
     bytesToHexString: function (bytes) {
-        var dec, hexstring, bytesAsHexString = "";
+        var dec;
+        var hexstring;
+        var bytesAsHexString = '';
         for (var i = 0; i < bytes.length; i++) {
             if (bytes[i] >= 0) {
                 dec = bytes[i];
@@ -3374,7 +3410,7 @@ var util = {
             hexstring = dec.toString(16);
             // zero padding
             if (hexstring.length === 1) {
-                hexstring = "0" + hexstring;
+                hexstring = '0' + hexstring;
             }
             bytesAsHexString += hexstring;
         }
@@ -3382,7 +3418,8 @@ var util = {
     },
     // This function can be removed if record.type is changed to a String
     /**
-     * Returns true if the record's TNF and type matches the supplied TNF and type.
+     * Returns true if the record's TNF and type matches the supplied TNF and
+     * type.
      *
      * @record NDEF record
      * @tnf 3-bit TNF (Type Name Format) - use one of the TNF_* constants
@@ -3390,7 +3427,7 @@ var util = {
      */
     isType: function (record, tnf, type) {
         if (record.tnf === tnf) {
-            var recordType;
+            var recordType = void 0;
             if (typeof (type) === 'string') {
                 recordType = type;
             }
@@ -3400,13 +3437,14 @@ var util = {
             return (util.bytesToString(record.type) === recordType);
         }
         return false;
-    },
+    }
 };
 // this is a module in ndef-js
 var textHelper = {
     decodePayload: function (data) {
-        var languageCodeLength = (data[0] & 0x3F), // 6 LSBs
-        languageCode = data.slice(1, 1 + languageCodeLength), utf16 = (data[0] & 0x80) !== 0; // assuming UTF-16BE
+        var languageCodeLength = (data[0] & 0x3F); // 6 LSBs
+        var languageCode = data.slice(1, 1 + languageCodeLength);
+        var utf16 = (data[0] & 0x80) !== 0; // assuming UTF-16BE
         // TODO need to deal with UTF in the future
         // console.log("lang " + languageCode + (utf16 ? " utf16" : " utf8"));
         return util.bytesToString(data.slice(languageCodeLength + 1));
@@ -3432,39 +3470,41 @@ var textHelper = {
 };
 // this is a module in ndef-js
 var uriHelper = {
-    // URI identifier codes from URI Record Type Definition NFCForum-TS-RTD_URI_1.0 2006-07-24
-    // index in array matches code in the spec
-    protocols: ["", "http://www.", "https://www.", "http://", "https://", "tel:", "mailto:", "ftp://anonymous:anonymous@", "ftp://ftp.", "ftps://", "sftp://", "smb://", "nfs://", "ftp://", "dav://", "news:", "telnet://", "imap:", "rtsp://", "urn:", "pop:", "sip:", "sips:", "tftp:", "btspp://", "btl2cap://", "btgoep://", "tcpobex://", "irdaobex://", "file://", "urn:epc:id:", "urn:epc:tag:", "urn:epc:pat:", "urn:epc:raw:", "urn:epc:", "urn:nfc:"],
+    // URI identifier codes from URI Record Type Definition
+    // NFCForum-TS-RTD_URI_1.0 2006-07-24 index in array matches code in the spec
+    protocols: ['', 'http://www.', 'https://www.', 'http://', 'https://', 'tel:', 'mailto:', 'ftp://anonymous:anonymous@', 'ftp://ftp.', 'ftps://', 'sftp://', 'smb://', 'nfs://', 'ftp://', 'dav://', 'news:', 'telnet://', 'imap:', 'rtsp://', 'urn:', 'pop:', 'sip:', 'sips:', 'tftp:', 'btspp://', 'btl2cap://', 'btgoep://', 'tcpobex://', 'irdaobex://', 'file://', 'urn:epc:id:', 'urn:epc:tag:', 'urn:epc:pat:', 'urn:epc:raw:', 'urn:epc:', 'urn:nfc:'],
     // decode a URI payload bytes
     // @returns a string
     decodePayload: function (data) {
         var prefix = uriHelper.protocols[data[0]];
         if (!prefix) {
-            prefix = "";
+            prefix = '';
         }
         return prefix + util.bytesToString(data.slice(1));
     },
     // shorten a URI with standard prefix
     // @returns an array of bytes
     encodePayload: function (uri) {
-        var prefix, protocolCode, encoded;
+        var prefix;
+        var protocolCode;
+        var encoded;
         // check each protocol, unless we've found a match
         // "urn:" is the one exception where we need to keep checking
         // slice so we don't check ""
         uriHelper.protocols.slice(1).forEach(function (protocol) {
-            if ((!prefix || prefix === "urn:") && uri.indexOf(protocol) === 0) {
+            if ((!prefix || prefix === 'urn:') && uri.indexOf(protocol) === 0) {
                 prefix = protocol;
             }
         });
         if (!prefix) {
-            prefix = "";
+            prefix = '';
         }
         encoded = util.stringToBytes(uri.slice(prefix.length));
         protocolCode = uriHelper.protocols.indexOf(prefix);
         // prepend protocol code
         encoded.unshift(protocolCode);
         return encoded;
-    },
+    }
 };
 module.exports.ndef = ndef;
 module.exports.util = util;
@@ -3474,7 +3514,7 @@ ndef.textHelper = textHelper;
 // create aliases
 // util.bytesToString = util.bytesToString;
 // util.stringToBytes = util.stringToBytes;
-// util.bytesToHexString = util.bytesToHexString; 
+// util.bytesToHexString = util.bytesToHexString;
 
 
 /***/ }),
