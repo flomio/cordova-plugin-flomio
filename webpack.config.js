@@ -29,13 +29,6 @@ module.exports = {
                   loader: 'ts-loader'
               }
           ]
-      },{
-          test: /(mqtt|pub|sub)\.js$/,
-          use: [
-              {
-                  loader: 'shebang-loader'
-              }
-          ]
       }]
   }
 };
