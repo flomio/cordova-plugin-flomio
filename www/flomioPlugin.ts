@@ -23,16 +23,16 @@ module.exports = {
 
   setConfiguration: (configurationDictionary, success, failure) => {
     const configurationArray = []
-    const keyArray = ["scanPeriod", "scanSound", "readerState", "powerOperation"]
+    const keyArray = ['scanPeriod', 'scanSound', 'readerState', 'powerOperation']
     // convert dictionary to array
     for (const index in keyArray) {
       if (typeof configurationDictionary[keyArray[index]] === 'undefined') {
-        configurationArray.push("unchanged")
+        configurationArray.push('unchanged')
       } else {
         configurationArray.push(configurationDictionary[keyArray[index]])
       }
     }
-    exec(success, failure, "FlomioPlugin", "setConfiguration", configurationArray)
+    exec(success, failure, 'FlomioPlugin', 'setConfiguration', configurationArray)
   },
 
   getConfiguration: (resultCallback, configurationDictionary, success, failure) => {
@@ -41,9 +41,9 @@ module.exports = {
         resultCallback({scanPeriod: scanPeriod, scanSound: scanSound})
       },
       (failure) => {
-        console.log("ERROR: FlomioPlugin.getConfiguration: " + failure)
+        console.log('ERROR: FlomioPlugin.getConfiguration: ' + failure)
       },
-      "FlomioPlugin", "getConfiguration", [])
+      'FlomioPlugin', 'getConfiguration', [])
   },
 
   stopReaders: (resultCallback, success, failure) => {
@@ -53,9 +53,9 @@ module.exports = {
         resultCallback({deviceId: undefined})
       },
       (failure) => {
-        console.log("ERROR: FlomioPlugin.stopReaders: " + failure)
+        console.log('ERROR: FlomioPlugin.stopReaders: ' + failure)
       },
-      "FlomioPlugin", "stopReaders", [])
+      'FlomioPlugin', 'stopReaders', [])
   },
 
   sleepReaders: (resultCallback, success, failure) => {
@@ -63,9 +63,9 @@ module.exports = {
       () => {
       },
       (failure) => {
-        console.log("ERROR: FlomioPlugin.sleepReaders: " + failure)
+        console.log('ERROR: FlomioPlugin.sleepReaders: ' + failure)
       },
-      "FlomioPlugin", "sleepReaders", [])
+      'FlomioPlugin', 'sleepReaders', [])
   },
 
   startReaders: (resultCallback, success, failure) => {
@@ -73,9 +73,9 @@ module.exports = {
       () => {
       },
       (failure) => {
-        console.log("ERROR: FlomioPlugin.startReaders: " + failure)
+        console.log('ERROR: FlomioPlugin.startReaders: ' + failure)
       },
-      "FlomioPlugin", "startReaders", [])
+      'FlomioPlugin', 'startReaders', [])
   },
 
   sendApdu: (resultCallback, deviceId, apdu, success, failure) => {
@@ -86,9 +86,9 @@ module.exports = {
           resolve(responseApdu)
         },
         (failure) => {
-          console.log("ERROR: FlomioPlugin.sendApdu: " + failure)
+          console.log('ERROR: FlomioPlugin.sendApdu: ' + failure)
         },
-        "FlomioPlugin", "sendApdu", [deviceId, apdu])
+        'FlomioPlugin', 'sendApdu', [deviceId, apdu])
     })
   },
 
@@ -99,9 +99,9 @@ module.exports = {
         resultCallback(deviceIdList)
       },
       (failure) => {
-        console.log("ERROR: FlomioPlugin.addConnectedDevicesListener: " + failure)
+        console.log('ERROR: FlomioPlugin.addConnectedDevicesListener: ' + failure)
       },
-      "FlomioPlugin", "setConnectedDevicesUpdateCallback", [])
+      'FlomioPlugin', 'setConnectedDevicesUpdateCallback', [])
   },
 
   addTagStatusChangeListener: (resultCallback, success, failure) => {
@@ -110,9 +110,9 @@ module.exports = {
         resultCallback({deviceId: deviceId, status: status})
       },
       (failure) => {
-        console.log("ERROR: FlomioPlugin.addTagStatusChangeListener: " + failure)
+        console.log('ERROR: FlomioPlugin.addTagStatusChangeListener: ' + failure)
       },
-      "FlomioPlugin", "setCardStatusChangeCallback", [])
+      'FlomioPlugin', 'setCardStatusChangeCallback', [])
   },
 
   addTagDiscoveredListener: (resultCallback, success, failure) => {
@@ -121,16 +121,16 @@ module.exports = {
         resultCallback({tagUid: tagUid, tagAtr: tagAtr, deviceId: deviceId})
       },
       (failure) => {
-        console.log("ERROR: FlomioPlugin.addTagDiscoveredListener: " + failure)
+        console.log('ERROR: FlomioPlugin.addTagDiscoveredListener: ' + failure)
       },
-      "FlomioPlugin", "setTagDiscoveredCallback", [])
+      'FlomioPlugin', 'setTagDiscoveredCallback', [])
   },
 
   addNdefListener: function (resultCallback, success, failure) { //ios 11
     function hexToBytes (hex) {
       let bytes = []
       for (let c = 0; c < hex.length; c += 2)
-        bytes.push(parseInt(hex.substr(c, 2), 16));
+        bytes.push(parseInt(hex.substr(c, 2), 16))
       return bytes
     }
 
@@ -152,17 +152,17 @@ module.exports = {
         resultCallback({ndefMessage: ndefMessage.map(formatRecord)})
       },
       (failure) => {
-        console.log("ERROR: FlomioPlugin.addNdefListener: " + failure)
+        console.log('ERROR: FlomioPlugin.addNdefListener: ' + failure)
       },
-      "FlomioPlugin", "setNdefDiscoveredCallback", [])
+      'FlomioPlugin', 'setNdefDiscoveredCallback', [])
   },
 
   readNdef: function (resultCallback, deviceId) {
-    let fullResponse = ""
+    let fullResponse = ''
     const apdus = []
     for (let page = 4; page < 16; page += 4) {
-      let n = ""
-      page > 16 ? n = "" + page.toString(16) : n = "0" + page.toString(16)
+      let n = ''
+      page > 16 ? n = '' + page.toString(16) : n = '0' + page.toString(16)
       const apdu = 'FFB000' + n + '10'
 
       function success () {
@@ -170,7 +170,7 @@ module.exports = {
 
       //store each sendApdu promise
       apdus.push(this.sendApdu(success, deviceId, apdu).then((responseApdu) => {
-        console.log("response apdu: " + responseApdu)
+        console.log('response apdu: ' + responseApdu)
         fullResponse = fullResponse.concat(responseApdu.slice(0, -5))
       }, (err) => {
         console.error(err)
@@ -181,9 +181,9 @@ module.exports = {
     Promise.all(apdus).then(function () {
       // console.log('fullResponse: ' + fullResponse)
       resultCallback(fullResponse)
-      fullResponse = fullResponse.replace(/\s/g, "") //remove spaces
+      fullResponse = fullResponse.replace(/\s/g, '') //remove spaces
       if (fullResponse.substring(0, 2) === '03') {
-        const i = fullResponse.indexOf("FE")
+        const i = fullResponse.indexOf('FE')
         console.log('index fe: ' + i)
         fullResponse = fullResponse.substring(3, i)
         console.log('fullResponse: ' + fullResponse)
@@ -228,11 +228,11 @@ module.exports = {
     // }, reason => {
     //     console.log(reason)
     // });
-    let fullResponse = ""
+    let fullResponse = ''
     const apdus = []
     for (let page = 4; page < 16; page += 4) {
-      let n = ""
-      page > 16 ? n = "" + page.toString(16) : n = "0" + page.toString(16)
+      let n = ''
+      page > 16 ? n = '' + page.toString(16) : n = '0' + page.toString(16)
       const apdu = 'FFB000' + n + '10'
 
       function didRespond () {
@@ -240,7 +240,7 @@ module.exports = {
 
       //store each sendApdu promise
       apdus.push(this.sendApdu(didRespond, deviceId, apdu).then((responseApdu) => {
-        console.log("response apdu: " + responseApdu)
+        console.log('response apdu: ' + responseApdu)
         fullResponse = fullResponse.concat(responseApdu.slice(0, -5))
       }, (err) => {
         console.error(err)
@@ -263,9 +263,9 @@ module.exports = {
           resolve()
         },
         (failure) => {
-          console.log("ERROR: FlomioPlugin.sendApdu: " + failure)
+          console.log('ERROR: FlomioPlugin.sendApdu: ' + failure)
         },
-        "FlomioPlugin", "launchNativeNfc", [])
+        'FlomioPlugin', 'launchNativeNfc', [])
     })
   }
 }
@@ -310,7 +310,6 @@ module.exports = {
  * Below is from Phonegap-nfc to encode and decode ndef messages
  */
 
-
 ndef.makeWriteApdus = function (dataHexString) {
   const slices = textHelper.makeSlices(dataHexString, 4)
   const apdusStrings = slices.map((slice, i) => {
@@ -318,7 +317,7 @@ ndef.makeWriteApdus = function (dataHexString) {
     let page = i * 4
     let n = page.toString(16)
     n = (n as any).padStart(2, '0')
-    var apdu = 'FFD600' + n + '04' + slice
+    let apdu = 'FFD600' + n + '04' + slice
     return apdu
   })
   return apdusStrings
@@ -337,7 +336,6 @@ ndef.tlvEncodeNdef = function (message) {
   return ndefType + length + message + terminator
 }
 
-
 const util = {
   // i must be <= 256
   toHex: function (i) {
@@ -351,7 +349,7 @@ const util = {
 
     // zero padding
     if (hex.length === 1) {
-      hex = "0" + hex
+      hex = '0' + hex
     }
 
     return hex
@@ -369,7 +367,7 @@ const util = {
     // based on
     // http://ciaranj.blogspot.fr/2007/11/utf8-characters-encoding-in-javascript.html
 
-    let result = ""
+    let result = ''
     let i, c, c1, c2, c3
     i = c = c1 = c2 = c3 = 0
 
@@ -392,7 +390,7 @@ const util = {
       } else if ((c > 191) && (c < 224)) {
 
         if (i + 1 >= bytes.length) {
-          throw "Un-expected encoding error, UTF-8 stream truncated, or incorrect"
+          throw new Error('Un-expected encoding error, UTF-8 stream truncated, or incorrect')
         }
         c2 = bytes[i + 1] & 0xff
         result += String.fromCharCode(((c & 31) << 6) | (c2 & 63))
@@ -401,7 +399,7 @@ const util = {
       } else {
 
         if (i + 2 >= bytes.length || i + 1 >= bytes.length) {
-          throw "Un-expected encoding error, UTF-8 stream truncated, or incorrect"
+          throw new Error('Un-expected encoding error, UTF-8 stream truncated, or incorrect')
         }
         c2 = bytes[i + 1] & 0xff
         c3 = bytes[i + 2] & 0xff
@@ -446,7 +444,7 @@ const util = {
   },
 
   bytesToHexString: function (bytes) {
-    let dec, hexstring, bytesAsHexString = ""
+    let dec, hexstring, bytesAsHexString = ''
     for (let i = 0; i < bytes.length; i++) {
       if (bytes[i] >= 0) {
         dec = bytes[i]
@@ -456,7 +454,7 @@ const util = {
       hexstring = dec.toString(16)
       // zero padding
       if (hexstring.length === 1) {
-        hexstring = "0" + hexstring
+        hexstring = '0' + hexstring
       }
       bytesAsHexString += hexstring
     }
@@ -483,7 +481,7 @@ const util = {
       return (util.bytesToString(record.type) === recordType)
     }
     return false
-  },
+  }
 
 }
 
@@ -531,14 +529,14 @@ const textHelper = {
 const uriHelper = {
   // URI identifier codes from URI Record Type Definition
   // NFCForum-TS-RTD_URI_1.0 2006-07-24 index in array matches code in the spec
-  protocols: ["", "http://www.", "https://www.", "http://", "https://", "tel:", "mailto:", "ftp://anonymous:anonymous@", "ftp://ftp.", "ftps://", "sftp://", "smb://", "nfs://", "ftp://", "dav://", "news:", "telnet://", "imap:", "rtsp://", "urn:", "pop:", "sip:", "sips:", "tftp:", "btspp://", "btl2cap://", "btgoep://", "tcpobex://", "irdaobex://", "file://", "urn:epc:id:", "urn:epc:tag:", "urn:epc:pat:", "urn:epc:raw:", "urn:epc:", "urn:nfc:"],
+  protocols: ['', 'http://www.', 'https://www.', 'http://', 'https://', 'tel:', 'mailto:', 'ftp://anonymous:anonymous@', 'ftp://ftp.', 'ftps://', 'sftp://', 'smb://', 'nfs://', 'ftp://', 'dav://', 'news:', 'telnet://', 'imap:', 'rtsp://', 'urn:', 'pop:', 'sip:', 'sips:', 'tftp:', 'btspp://', 'btl2cap://', 'btgoep://', 'tcpobex://', 'irdaobex://', 'file://', 'urn:epc:id:', 'urn:epc:tag:', 'urn:epc:pat:', 'urn:epc:raw:', 'urn:epc:', 'urn:nfc:'],
 
   // decode a URI payload bytes
   // @returns a string
   decodePayload: function (data) {
     let prefix = uriHelper.protocols[data[0]]
     if (!prefix) { // 36 to 255 should be ""
-      prefix = ""
+      prefix = ''
     }
     return prefix + util.bytesToString(data.slice(1))
   },
@@ -555,13 +553,13 @@ const uriHelper = {
     // "urn:" is the one exception where we need to keep checking
     // slice so we don't check ""
     uriHelper.protocols.slice(1).forEach(function (protocol) {
-      if ((!prefix || prefix === "urn:") && uri.indexOf(protocol) === 0) {
+      if ((!prefix || prefix === 'urn:') && uri.indexOf(protocol) === 0) {
         prefix = protocol
       }
     })
 
     if (!prefix) {
-      prefix = ""
+      prefix = ''
     }
 
     encoded = util.stringToBytes(uri.slice(prefix.length))
@@ -570,7 +568,7 @@ const uriHelper = {
     encoded.unshift(protocolCode)
 
     return encoded
-  },
+  }
 
 }
 
