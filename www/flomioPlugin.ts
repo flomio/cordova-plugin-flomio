@@ -1,5 +1,5 @@
-var exec = require('cordova/exec')
-var ndef = require('ndef')
+const exec = require('cordova/exec')
+const ndef = require('ndef')
 
 /**
  * Constructor
@@ -22,10 +22,10 @@ module.exports = {
   },
 
   setConfiguration: (configurationDictionary, success, failure) => {
-    var configurationArray = new Array()
-    var keyArray = new Array("scanPeriod", "scanSound", "readerState", "powerOperation")
+    const configurationArray = []
+    const keyArray = ["scanPeriod", "scanSound", "readerState", "powerOperation"]
     // convert dictionary to array
-    for (var index in keyArray) {
+    for (const index in keyArray) {
       if (typeof configurationDictionary[keyArray[index]] === 'undefined') {
         configurationArray.push("unchanged")
       } else {
@@ -138,7 +138,7 @@ module.exports = {
       console.log('formatRecorde', record)
 
       // TODO: update ndef module
-      var formatted = ndef.record(record.tnf,
+      const formatted = ndef.record(record.tnf,
         hexToBytes(record.type),
         hexToBytes(record.id),
         hexToBytes(record.payload)
@@ -158,12 +158,12 @@ module.exports = {
   },
 
   readNdef: function (resultCallback, deviceId) {
-    var fullResponse = ""
-    var apdus = []
+    let fullResponse = ""
+    const apdus = []
     for (let page = 4; page < 16; page += 4) {
       let n = ""
       page > 16 ? n = "" + page.toString(16) : n = "0" + page.toString(16)
-      var apdu = 'FFB000' + n + '10'
+      const apdu = 'FFB000' + n + '10'
 
       function success () {
       }
@@ -183,11 +183,11 @@ module.exports = {
       resultCallback(fullResponse)
       fullResponse = fullResponse.replace(/\s/g, "") //remove spaces
       if (fullResponse.substring(0, 2) === '03') {
-        var i = fullResponse.indexOf("FE")
+        const i = fullResponse.indexOf("FE")
         console.log('index fe: ' + i)
         fullResponse = fullResponse.substring(3, i)
         console.log('fullResponse: ' + fullResponse)
-        var data = util.stringToBytes(fullResponse)
+        const data = util.stringToBytes(fullResponse)
         console.log('data: ' + data)
         console.log('fullResponse before fe: ' + fullResponse)
         const resp = ndef.decodeMessage(data)
@@ -201,9 +201,9 @@ module.exports = {
   writeNdef: function (resultCallback, deviceId, ndefMessage) {
     console.log('writeNdef')
     console.log(deviceId)
-    var bytes = ndef.encodeMessage(ndefMessage)
+    const bytes = ndef.encodeMessage(ndefMessage)
     console.log('bytes' + bytes)
-    var hexString = util.bytesToHexString(bytes)
+    const hexString = util.bytesToHexString(bytes)
     console.log('hexString' + hexString)
     this.write(resultCallback, deviceId, hexString)
   },
@@ -228,12 +228,12 @@ module.exports = {
     // }, reason => {
     //     console.log(reason)
     // });
-    var fullResponse = ""
-    var apdus = []
+    let fullResponse = ""
+    const apdus = []
     for (let page = 4; page < 16; page += 4) {
       let n = ""
       page > 16 ? n = "" + page.toString(16) : n = "0" + page.toString(16)
-      var apdu = 'FFB000' + n + '10'
+      const apdu = 'FFB000' + n + '10'
 
       function didRespond () {
       }
@@ -312,9 +312,8 @@ module.exports = {
 
 
 ndef.makeWriteApdus = function (dataHexString) {
-  var apdusStrings = []
   const slices = textHelper.makeSlices(dataHexString, 4)
-  apdusStrings = slices.map((slice, i) => {
+  const apdusStrings = slices.map((slice, i) => {
     slice = slice.padEnd(4, '0') //pads end of string if not 4 chars long
     let page = i * 4
     let n = page.toString(16)
@@ -330,7 +329,7 @@ ndef.tlvEncodeNdef = function (message) {
   console.log('tlvEncodeNdef')
   const ndefType = '03'
   const length = message.length / 2
-  var lengthString = length.toString(16)
+  let lengthString = length.toString(16)
   lengthString = (lengthString as any).padStart(2, '0')
   // Add the ndef message terminator
   const terminator = 'FE'
@@ -339,10 +338,10 @@ ndef.tlvEncodeNdef = function (message) {
 }
 
 
-var util = {
+const util = {
   // i must be <= 256
   toHex: function (i) {
-    var hex
+    let hex
 
     if (i < 0) {
       i += 256
@@ -370,8 +369,8 @@ var util = {
     // based on
     // http://ciaranj.blogspot.fr/2007/11/utf8-characters-encoding-in-javascript.html
 
-    var result = ""
-    var i, c, c1, c2, c3
+    let result = ""
+    let i, c, c1, c2, c3
     i = c = c1 = c2 = c3 = 0
 
     // Perform byte-order check.
@@ -418,11 +417,11 @@ var util = {
     // based on
     // http://ciaranj.blogspot.fr/2007/11/utf8-characters-encoding-in-javascript.html
 
-    var bytes = []
+    const bytes = []
 
-    for (var n = 0; n < string.length; n++) {
+    for (let n = 0; n < string.length; n++) {
 
-      var c = string.charCodeAt(n)
+      const c = string.charCodeAt(n)
 
       if (c < 128) {
 
@@ -447,8 +446,8 @@ var util = {
   },
 
   bytesToHexString: function (bytes) {
-    var dec, hexstring, bytesAsHexString = ""
-    for (var i = 0; i < bytes.length; i++) {
+    let dec, hexstring, bytesAsHexString = ""
+    for (let i = 0; i < bytes.length; i++) {
       if (bytes[i] >= 0) {
         dec = bytes[i]
       } else {
@@ -475,7 +474,7 @@ var util = {
    */
   isType: function (record, tnf, type) {
     if (record.tnf === tnf) { // TNF is 3-bit
-      var recordType
+      let recordType
       if (typeof(type) === 'string') {
         recordType = type
       } else {
@@ -489,11 +488,11 @@ var util = {
 }
 
 // this is a module in ndef-js
-var textHelper = {
+const textHelper = {
 
   decodePayload: function (data) {
 
-    var languageCodeLength = (data[0] & 0x3F), // 6 LSBs
+    const languageCodeLength = (data[0] & 0x3F), // 6 LSBs
       languageCode = data.slice(1, 1 + languageCodeLength),
       utf16 = (data[0] & 0x80) !== 0 // assuming UTF-16BE
 
@@ -512,7 +511,7 @@ var textHelper = {
       lang = 'en'
     }
 
-    var encoded = util.stringToBytes(lang + text)
+    const encoded = util.stringToBytes(lang + text)
     encoded.unshift(lang.length)
 
     return encoded
@@ -529,7 +528,7 @@ var textHelper = {
 }
 
 // this is a module in ndef-js
-var uriHelper = {
+const uriHelper = {
   // URI identifier codes from URI Record Type Definition
   // NFCForum-TS-RTD_URI_1.0 2006-07-24 index in array matches code in the spec
   protocols: ["", "http://www.", "https://www.", "http://", "https://", "tel:", "mailto:", "ftp://anonymous:anonymous@", "ftp://ftp.", "ftps://", "sftp://", "smb://", "nfs://", "ftp://", "dav://", "news:", "telnet://", "imap:", "rtsp://", "urn:", "pop:", "sip:", "sips:", "tftp:", "btspp://", "btl2cap://", "btgoep://", "tcpobex://", "irdaobex://", "file://", "urn:epc:id:", "urn:epc:tag:", "urn:epc:pat:", "urn:epc:raw:", "urn:epc:", "urn:nfc:"],
@@ -537,7 +536,7 @@ var uriHelper = {
   // decode a URI payload bytes
   // @returns a string
   decodePayload: function (data) {
-    var prefix = uriHelper.protocols[data[0]]
+    let prefix = uriHelper.protocols[data[0]]
     if (!prefix) { // 36 to 255 should be ""
       prefix = ""
     }
@@ -548,7 +547,7 @@ var uriHelper = {
   // @returns an array of bytes
   encodePayload: function (uri) {
 
-    var prefix,
+    let prefix,
       protocolCode,
       encoded
 
