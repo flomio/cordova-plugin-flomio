@@ -1,6 +1,10 @@
 const exec = require('cordova/exec')
 const ndef = require('ndef')
 
+function noop () {
+  // empty
+}
+
 /**
  * Constructor
  */
@@ -60,8 +64,7 @@ module.exports = {
 
   sleepReaders: (resultCallback, success, failure) => {
     exec(
-      () => {
-      },
+      noop,
       (failure) => {
         console.log('ERROR: FlomioPlugin.sleepReaders: ' + failure)
       },
@@ -70,8 +73,7 @@ module.exports = {
 
   startReaders: (resultCallback, success, failure) => {
     exec(
-      () => {
-      },
+      noop,
       (failure) => {
         console.log('ERROR: FlomioPlugin.startReaders: ' + failure)
       },
@@ -126,11 +128,12 @@ module.exports = {
       'FlomioPlugin', 'setTagDiscoveredCallback', [])
   },
 
-  addNdefListener: function (resultCallback, success, failure) { //ios 11
+  addNdefListener: function (resultCallback, success, failure) { // ios 11
     function hexToBytes (hex) {
       let bytes = []
-      for (let c = 0; c < hex.length; c += 2)
+      for (let c = 0; c < hex.length; c += 2) {
         bytes.push(parseInt(hex.substr(c, 2), 16))
+      }
       return bytes
     }
 
@@ -165,11 +168,8 @@ module.exports = {
       page > 16 ? n = '' + page.toString(16) : n = '0' + page.toString(16)
       const apdu = 'FFB000' + n + '10'
 
-      function success () {
-      }
-
-      //store each sendApdu promise
-      apdus.push(this.sendApdu(success, deviceId, apdu).then((responseApdu) => {
+      // store each sendApdu promise
+      apdus.push(this.sendApdu(noop, deviceId, apdu).then((responseApdu) => {
         console.log('response apdu: ' + responseApdu)
         fullResponse = fullResponse.concat(responseApdu.slice(0, -5))
       }, (err) => {
@@ -177,11 +177,11 @@ module.exports = {
       }))
     }
 
-    //send all apdus and capture result
+    // send all apdus and capture result
     Promise.all(apdus).then(function () {
       // console.log('fullResponse: ' + fullResponse)
       resultCallback(fullResponse)
-      fullResponse = fullResponse.replace(/\s/g, '') //remove spaces
+      fullResponse = fullResponse.replace(/\s/g, '') // remove spaces
       if (fullResponse.substring(0, 2) === '03') {
         const i = fullResponse.indexOf('FE')
         console.log('index fe: ' + i)
@@ -235,11 +235,8 @@ module.exports = {
       page > 16 ? n = '' + page.toString(16) : n = '0' + page.toString(16)
       const apdu = 'FFB000' + n + '10'
 
-      function didRespond () {
-      }
-
-      //store each sendApdu promise
-      apdus.push(this.sendApdu(didRespond, deviceId, apdu).then((responseApdu) => {
+      // store each sendApdu promise
+      apdus.push(this.sendApdu(noop, deviceId, apdu).then((responseApdu) => {
         console.log('response apdu: ' + responseApdu)
         fullResponse = fullResponse.concat(responseApdu.slice(0, -5))
       }, (err) => {
@@ -247,7 +244,7 @@ module.exports = {
       }))
     }
 
-    //send all apdus and capture result
+    // send all apdus and capture result
     Promise.all(apdus).then(function () {
       console.log('fullResponse: ' + fullResponse)
     }, reason => {
@@ -313,7 +310,7 @@ module.exports = {
 ndef.makeWriteApdus = function (dataHexString) {
   const slices = textHelper.makeSlices(dataHexString, 4)
   const apdusStrings = slices.map((slice, i) => {
-    slice = slice.padEnd(4, '0') //pads end of string if not 4 chars long
+    slice = slice.padEnd(4, '0') // pads end of string if not 4 chars long
     let page = i * 4
     let n = page.toString(16)
     n = (n as any).padStart(2, '0')
@@ -368,12 +365,16 @@ const util = {
     // http://ciaranj.blogspot.fr/2007/11/utf8-characters-encoding-in-javascript.html
 
     let result = ''
-    let i, c, c1, c2, c3
+    let i
+    let c
+    let c1
+    let c2
+    let c3
     i = c = c1 = c2 = c3 = 0
 
     // Perform byte-order check.
     if (bytes.length >= 3) {
-      if ((bytes[0] & 0xef) == 0xef && (bytes[1] & 0xbb) == 0xbb && (bytes[2] & 0xbf) == 0xbf) {
+      if ((bytes[0] & 0xef) === 0xef && (bytes[1] & 0xbb) === 0xbb && (bytes[2] & 0xbf) === 0xbf) {
         // stream has a BOM at the start, skip over
         i = 3
       }
@@ -411,15 +412,15 @@ const util = {
     return result
   },
 
-  stringToBytes: function (string) {
+  stringToBytes: function (str) {
     // based on
     // http://ciaranj.blogspot.fr/2007/11/utf8-characters-encoding-in-javascript.html
 
     const bytes = []
 
-    for (let n = 0; n < string.length; n++) {
+    for (let n = 0; n < str.length; n++) {
 
-      const c = string.charCodeAt(n)
+      const c = str.charCodeAt(n)
 
       if (c < 128) {
 
@@ -444,7 +445,9 @@ const util = {
   },
 
   bytesToHexString: function (bytes) {
-    let dec, hexstring, bytesAsHexString = ''
+    let dec
+    let hexstring
+    let bytesAsHexString = ''
     for (let i = 0; i < bytes.length; i++) {
       if (bytes[i] >= 0) {
         dec = bytes[i]
@@ -490,9 +493,9 @@ const textHelper = {
 
   decodePayload: function (data) {
 
-    const languageCodeLength = (data[0] & 0x3F), // 6 LSBs
-      languageCode = data.slice(1, 1 + languageCodeLength),
-      utf16 = (data[0] & 0x80) !== 0 // assuming UTF-16BE
+    const languageCodeLength = (data[0] & 0x3F) // 6 LSBs
+    const languageCode = data.slice(1, 1 + languageCodeLength)
+    const utf16 = (data[0] & 0x80) !== 0 // assuming UTF-16BE
 
     // TODO need to deal with UTF in the future
     // console.log("lang " + languageCode + (utf16 ? " utf16" : " utf8"));
@@ -545,9 +548,9 @@ const uriHelper = {
   // @returns an array of bytes
   encodePayload: function (uri) {
 
-    let prefix,
-      protocolCode,
-      encoded
+    let prefix
+    let protocolCode
+    let encoded
 
     // check each protocol, unless we've found a match
     // "urn:" is the one exception where we need to keep checking
