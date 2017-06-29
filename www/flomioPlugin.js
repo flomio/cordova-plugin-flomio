@@ -6,9 +6,9 @@
 /******/ 	function __webpack_require__(moduleId) {
 /******/
 /******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
+/******/ 		if(installedModules[moduleId]) {
 /******/ 			return installedModules[moduleId].exports;
-/******/
+/******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
@@ -3038,7 +3038,6 @@ process.umask = function() { return 0; };
 /* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var _this = this;
 var exec = __webpack_require__(3);
 var ndef = __webpack_require__(2);
 function noop() {
@@ -3176,14 +3175,14 @@ module.exports = {
             fullResponse = fullResponse.replace(/\s/g, ''); // remove spaces
             if (fullResponse.substring(0, 2) === '03') {
                 var i = fullResponse.indexOf('FE');
-                console.log('index fe: ' + i);
+                // console.log('index fe: ' + i)
                 fullResponse = fullResponse.substring(3, i);
-                console.log('fullResponse: ' + fullResponse);
+                // console.log('fullResponse: ' + fullResponse)
                 var data = util.stringToBytes(fullResponse);
-                console.log('data: ' + data);
-                console.log('fullResponse before fe: ' + fullResponse);
+                // console.log('data: ' + data)
+                // console.log('fullResponse before fe: ' + fullResponse)
                 var resp = ndef.decodeMessage(data);
-                console.log('resp: ' + JSON.stringify(resp));
+                // console.log('resp: ' + JSON.stringify(resp))
             }
         }, function (reason) {
             console.log(reason);
@@ -3200,8 +3199,8 @@ module.exports = {
     },
     write: function (resultCallback, deviceId, dataHexString, success, failure) {
         // var apdus = []
-        // var hex = ndef.tlvEncodeNdef(dataHexString)
-        // const apduStrings = ndef.makeWriteApdus(hex, 4)
+        var hex = ndef.tlvEncodeNdef(dataHexString);
+        var apduStrings = ndef.makeWriteApdus(hex, 4);
         // function success() {}
         // console.log(deviceId)
         // this.sendApdu(success, deviceId, 'FFD60000040313').then((responseApdu)
@@ -3219,12 +3218,13 @@ module.exports = {
         // });
         var fullResponse = '';
         var apdus = [];
-        for (var page = 4; page < 16; page += 4) {
-            var n = '';
-            page > 16 ? n = '' + page.toString(16) : n = '0' + page.toString(16);
-            var apdu = 'FFB000' + n + '10';
+        for (var i in apduStrings) {
+            // let n = ''
+            // page > 16 ? n = '' + page.toString(16) : n = '0' + page.toString(16)
+            // const apdu = 'FFB000' + n + '10'
             // store each sendApdu promise
-            apdus.push(_this.sendApdu(noop, deviceId, apdu).then(function (responseApdu) {
+            console.log(apduStrings[i]);
+            apdus.push(this.sendApdu(noop, deviceId, apduStrings[i]).then(function (responseApdu) {
                 console.log('response apdu: ' + responseApdu);
                 fullResponse = fullResponse.concat(responseApdu.slice(0, -5));
             }, function (err) {
@@ -3244,7 +3244,7 @@ module.exports = {
                 resultCallback();
                 resolve();
             }, function (failure) {
-                console.log('ERROR: FlomioPlugin.sendApdu: ' + failure);
+                console.log('ERROR: FlomioPlugin.launchNativeNfc: ' + failure);
             }, 'FlomioPlugin', 'launchNativeNfc', []);
         });
     }
@@ -3287,10 +3287,11 @@ module.exports = {
  * Below is from Phonegap-nfc to encode and decode ndef messages
  */
 ndef.makeWriteApdus = function (dataHexString) {
-    var slices = textHelper.makeSlices(dataHexString, 4);
+    var sliceSize = 8;
+    var slices = textHelper.makeSlices(dataHexString, sliceSize);
     var apdusStrings = slices.map(function (slice, i) {
-        slice = slice.padEnd(4, '0'); // pads end of string if not 4 chars long
-        var page = i * 4;
+        slice = slice.padEnd(sliceSize, '0'); // pads end of string if not 'sliceSize' chars long
+        var page = i + 4;
         var n = page.toString(16);
         n = n.padStart(2, '0');
         var apdu = 'FFD600' + n + '04' + slice;
@@ -3395,6 +3396,13 @@ var util = {
             }
         }
         return bytes;
+    },
+    hexStringToPrintableText: function (payload) {
+        var hex = payload.toString(); //force conversion
+        var str = '';
+        for (var i = 0; i < hex.length; i += 2)
+            str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+        return str;
     },
     bytesToHexString: function (bytes) {
         var dec;

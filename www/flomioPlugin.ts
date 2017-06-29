@@ -184,14 +184,14 @@ module.exports = {
       fullResponse = fullResponse.replace(/\s/g, '') // remove spaces
       if (fullResponse.substring(0, 2) === '03') {
         const i = fullResponse.indexOf('FE')
-        console.log('index fe: ' + i)
+        // console.log('index fe: ' + i)
         fullResponse = fullResponse.substring(3, i)
-        console.log('fullResponse: ' + fullResponse)
+        // console.log('fullResponse: ' + fullResponse)
         const data = util.stringToBytes(fullResponse)
-        console.log('data: ' + data)
-        console.log('fullResponse before fe: ' + fullResponse)
+        // console.log('data: ' + data)
+        // console.log('fullResponse before fe: ' + fullResponse)
         const resp = ndef.decodeMessage(data)
-        console.log('resp: ' + JSON.stringify(resp))
+        // console.log('resp: ' + JSON.stringify(resp))
       }
     }, reason => {
       console.log(reason)
@@ -208,10 +208,10 @@ module.exports = {
     this.write(resultCallback, deviceId, hexString)
   },
 
-  write: (resultCallback, deviceId, dataHexString, success, failure) => {
+  write: function (resultCallback, deviceId, dataHexString, success, failure) {
     // var apdus = []
-    // var hex = ndef.tlvEncodeNdef(dataHexString)
-    // const apduStrings = ndef.makeWriteApdus(hex, 4)
+    var hex = ndef.tlvEncodeNdef(dataHexString)
+    const apduStrings = ndef.makeWriteApdus(hex, 4)
     // function success() {}
     // console.log(deviceId)
     // this.sendApdu(success, deviceId, 'FFD60000040313').then((responseApdu)
@@ -230,13 +230,14 @@ module.exports = {
     // });
     let fullResponse = ''
     const apdus = []
-    for (let page = 4; page < 16; page += 4) {
-      let n = ''
-      page > 16 ? n = '' + page.toString(16) : n = '0' + page.toString(16)
-      const apdu = 'FFB000' + n + '10'
+    for (let i in apduStrings) {
+      // let n = ''
+      // page > 16 ? n = '' + page.toString(16) : n = '0' + page.toString(16)
+      // const apdu = 'FFB000' + n + '10'
 
       // store each sendApdu promise
-      apdus.push(this.sendApdu(noop, deviceId, apdu).then((responseApdu) => {
+      console.log(apduStrings[i])
+      apdus.push(this.sendApdu(noop, deviceId, apduStrings[i]).then((responseApdu) => {
         console.log('response apdu: ' + responseApdu)
         fullResponse = fullResponse.concat(responseApdu.slice(0, -5))
       }, (err) => {
@@ -260,7 +261,7 @@ module.exports = {
           resolve()
         },
         (failure) => {
-          console.log('ERROR: FlomioPlugin.sendApdu: ' + failure)
+          console.log('ERROR: FlomioPlugin.launchNativeNfc: ' + failure)
         },
         'FlomioPlugin', 'launchNativeNfc', [])
     })
@@ -308,10 +309,11 @@ module.exports = {
  */
 
 ndef.makeWriteApdus = function (dataHexString) {
-  const slices = textHelper.makeSlices(dataHexString, 4)
+  const sliceSize = 8;
+  const slices = textHelper.makeSlices(dataHexString, sliceSize)
   const apdusStrings = slices.map((slice, i) => {
-    slice = slice.padEnd(4, '0') // pads end of string if not 4 chars long
-    let page = i * 4
+    slice = slice.padEnd(sliceSize, '0') // pads end of string if not 'sliceSize' chars long
+    let page = i + 4
     let n = page.toString(16)
     n = (n as any).padStart(2, '0')
     let apdu = 'FFD600' + n + '04' + slice
@@ -442,6 +444,14 @@ const util = {
     }
 
     return bytes
+  },
+
+  hexStringToPrintableText: function (payload) {
+   var hex = payload.toString();//force conversion
+    var str = '';
+    for (var i = 0; i < hex.length; i += 2)
+        str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+    return str
   },
 
   bytesToHexString: function (bytes) {
