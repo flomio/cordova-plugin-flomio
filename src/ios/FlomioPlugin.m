@@ -74,7 +74,7 @@ NSString * NSDataToHex(NSData *data) {
 
 - (void )launchNativeNfc:(CDVInvokedUrlCommand*)command {
     [self startNfc];
-    NSArray* result = @[deviceUuid, @""];
+    NSArray* result = @[@"Launch attempted"];
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
     [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
@@ -137,11 +137,21 @@ NSString * NSDataToHex(NSData *data) {
     [sharedManager sendApdu:apdu  toDevice:deviceUuid success:^(NSString *response) {
         NSLog(@"command: %@, response: %@", apdu, response);
         if (response.length > 1){
-            NSArray* result = @[deviceUuid, response];
-            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
-            [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
-            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-        } else {
+            if ([response isEqualToString: @"63 00"]){
+                double delayInSeconds = 0.5; //add delay to get rid of errors sending future commands
+                dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+                dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+                    NSArray* result = @[deviceUuid, response];
+                    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
+                    [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+                    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+                });
+            } else {
+                NSArray* result = @[deviceUuid, response];
+                CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
+                [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+                [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+            }
             NSArray* result = @[deviceUuid, @""];
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_NO_RESULT messageAsMultipart:result];
             [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];

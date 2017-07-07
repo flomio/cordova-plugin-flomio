@@ -3153,6 +3153,20 @@ module.exports = {
             console.log('ERROR: FlomioPlugin.addNdefListener: ' + failure);
         }, 'FlomioPlugin', 'setNdefDiscoveredCallback', []);
     },
+    // readPage: (resultCallback, deviceId, page, success, failure) => {
+    //   let n = ''
+    //   page > 16 ? n = '' + page.toString(16) : n = '0' + page.toString(16)
+    //   const apdu = 'FFB000' + n + '10'
+    //   return this.sendApdu(noop, deviceId, apdu).then((responseApdu) => {
+    //       console.log('response apdu: ' + responseApdu)
+    //     }, (err) => {
+    //       console.error(err)
+    //   })
+    // },
+    // formatCapibilityContainer: (resultCallback, deviceId, success, failure) => {
+    //   const capibilityContainer = this.readPage(noop, deviceId, '03')
+    //   console.log('capibilityContainer:' + capibilityContainer);
+    // },
     readNdef: function (resultCallback, deviceId) {
         var fullResponse = '';
         var apdus = [];
@@ -3201,27 +3215,9 @@ module.exports = {
         // var apdus = []
         var hex = ndef.tlvEncodeNdef(dataHexString);
         var apduStrings = ndef.makeWriteApdus(hex, 4);
-        // function success() {}
-        // console.log(deviceId)
-        // this.sendApdu(success, deviceId, 'FFD60000040313').then((responseApdu)
-        // => { console.log("response apdu: " + responseApdu); // fullResponse =
-        // fullResponse.concat(responseApdu.slice(0, -5)) }, (err) => {
-        // console.error(err); }) // for (let i = 0; i < apduStrings.length; i +=
-        // 1) { //     function success() {} //     //store each sendApdu promise
-        // //     console.log('apduStrings[i]' + apduStrings[i]) //     var apdu =
-        // apduStrings[i]; //     apdus.push() // }
-        // //send all apdus and capture result
-        // Promise.all(apdus).then(function() {
-        //     console.log('finished writing: ')
-        // }, reason => {
-        //     console.log(reason)
-        // });
         var fullResponse = '';
         var apdus = [];
         for (var i in apduStrings) {
-            // let n = ''
-            // page > 16 ? n = '' + page.toString(16) : n = '0' + page.toString(16)
-            // const apdu = 'FFB000' + n + '10'
             // store each sendApdu promise
             console.log(apduStrings[i]);
             apdus.push(this.sendApdu(noop, deviceId, apduStrings[i]).then(function (responseApdu) {
@@ -3308,8 +3304,8 @@ ndef.tlvEncodeNdef = function (message) {
     lengthString = lengthString.padStart(2, '0');
     // Add the ndef message terminator
     var terminator = 'FE';
-    console.log('ndefType + length + message + terminator' + ndefType + length + message + terminator);
-    return ndefType + length + message + terminator;
+    console.log('ndefType + length + message + terminator' + ndefType + lengthString + message + terminator);
+    return ndefType + lengthString + message + terminator;
 };
 var util = {
     // i must be <= 256
