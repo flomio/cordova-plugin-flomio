@@ -3235,11 +3235,10 @@ module.exports = {
         });
     },
     launchNativeNfc: function (resultCallback, success, failure) {
+        // exec(success, failure, 'FlomioPlugin', 'launchNativeNfc', [])
         return new Promise(function (resolve, reject) {
-            exec(function () {
-                resultCallback();
-                resolve();
-            }, function (failure) {
+            exec(success, function (failure) {
+                reject();
                 console.log('ERROR: FlomioPlugin.launchNativeNfc: ' + failure);
             }, 'FlomioPlugin', 'launchNativeNfc', []);
         });

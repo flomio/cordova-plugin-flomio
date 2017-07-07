@@ -250,14 +250,13 @@ module.exports = {
     })
   },
 
-  launchNativeNfc: (resultCallback, success, failure) => {
+  launchNativeNfc: (success, failure) => {
+    // exec(success, failure, 'FlomioPlugin', 'launchNativeNfc', [])
     return new Promise((resolve, reject) => {
       exec(
-        () => {
-          resultCallback()
-          resolve()
-        },
+        success,
         (failure) => {
+          reject()
           console.log('ERROR: FlomioPlugin.launchNativeNfc: ' + failure)
         },
         'FlomioPlugin', 'launchNativeNfc', [])
