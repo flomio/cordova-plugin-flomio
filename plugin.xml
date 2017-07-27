@@ -119,8 +119,6 @@
         <framework src="MediaPlayer.framework" weak="true" />
         <framework src="libc++.dylib" />
 
-        <resource-file src="src/ios/NFC_Actions.entitlements" />
-
         <!-- Request permission to use mircophone -->
        <config-file target="*-Info.plist" parent="NSMicrophoneUsageDescription">
             <string>This app requires microphone access to function properly.</string>
