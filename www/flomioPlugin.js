@@ -82,8 +82,8 @@
 
 
 var base64 = __webpack_require__(4)
-var ieee754 = __webpack_require__(5)
-var isArray = __webpack_require__(6)
+var ieee754 = __webpack_require__(6)
+var isArray = __webpack_require__(5)
 
 exports.Buffer = Buffer
 exports.SlowBuffer = SlowBuffer
@@ -2093,6 +2093,17 @@ function fromByteArray (uint8) {
 /* 5 */
 /***/ (function(module, exports) {
 
+var toString = {}.toString;
+
+module.exports = Array.isArray || function (arr) {
+  return toString.call(arr) == '[object Array]';
+};
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports) {
+
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = nBytes * 8 - mLen - 1
@@ -2177,17 +2188,6 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
   buffer[offset + i - d] |= s * 128
 }
-
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports) {
-
-var toString = {}.toString;
-
-module.exports = Array.isArray || function (arr) {
-  return toString.call(arr) == '[object Array]';
-};
 
 
 /***/ }),
@@ -3234,7 +3234,7 @@ module.exports = {
             console.log(reason);
         });
     },
-    launchNativeNfc: function (resultCallback, success, failure) {
+    launchNativeNfc: function (success, failure) {
         // exec(success, failure, 'FlomioPlugin', 'launchNativeNfc', [])
         return new Promise(function (resolve, reject) {
             exec(success, function (failure) {
