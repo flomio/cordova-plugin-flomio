@@ -5,10 +5,28 @@ function noop () {
   // empty
 }
 
+export class Device {
+  public deviceId: string
+  public firmwareRevision?: string
+  public hardwareRevision?: string
+  public batteryLevel?: string
+  public communicationStatus?: number
+  constructor (deviceId: string, batteryLevel?: string, hardwareRevision?: string, firmwareRevision?: string, communicationStatus?: number) {
+    this.deviceId = deviceId
+    this.batteryLevel = batteryLevel
+    this.firmwareRevision = firmwareRevision
+    this.hardwareRevision = hardwareRevision
+    this.communicationStatus = communicationStatus
+  }
+}
+
+let devices: Device[] = []
+
 /**
  * Constructor
  */
 module.exports = {
+  
   init: (success, failure) => {
     exec(success, failure, 'FlomioPlugin', 'init', [])
   },
@@ -81,11 +99,13 @@ module.exports = {
   },
 
   sendApdu: (resultCallback, deviceId, apdu, success, failure) => {
+    console.log('in send apdu: ' + apdu + ' device: ' + deviceId)
     return new Promise((resolve, reject) => {
       exec(
         (deviceId, responseApdu) => {
-          resultCallback({deviceId: deviceId, responseApdu: responseApdu})
+          console.log('In response apdu: ' + responseApdu)
           resolve(responseApdu)
+          resultCallback({deviceId: deviceId, responseApdu: responseApdu})
         },
         (failure) => {
           console.log('ERROR: FlomioPlugin.sendApdu: ' + failure)
@@ -97,8 +117,16 @@ module.exports = {
   // Delegate/Event Listeners
   addConnectedDevicesListener: (resultCallback, success, failure) => {
     exec(
-      (deviceIdList) => {
-        resultCallback(deviceIdList)
+      (device) => {
+        // alert(JSON.stringify(device));
+        let deviceId = device['Device ID']
+        let batteryLevel = device['Battery Level']
+        let hardwareRevision = device['Hardware Revision']
+        let firmwareRevision = device['Firmware Revision']
+        let communicationStatus = device['Communication Status']
+        let newDevice = new Device(deviceId, batteryLevel, hardwareRevision, firmwareRevision, communicationStatus)
+        devices.push(newDevice)
+        resultCallback(device)
       },
       (failure) => {
         console.log('ERROR: FlomioPlugin.addConnectedDevicesListener: ' + failure)
@@ -160,57 +188,56 @@ module.exports = {
       'FlomioPlugin', 'setNdefDiscoveredCallback', [])
   },
 
-  // readPage: (resultCallback, deviceId, page, success, failure) => {
-  //   let n = ''
-  //   page > 16 ? n = '' + page.toString(16) : n = '0' + page.toString(16)
-  //   const apdu = 'FFB000' + n + '10'
-  //   return this.sendApdu(noop, deviceId, apdu).then((responseApdu) => {
-  //       console.log('response apdu: ' + responseApdu)
-  //     }, (err) => {
-  //       console.error(err)
-  //   })
-  // },
-
-  // formatCapibilityContainer: (resultCallback, deviceId, success, failure) => {
-  //   const capibilityContainer = this.readPage(noop, deviceId, '03')
-  //   console.log('capibilityContainer:' + capibilityContainer);
-  // },
-
   readNdef: function (resultCallback, deviceId) {
     let fullResponse = ''
     const apdus = []
-    for (let page = 4; page < 16; page += 4) {
-      let n = ''
-      page > 16 ? n = '' + page.toString(16) : n = '0' + page.toString(16)
-      const apdu = 'FFB000' + n + '10'
-
-      // store each sendApdu promise
-      apdus.push(this.sendApdu(noop, deviceId, apdu).then((responseApdu) => {
-        console.log('response apdu: ' + responseApdu)
-        fullResponse = fullResponse.concat(responseApdu.slice(0, -5))
-      }, (err) => {
-        console.error(err)
-      }))
-    }
-
-    // send all apdus and capture result
-    Promise.all(apdus).then(function () {
-      // console.log('fullResponse: ' + fullResponse)
-      resultCallback(fullResponse)
-      fullResponse = fullResponse.replace(/\s/g, '') // remove spaces
-      if (fullResponse.substring(0, 2) === '03') {
-        const i = fullResponse.indexOf('FE')
-        // console.log('index fe: ' + i)
-        fullResponse = fullResponse.substring(3, i)
-        // console.log('fullResponse: ' + fullResponse)
-        const data = util.stringToBytes(fullResponse)
-        // console.log('data: ' + data)
-        // console.log('fullResponse before fe: ' + fullResponse)
-        const resp = ndef.decodeMessage(data)
-        // console.log('resp: ' + JSON.stringify(resp))
+    let numberOfPages: number
+   
+    this.readCapabilityContainer(devices[0].deviceId).then((capabilityContainer) => {
+      capabilityContainer = capabilityContainer.replace(/\s/g, '') // remove spaces
+      if (capabilityContainer.substring(0, 2) === 'E1') {
+        const length = parseInt(capabilityContainer.substring(4,6), 16)
+        console.log('capabilityContainer: ' + capabilityContainer)
+        console.log('length: ' + length)
+        const numberOfBytes = length * 8
+        numberOfPages = numberOfBytes / 4
+        console.log('number of pages: ' + numberOfPages)
+        // E1 00 byteSize (divided by 8) 00... eg E1 10 06 00 = 48 bytes
+        // length * 8 = number of bytes
+        // number of bytes / 4 = number of pages
       }
-    }, reason => {
-      console.log(reason)
+      console.log(JSON.stringify(numberOfPages))
+      for (let page = 4; page < numberOfPages; page += 4) {
+        let n = ''
+        page >= 16 ? n = '' + page.toString(16) : n = '0' + page.toString(16)
+        const apdu = 'FFB000' + n + '10'
+
+        // store each sendApdu promise
+        apdus.push(this.sendApdu(noop, deviceId, apdu).then((responseApdu) => {
+          console.log('response apdu: ' + responseApdu)
+          fullResponse = fullResponse.concat(responseApdu.slice(0, -5))
+        }, (err) => {
+          console.error(err)
+        }))
+      }
+      // send all apdus and capture result
+      Promise.all(apdus).then(function () {
+        fullResponse = fullResponse.replace(/\s/g, '') // remove spaces
+        if (fullResponse.substring(0, 2) === '03') {
+          const length = parseInt(fullResponse.substring(2,4), 16)
+          const payloadOffset = 4
+          const payload = fullResponse.substring(payloadOffset, (length * 2) + payloadOffset)
+          console.log('length: ' + length + ' payload: ' + payload)
+          const byteArray = new Buffer(payload, 'hex').toJSON().data
+          console.log('byteArray: ' + byteArray)
+          const ndefMessage = ndef.decodeMessage(byteArray)
+          resultCallback({ndefMessage: ndefMessage})
+        }
+      }, reason => {
+        console.log(reason)
+      })
+    }, (err) => {
+      console.log(err)
     })
   },
 
@@ -226,7 +253,7 @@ module.exports = {
 
   write: function (resultCallback, deviceId, dataHexString, success, failure) {
     // var apdus = []
-    var hex = ndef.tlvEncodeNdef(dataHexString)
+    let hex = ndef.tlvEncodeNdef(dataHexString)
     const apduStrings = ndef.makeWriteApdus(hex, 4)
   
     let fullResponse = ''
@@ -261,6 +288,61 @@ module.exports = {
         },
         'FlomioPlugin', 'launchNativeNfc', [])
     })
+  },
+
+  async readPage (deviceId: string, page: number) {
+    let n = ''
+    page >= 16 ? n = '' + page.toString(16) : n = '0' + page.toString(16)
+    const apdu: string = 'FFB000' + n + '10'
+    console.log('read page: ' + page + ' command APDU: ' + apdu + ' device id: ' + deviceId)
+    return await this.sendApdu(noop, deviceId, apdu)
+  },
+
+  async readCapabilityContainer (deviceId) {
+    console.log('readCapabilityContainer ' + deviceId)
+    return await this.readPage(deviceId, 3)
+  },
+
+  async determineMaximumTranceiveLength (): Promise<number> {
+    let userMemory: number
+    for (let page = 4; page < 256; page += 2) {
+      const response = await this.readPage(this.deviceId, page )
+      console.log('determineTagSize response: ' + response + 'page: ' + page)
+      if ((response === '63 00') || (response.length <= 5)) {
+        console.log('size ==' + page)
+        let totalMemory = page * this.BYTES_PER_PAGE
+        userMemory = totalMemory - (this.BYTES_PER_PAGE * 4)
+        console.log('USER MEMORY: ' + userMemory)
+        break
+      }
+    }
+    return userMemory
+  },
+
+  async formatCapabilityContainer () {
+    const userMemory = await this.determineMaximumTranceiveLength()
+    if (userMemory) {
+      const valueForCapabilityContainer: number = userMemory / 8
+      let n = ''
+      valueForCapabilityContainer >= 16 ? n = '' + valueForCapabilityContainer.toString(16) : n = '0' + valueForCapabilityContainer.toString(16)
+      const apdu = 'FFD6000304' + 'E110' + n + '00'
+      const response = await this.sendApdu(this.deviceId, apdu)
+      console.log('response to apdu: ' + apdu + ' response: ' + response)
+      const verify: boolean = await this.checkIfTagFormatted()
+      console.log('tag formatted' + verify.valueOf)
+    }
+  },
+
+  async checkIfTagFormatted (): Promise<boolean> {
+    const capabilityContainer = await this.readCapabilityContainer()
+    if (capabilityContainer.slice(0,2) === 'E1') {
+      // capability container already formatted, leave it be
+      const currentTagSizeString = capabilityContainer.slice(4,6)
+      console.log('currentTagSize: ' + currentTagSizeString + ' * 8')
+      return true
+    } else {
+      return false
+    }
   }
 }
 
@@ -305,7 +387,7 @@ module.exports = {
  */
 
 ndef.makeWriteApdus = function (dataHexString) {
-  const sliceSize = 8;
+  const sliceSize = 8
   const slices = textHelper.makeSlices(dataHexString, sliceSize)
   const apdusStrings = slices.map((slice, i) => {
     slice = slice.padEnd(sliceSize, '0') // pads end of string if not 'sliceSize' chars long
@@ -443,10 +525,11 @@ const util = {
   },
 
   hexStringToPrintableText: function (payload) {
-   var hex = payload.toString();//force conversion
-    var str = '';
-    for (var i = 0; i < hex.length; i += 2)
-        str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+    let hex = payload.toString() // force conversion
+    let str = ''
+    for (let i = 0; i < hex.length; i += 2) {
+      str += String.fromCharCode(parseInt(hex.substr(i, 2), 16))
+    }
     return str
   },
 
@@ -533,6 +616,9 @@ const textHelper = {
   }
 
 }
+
+const BYTES_PER_PAGE: number = 4
+let deviceId: string = '' // reference to first connected device
 
 // this is a module in ndef-js
 const uriHelper = {
