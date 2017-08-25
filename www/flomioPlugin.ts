@@ -232,6 +232,8 @@ module.exports = {
           console.log('byteArray: ' + byteArray)
           const ndefMessage = ndef.decodeMessage(byteArray)
           resultCallback({ndefMessage: ndefMessage})
+        } else {
+          resultCallback({rawData: fullResponse})
         }
       }, reason => {
         console.log(reason)

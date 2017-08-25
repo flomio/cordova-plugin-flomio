@@ -3213,20 +3213,6 @@ module.exports = {
             console.log('ERROR: FlomioPlugin.addNdefListener: ' + failure);
         }, 'FlomioPlugin', 'setNdefDiscoveredCallback', []);
     },
-    // readPage: (resultCallback, deviceId, page, success, failure) => {
-    //   let n = ''
-    //   page > 16 ? n = '' + page.toString(16) : n = '0' + page.toString(16)
-    //   const apdu = 'FFB000' + n + '10'
-    //   return this.sendApdu(noop, deviceId, apdu).then((responseApdu) => {
-    //       console.log('response apdu: ' + responseApdu)
-    //     }, (err) => {
-    //       console.error(err)
-    //   })
-    // },
-    // formatcapabilityContainer: (resultCallback, deviceId, success, failure) => {
-    //   const capabilityContainer = this.readPage(noop, deviceId, '03')
-    //   console.log('capabilityContainer:' + capabilityContainer);
-    // },
     readNdef: function (resultCallback, deviceId) {
         var _this = this;
         var fullResponse = '';
@@ -3270,6 +3256,9 @@ module.exports = {
                     console.log('byteArray: ' + byteArray);
                     var ndefMessage = ndef.decodeMessage(byteArray);
                     resultCallback({ ndefMessage: ndefMessage });
+                }
+                else {
+                    resultCallback({ rawData: fullResponse });
                 }
             }, function (reason) {
                 console.log(reason);
