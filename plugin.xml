@@ -117,6 +117,7 @@
         <!-- System Frameworks -->
         <framework src="MediaPlayer.framework" weak="true" />
         <framework src="libc++.dylib" />
+        <framework src="libz.dylib" />
 
         <!-- Request permission to use mircophone -->
        <config-file target="*-Info.plist" parent="NSMicrophoneUsageDescription">
