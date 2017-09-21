@@ -1,5 +1,6 @@
 const exec = require('cordova/exec')
 const ndef = require('ndef')
+import { PushParser } from 'ndef-lib'
 
 function noop () {
   // empty
@@ -188,61 +189,6 @@ module.exports = {
       'FlomioPlugin', 'setNdefDiscoveredCallback', [])
   },
 
-  readNdef: function (resultCallback, deviceId) {
-    let fullResponse = ''
-    const apdus = []
-    let numberOfPages: number
-   
-    this.readCapabilityContainer(devices[0].deviceId).then((capabilityContainer) => {
-      capabilityContainer = capabilityContainer.replace(/\s/g, '') // remove spaces
-      if (capabilityContainer.substring(0, 2) === 'E1') {
-        const length = parseInt(capabilityContainer.substring(4,6), 16)
-        console.log('capabilityContainer: ' + capabilityContainer)
-        console.log('length: ' + length)
-        const numberOfBytes = length * 8
-        numberOfPages = numberOfBytes / 4
-        console.log('number of pages: ' + numberOfPages)
-        // E1 00 byteSize (divided by 8) 00... eg E1 10 06 00 = 48 bytes
-        // length * 8 = number of bytes
-        // number of bytes / 4 = number of pages
-      }
-      console.log(JSON.stringify(numberOfPages))
-      for (let page = 4; page < numberOfPages; page += 4) {
-        let n = ''
-        page >= 16 ? n = '' + page.toString(16) : n = '0' + page.toString(16)
-        const apdu = 'FFB000' + n + '10'
-
-        // store each sendApdu promise
-        apdus.push(this.sendApdu(noop, deviceId, apdu).then((responseApdu) => {
-          console.log('response apdu: ' + responseApdu)
-          fullResponse = fullResponse.concat(responseApdu.slice(0, -5))
-        }, (err) => {
-          console.error(err)
-        }))
-      }
-      // send all apdus and capture result
-      Promise.all(apdus).then(function () {
-        fullResponse = fullResponse.replace(/\s/g, '') // remove spaces
-        if (fullResponse.substring(0, 2) === '03') {
-          const length = parseInt(fullResponse.substring(2,4), 16)
-          const payloadOffset = 4
-          const payload = fullResponse.substring(payloadOffset, (length * 2) + payloadOffset)
-          console.log('length: ' + length + ' payload: ' + payload)
-          const byteArray = new Buffer(payload, 'hex').toJSON().data
-          console.log('byteArray: ' + byteArray)
-          const ndefMessage = ndef.decodeMessage(byteArray)
-          resultCallback({ndefMessage: ndefMessage})
-        } else {
-          resultCallback({rawData: fullResponse})
-        }
-      }, reason => {
-        console.log(reason)
-      })
-    }, (err) => {
-      console.log(err)
-    })
-  },
-
   writeNdef: function (resultCallback, deviceId, ndefMessage) {
     console.log('writeNdef')
     console.log(deviceId)
@@ -290,6 +236,43 @@ module.exports = {
         },
         'FlomioPlugin', 'launchNativeNfc', [])
     })
+  },
+
+  async readNdef (resultCallback, deviceId: string) {
+    let fullResponse = ''
+    const apdus = []
+    let numberOfPages: number
+    let capabilityContainer = await this.readCapabilityContainer(devices[0].deviceId)
+    capabilityContainer = util.removeSpaces(capabilityContainer)
+    if (capabilityContainer.substring(0, 2) === 'E1') {
+      const length = parseInt(capabilityContainer.substring(4,6), 16)
+      console.log('capabilityContainer: ' + capabilityContainer)
+      console.log('length: ' + length)
+      const numberOfBytes = length * 8
+      numberOfPages = numberOfBytes / 4
+      console.log('number of pages: ' + numberOfPages)
+      // E1 00 byteSize (divided by 8) 00... eg E1 10 06 00 = 48 bytes
+      // length * 8 = number of bytes
+      // number of bytes / 4 = number of pages
+    } else {
+      console.log('capabilityContainer not formatted correctly')
+    }
+    const parser = new PushParser()
+    let messages = []
+    parser.on('record', (record) => {
+      messages.push(record)
+    })
+    parser.on('messageEnd', () => {
+      resultCallback({ndefMessage: messages})
+    })
+    for (let page = 4; page < numberOfPages; page += 4) {
+      let n = ''
+      page >= 16 ? n = '' + page.toString(16) : n = '0' + page.toString(16)
+      const apdu = 'FFB000' + n + '10'
+      let response: string = await this.sendApdu(noop, devices[0].deviceId, apdu)
+      const buffer = util.responseToBuffer(response)
+      parser.push(buffer)
+    }
   },
 
   async readPage (deviceId: string, page: number) {
@@ -575,6 +558,16 @@ const util = {
       return (util.bytesToString(record.type) === recordType)
     }
     return false
+  },
+
+  responseToBuffer: function (response: string): Buffer {
+    response = util.removeSpaces(response)
+    response = response.slice(0, -4)
+    return Buffer.from(response, 'hex')
+  },
+
+  removeSpaces: function (stringWithSpaces: string): string {
+    return stringWithSpaces.replace(/\s/g, '')
   }
 
 }

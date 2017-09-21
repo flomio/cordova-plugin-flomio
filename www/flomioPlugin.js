@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 11);
+/******/ 	return __webpack_require__(__webpack_require__.s = 18);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -81,9 +81,9 @@
 
 
 
-var base64 = __webpack_require__(4)
-var ieee754 = __webpack_require__(6)
-var isArray = __webpack_require__(5)
+var base64 = __webpack_require__(11)
+var ieee754 = __webpack_require__(14)
+var isArray = __webpack_require__(12)
 
 exports.Buffer = Buffer
 exports.SlowBuffer = SlowBuffer
@@ -1861,7 +1861,7 @@ function isnan (val) {
   return val !== val // eslint-disable-line no-self-compare
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
 
 /***/ }),
 /* 1 */
@@ -1944,9 +1944,849 @@ module.exports = {
 
 /***/ }),
 /* 2 */
+/***/ (function(module, exports) {
+
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(process, Buffer) {var ndef = __webpack_require__(9);
+"use strict";
+/* WEBPACK VAR INJECTION */(function(Buffer) {
+// ndef-util.js
+// Copyright 2013 Don Coleman
+//
+Object.defineProperty(exports, "__esModule", { value: true });
+// This is from phonegap-nfc.js and is a combination of helpers in nfc and util
+// https://github.com/chariotsolutions/phonegap-nfc/blob/master/www/phonegap-nfc.js
+function stringToBytes(string) {
+    var bytes = Buffer.from(string).toJSON();
+    if (bytes.hasOwnProperty('data')) {
+        // Node 0.12.x
+        return bytes.data;
+    }
+    else {
+        // Node 0.10.x
+        return bytes;
+    }
+}
+exports.stringToBytes = stringToBytes;
+function bytesToString(bytes) {
+    return Buffer.from(bytes).toString();
+}
+exports.bytesToString = bytesToString;
+// useful for readable version of Tag UID
+function bytesToHexString(bytes) {
+    var dec;
+    var hexstring;
+    var bytesAsHexString = '';
+    for (var i = 0; i < bytes.length; i++) {
+        if (bytes[i] >= 0) {
+            dec = bytes[i];
+        }
+        else {
+            dec = 256 + bytes[i];
+        }
+        hexstring = dec.toString(16);
+        // zero padding
+        if (hexstring.length == 1) {
+            hexstring = '0' + hexstring;
+        }
+        bytesAsHexString += hexstring;
+    }
+    return bytesAsHexString;
+}
+exports.bytesToHexString = bytesToHexString;
+// i must be <= 256
+function toHex(i) {
+    var hex;
+    if (i < 0) {
+        i += 256;
+    }
+    hex = i.toString(16);
+    // zero padding
+    if (hex.length == 1) {
+        hex = '0' + hex;
+    }
+    return hex;
+}
+exports.toHex = toHex;
+function toPrintable(i) {
+    if (i >= 0x20 && i <= 0x7F) {
+        return String.fromCharCode(i);
+    }
+    else {
+        return '.';
+    }
+}
+exports.toPrintable = toPrintable;
+//# sourceMappingURL=ndef-util.js.map
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TNF_EMPTY = 0x0;
+exports.TNF_WELL_KNOWN = 0x01;
+exports.TNF_MIME_MEDIA = 0x02;
+exports.TNF_ABSOLUTE_URI = 0x03;
+exports.TNF_EXTERNAL_TYPE = 0x04;
+exports.TNF_UNKNOWN = 0x05;
+exports.TNF_UNCHANGED = 0x06;
+exports.TNF_RESERVED = 0x07;
+exports.RTD_TEXT = 'T'; // [0x54]
+exports.RTD_URI = 'U'; // [0x55]
+exports.RTD_SMART_POSTER = 'Sp'; // [0x53, 0x70]
+exports.RTD_ALTERNATIVE_CARRIER = 'ac'; // [0x61, 0x63]
+exports.RTD_HANDOVER_CARRIER = 'Hc'; // [0x48, 0x63]
+exports.RTD_HANDOVER_REQUEST = 'Hr'; // [0x48, 0x72]
+exports.RTD_HANDOVER_SELECT = 'Hs'; // [0x48, 0x73]
+exports.MESSAGE_STOP_BYTE = 0xfe;
+exports.MESSAGE_START_TAG = 0x03;
+//# sourceMappingURL=consts.js.map
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(Buffer) {
+// ndef.js
+// Copyright 2013 Don Coleman
+//
+// This code is from phonegap-nfc.js https://github.com/don/phonegap-nfc
+Object.defineProperty(exports, "__esModule", { value: true });
+var utils = __webpack_require__(4);
+var consts = __webpack_require__(5);
+var textHelper = __webpack_require__(22);
+var uriHelper = __webpack_require__(23);
+// import {
+//   RTD_SMART_POSTER, RTD_TEXT, RTD_URI, TNF_ABSOLUTE_URI, TNF_EMPTY,
+//   TNF_EXTERNAL_TYPE, TNF_MIME_MEDIA, TNF_RESERVED, TNF_UNCHANGED, TNF_UNKNOWN,
+//   TNF_WELL_KNOWN
+// } from './consts'
+/**
+ * Creates a JSON representation of a NDEF Record.
+ *
+ * @tnf 3-bit TNF (Type Name Format) - use one of the TNF_* constants
+ * @type byte array, containing zero to 255 bytes, must not be null
+ * @id byte array, containing zero to 255 bytes, must not be null
+ * @payload byte array, containing zero to (2 ** 32 - 1) bytes, must not be null
+ *
+ * @returns JSON representation of a NDEF record
+ *
+ * @see Ndef.textRecord, Ndef.uriRecord and Ndef.mimeMediaRecord for examples
+ */
+function record(tnf, type, id, payload) {
+    // handle null values
+    if (!tnf) {
+        tnf = consts.TNF_EMPTY;
+    }
+    if (!type) {
+        type = [];
+    }
+    if (!id) {
+        id = [];
+    }
+    if (!payload) {
+        payload = [];
+    }
+    // store type as String so it's easier to compare
+    if (type instanceof Array) {
+        type = utils.bytesToString(type);
+    }
+    // in the future, id could be a String
+    if (!(id instanceof Array)) {
+        id = utils.stringToBytes(id);
+    }
+    // Payload must be binary
+    if (!(payload instanceof Array)) {
+        payload = utils.stringToBytes(payload);
+    }
+    // TODO: typescript
+    var record = {
+        tnf: tnf,
+        type: type,
+        id: id,
+        payload: payload
+    };
+    // Experimental feature
+    // Convert payload to text for Text and URI records
+    if (tnf === consts.TNF_WELL_KNOWN) {
+        // TODO: typescript
+        switch (record.type) {
+            case consts.RTD_TEXT:
+                record.value = exports.text.decodePayload(record.payload);
+                break;
+            case consts.RTD_URI:
+                record.value = exports.uri.decodePayload(record.payload);
+                break;
+        }
+    }
+    return record;
+}
+exports.record = record;
+/**
+ * Helper that creates an NDEF record containing plain text.
+ *
+ * @text String of text to encode
+ * @languageCode ISO/IANA language code. Examples: “fi”, “en-US”, “fr-CA”,
+ *     “jp”. (optional)
+ * @id byte[] (optional)
+ */
+function textRecord(text, languageCode, id) {
+    var payload = textHelper.encodePayload(text, languageCode);
+    if (!id) {
+        id = [];
+    }
+    return record(consts.TNF_WELL_KNOWN, consts.RTD_TEXT, id, payload);
+}
+exports.textRecord = textRecord;
+/**
+ * Helper that creates a NDEF record containing a URI.
+ *
+ * @uri String
+ * @id byte[] (optional)
+ */
+function uriRecord(uri, id) {
+    var payload = uriHelper.encodePayload(uri);
+    if (!id) {
+        id = [];
+    }
+    return record(consts.TNF_WELL_KNOWN, consts.RTD_URI, id, payload);
+}
+exports.uriRecord = uriRecord;
+/**
+ * Helper that creates a NDEF record containing an absolute URI.
+ *
+ * An Absolute URI record means the URI describes the payload of the record.
+ *
+ * For example a SOAP message could use
+ * "http://schemas.xmlsoap.org/soap/envelope/" as the type and XML content for
+ * the payload.
+ *
+ * Absolute URI can also be used to write LaunchApp records for Windows.
+ *
+ * See 2.4.2 Payload Type of the NDEF Specification
+ * http://www.nfc-forum.org/specs/spec_list#ndefts
+ *
+ * Note that by default, Android will open the URI defined in the type
+ * field of an Absolute URI record (TNF=3) and ignore the payload.
+ * BlackBerry and Windows do not open the browser for TNF=3.
+ *
+ * To write a URI as the payload use uriRecord(uri)
+ *
+ * @uri String
+ * @payload byte[] or String
+ * @id byte[] (optional)
+ */
+function absoluteUriRecord(uri, payload, id) {
+    if (!id) {
+        id = [];
+    }
+    if (!payload) {
+        payload = [];
+    }
+    return record(consts.TNF_ABSOLUTE_URI, uri, id, payload);
+}
+exports.absoluteUriRecord = absoluteUriRecord;
+/**
+ * Helper that creates a NDEF record containing an mimeMediaRecord.
+ *
+ * @mimeType String
+ * @payload byte[]
+ * @id byte[] (optional)
+ */
+function mimeMediaRecord(mimeType, payload, id) {
+    if (!id) {
+        id = [];
+    }
+    return record(consts.TNF_MIME_MEDIA, mimeType, id, payload);
+}
+exports.mimeMediaRecord = mimeMediaRecord;
+/**
+ * Helper that creates an NDEF record containing an Smart Poster.
+ *
+ * @ndefRecords array of NDEF Records
+ * @id byte[] (optional)
+ */
+function smartPoster(ndefRecords, id) {
+    var payload = [];
+    if (!id) {
+        id = [];
+    }
+    if (ndefRecords) {
+        // make sure we have an array of something like NDEF records before encoding
+        if (ndefRecords[0] instanceof Object && ndefRecords[0].hasOwnProperty('tnf')) {
+            payload = encodeMessage(ndefRecords);
+        }
+        else {
+            // assume the caller has already encoded the NDEF records into a byte
+            // array
+            payload = ndefRecords;
+        }
+    }
+    else {
+        console.log('WARNING: Expecting an array of NDEF records');
+    }
+    return record(consts.TNF_WELL_KNOWN, consts.RTD_SMART_POSTER, id, payload);
+}
+exports.smartPoster = smartPoster;
+/**
+ * Helper that creates an empty NDEF record.
+ *
+ */
+function emptyRecord() {
+    return record(consts.TNF_EMPTY, [], [], []);
+}
+exports.emptyRecord = emptyRecord;
+/**
+ * Helper that creates an Android Application Record (AAR).
+ * http://developer.android.com/guide/topics/connectivity/nfc/nfc.html#aar
+ *
+ */
+function androidApplicationRecord(packageName) {
+    return record(consts.TNF_EXTERNAL_TYPE, 'android.com:pkg', [], packageName);
+}
+exports.androidApplicationRecord = androidApplicationRecord;
+/**
+ * Encodes an NDEF Message into bytes that can be written to a NFC tag.
+ *
+ * @ndefRecords an Array of NDEF Records
+ *
+ * @returns byte array
+ *
+ * @see NFC Data Exchange Format (NDEF)
+ *     http://www.nfc-forum.org/specs/spec_list/
+ */
+function encodeMessage(ndefRecords) {
+    var encoded = [];
+    var tnf_byte;
+    var record_type;
+    var payload_length;
+    var id_length;
+    // messageBegin, messageEnd
+    var mb;
+    var me;
+    var cf = false; // chunkFlag TODO implement
+    // boolean shortRecord
+    var sr;
+    // boolean idLengthFieldIsPresent
+    var il;
+    for (var i = 0; i < ndefRecords.length; i++) {
+        mb = (i === 0);
+        me = (i === (ndefRecords.length - 1));
+        sr = (ndefRecords[i].payload.length < 0xFF);
+        il = (ndefRecords[i].id.length > 0);
+        tnf_byte = encodeTnf(mb, me, cf, sr, il, ndefRecords[i].tnf);
+        encoded.push(tnf_byte);
+        // type is stored as String, converting to bytes for storage
+        record_type = utils.stringToBytes(ndefRecords[i].type);
+        encoded.push(record_type.length);
+        if (sr) {
+            payload_length = ndefRecords[i].payload.length;
+            encoded.push(payload_length);
+        }
+        else {
+            payload_length = ndefRecords[i].payload.length;
+            // 4 bytes
+            encoded.push((payload_length >> 24));
+            encoded.push((payload_length >> 16));
+            encoded.push((payload_length >> 8));
+            encoded.push((payload_length & 0xFF));
+        }
+        if (il) {
+            id_length = ndefRecords[i].id.length;
+            encoded.push(id_length);
+        }
+        encoded = encoded.concat(record_type);
+        if (il) {
+            encoded = encoded.concat(ndefRecords[i].id);
+        }
+        encoded = encoded.concat(ndefRecords[i].payload);
+    }
+    return encoded;
+}
+exports.encodeMessage = encodeMessage;
+/**
+ * Decodes an array bytes into an NDEF Message
+ *
+ * @bytes an array bytes read from a NFC tag
+ *
+ * @returns array of NDEF Records
+ *
+ * @see NFC Data Exchange Format (NDEF)
+ *     http://www.nfc-forum.org/specs/spec_list/
+ */
+function decodeMessage(bytes) {
+    bytes = bytes.slice(0);
+    var ndef_message = [];
+    var tnf_byte;
+    var header;
+    var type_length = 0;
+    var payload_length = 0;
+    var id_length = 0;
+    var record_type = [];
+    var id = [];
+    var payload = [];
+    while (bytes.length) {
+        tnf_byte = bytes.shift();
+        header = decodeTnf(tnf_byte);
+        type_length = bytes.shift();
+        if (header.sr) {
+            payload_length = bytes.shift();
+        }
+        else {
+            // next 4 bytes are length
+            payload_length = ((0xFF & bytes.shift()) << 24) |
+                ((0xFF & bytes.shift()) << 16) |
+                ((0xFF & bytes.shift()) << 8) |
+                (0xFF & bytes.shift());
+        }
+        if (header.il) {
+            id_length = bytes.shift();
+        }
+        record_type = bytes.splice(0, type_length);
+        id = bytes.splice(0, id_length);
+        payload = bytes.splice(0, payload_length);
+        ndef_message.push(record(header.tnf, record_type, id, payload));
+        if (header.me)
+            break; // last message
+    }
+    return ndef_message;
+}
+exports.decodeMessage = decodeMessage;
+/**
+ * Decode the bit flags from a TNF Byte.
+ *
+ * @returns object with decoded data
+ *
+ *  See NFC Data Exchange Format (NDEF) Specification Section 3.2 RecordLayout
+ */
+function decodeTnf(tnf_byte) {
+    return {
+        mb: (tnf_byte & 0x80) !== 0,
+        me: (tnf_byte & 0x40) !== 0,
+        cf: (tnf_byte & 0x20) !== 0,
+        sr: (tnf_byte & 0x10) !== 0,
+        il: (tnf_byte & 0x8) !== 0,
+        tnf: (tnf_byte & 0x7)
+    };
+}
+exports.decodeTnf = decodeTnf;
+/**
+ * Encode NDEF bit flags into a TNF Byte.
+ *
+ * @returns tnf byte
+ *
+ *  See NFC Data Exchange Format (NDEF) Specification Section 3.2 RecordLayout
+ */
+function encodeTnf(mb, me, cf, sr, il, tnf) {
+    var value = tnf;
+    if (mb) {
+        value = value | 0x80;
+    }
+    if (me) {
+        value = value | 0x40;
+    }
+    // note if cf: me, mb, li must be false and tnf must be 0x6
+    if (cf) {
+        value = value | 0x20;
+    }
+    if (sr) {
+        value = value | 0x10;
+    }
+    if (il) {
+        value = value | 0x8;
+    }
+    return value;
+}
+exports.encodeTnf = encodeTnf;
+// TODO test with byte[] and string
+function isType(record, tnf, type) {
+    if (record.tnf === tnf) {
+        return (s(record) === s(type));
+    }
+    return false;
+}
+exports.isType = isType;
+// }
+function tnfToString(tnf) {
+    var value = tnf;
+    switch (tnf) {
+        case consts.TNF_EMPTY:
+            value = 'Empty';
+            break;
+        case consts.TNF_WELL_KNOWN:
+            value = 'Well Known';
+            break;
+        case consts.TNF_MIME_MEDIA:
+            value = 'Mime Media';
+            break;
+        case consts.TNF_ABSOLUTE_URI:
+            value = 'Absolute URI';
+            break;
+        case consts.TNF_EXTERNAL_TYPE:
+            value = 'External';
+            break;
+        case consts.TNF_UNKNOWN:
+            value = 'Unknown';
+            break;
+        case consts.TNF_UNCHANGED:
+            value = 'Unchanged';
+            break;
+        case consts.TNF_RESERVED:
+            value = 'Reserved';
+            break;
+    }
+    return value;
+}
+exports.tnfToString = tnfToString;
+// Convert NDEF records and messages to strings
+// This works OK for demos, but real code proably needs
+// a custom implementation. It would be nice to make
+// smarter record objects that can print themselves
+var stringifier = {
+    stringify: function (data, separator) {
+        if (Array.isArray(data)) {
+            if (typeof data[0] === 'number') {
+                // guessing this message bytes
+                data = decodeMessage(data);
+            }
+            return stringifier.printRecords(data, separator);
+        }
+        else {
+            return stringifier.printRecord(data, separator);
+        }
+    },
+    // @message - NDEF Message (array of NDEF Records)
+    // @separator - line separator, optional, defaults to \n
+    // @returns string with NDEF Message
+    printRecords: function (message, separator) {
+        if (!separator) {
+            separator = '\n';
+        }
+        var result = '';
+        // Print out the payload for each record
+        message.forEach(function (record) {
+            result += stringifier.printRecord(record, separator);
+            result += separator;
+        });
+        return result.slice(0, (-1 * separator.length));
+    },
+    // @record - NDEF Record
+    // @separator - line separator, optional, defaults to \n
+    // @returns string with NDEF Record
+    printRecord: function (record, separator) {
+        var result = '';
+        if (!separator) {
+            separator = '\n';
+        }
+        switch (record.tnf) {
+            case consts.TNF_EMPTY:
+                result += 'Empty Record';
+                result += separator;
+                break;
+            case consts.TNF_WELL_KNOWN:
+                result += stringifier.printWellKnown(record, separator);
+                break;
+            case consts.TNF_MIME_MEDIA:
+                result += 'MIME Media';
+                result += separator;
+                result += s(record.type);
+                result += separator;
+                result += s(record.payload); // might be binary
+                break;
+            case consts.TNF_ABSOLUTE_URI:
+                result += 'Absolute URI';
+                result += separator;
+                result += s(record.type); // the URI is the type
+                result += separator;
+                result += s(record.payload); // might be binary
+                break;
+            case consts.TNF_EXTERNAL_TYPE:
+                // AAR contains strings, other types could
+                // contain binary data
+                result += 'External';
+                result += separator;
+                result += s(record.type);
+                result += separator;
+                result += s(record.payload);
+                break;
+            default:
+                result += s("Can't process TNF " + record.tnf);
+        }
+        result += separator;
+        return result;
+    },
+    printWellKnown: function (record, separator) {
+        var result = '';
+        if (record.tnf !== consts.TNF_WELL_KNOWN) {
+            return 'ERROR expecting TNF Well Known';
+        }
+        switch (record.type) {
+            case consts.RTD_TEXT:
+                result += 'Text Record';
+                result += separator;
+                result += (exports.text.decodePayload(record.payload));
+                break;
+            case consts.RTD_URI:
+                result += 'URI Record';
+                result += separator;
+                result += (exports.uri.decodePayload(record.payload));
+                break;
+            case consts.RTD_SMART_POSTER:
+                result += 'Smart Poster';
+                result += separator;
+                // the payload of a smartposter is a NDEF message
+                result += stringifier.printRecords(decodeMessage(record.payload));
+                break;
+            default:
+                // attempt to display other types
+                result += record.type + ' Record';
+                result += separator;
+                result += s(record.payload);
+        }
+        return result;
+    }
+};
+// convert bytes to a String
+function s(bytes) {
+    return Buffer.from(bytes).toString();
+}
+exports.text = textHelper;
+exports.uri = uriHelper;
+// export const util = util
+exports.util = utils;
+exports.stringify = stringifier.stringify;
+// expose helper objects
+// util = util
+// stringify = stringifier.stringify
+// module.exports = ndef
+//# sourceMappingURL=ndef.js.map
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(process, Buffer) {var ndef = __webpack_require__(17);
 module.exports = ndef;
 
 if (process.version.indexOf('v0.8') === 0) {
@@ -1960,16 +2800,540 @@ if (process.version.indexOf('v0.8') === 0) {
     }
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10), __webpack_require__(0).Buffer))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 3 */
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process, Buffer) {
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+Object.defineProperty(exports, "__esModule", { value: true });
+if (process.version.indexOf('v0.8') === 0) {
+    // Monkey Patch Buffer for Node 0.8 support
+    Buffer.prototype.toJSON = function () {
+        var j = [];
+        for (var i = 0; i < this.length; i++) {
+            j[i] = this[i];
+        }
+        return j;
+    };
+}
+__export(__webpack_require__(6));
+__export(__webpack_require__(5));
+__export(__webpack_require__(24));
+//# sourceMappingURL=index.js.map
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(0).Buffer))
+
+/***/ }),
+/* 9 */
 /***/ (function(module, exports) {
 
 module.exports = require("cordova/exec");
 
 /***/ }),
-/* 4 */
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(global) {
+
+// compare and isBuffer taken from https://github.com/feross/buffer/blob/680e9e5e488f22aac27599a57dc844a6315928dd/index.js
+// original notice:
+
+/*!
+ * The buffer module from node.js, for the browser.
+ *
+ * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
+ * @license  MIT
+ */
+function compare(a, b) {
+  if (a === b) {
+    return 0;
+  }
+
+  var x = a.length;
+  var y = b.length;
+
+  for (var i = 0, len = Math.min(x, y); i < len; ++i) {
+    if (a[i] !== b[i]) {
+      x = a[i];
+      y = b[i];
+      break;
+    }
+  }
+
+  if (x < y) {
+    return -1;
+  }
+  if (y < x) {
+    return 1;
+  }
+  return 0;
+}
+function isBuffer(b) {
+  if (global.Buffer && typeof global.Buffer.isBuffer === 'function') {
+    return global.Buffer.isBuffer(b);
+  }
+  return !!(b != null && b._isBuffer);
+}
+
+// based on node assert, original notice:
+
+// http://wiki.commonjs.org/wiki/Unit_Testing/1.0
+//
+// THIS IS NOT TESTED NOR LIKELY TO WORK OUTSIDE V8!
+//
+// Originally from narwhal.js (http://narwhaljs.org)
+// Copyright (c) 2009 Thomas Robinson <280north.com>
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the 'Software'), to
+// deal in the Software without restriction, including without limitation the
+// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+// sell copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+// ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+var util = __webpack_require__(21);
+var hasOwn = Object.prototype.hasOwnProperty;
+var pSlice = Array.prototype.slice;
+var functionsHaveNames = (function () {
+  return function foo() {}.name === 'foo';
+}());
+function pToString (obj) {
+  return Object.prototype.toString.call(obj);
+}
+function isView(arrbuf) {
+  if (isBuffer(arrbuf)) {
+    return false;
+  }
+  if (typeof global.ArrayBuffer !== 'function') {
+    return false;
+  }
+  if (typeof ArrayBuffer.isView === 'function') {
+    return ArrayBuffer.isView(arrbuf);
+  }
+  if (!arrbuf) {
+    return false;
+  }
+  if (arrbuf instanceof DataView) {
+    return true;
+  }
+  if (arrbuf.buffer && arrbuf.buffer instanceof ArrayBuffer) {
+    return true;
+  }
+  return false;
+}
+// 1. The assert module provides functions that throw
+// AssertionError's when particular conditions are not met. The
+// assert module must conform to the following interface.
+
+var assert = module.exports = ok;
+
+// 2. The AssertionError is defined in assert.
+// new assert.AssertionError({ message: message,
+//                             actual: actual,
+//                             expected: expected })
+
+var regex = /\s*function\s+([^\(\s]*)\s*/;
+// based on https://github.com/ljharb/function.prototype.name/blob/adeeeec8bfcc6068b187d7d9fb3d5bb1d3a30899/implementation.js
+function getName(func) {
+  if (!util.isFunction(func)) {
+    return;
+  }
+  if (functionsHaveNames) {
+    return func.name;
+  }
+  var str = func.toString();
+  var match = str.match(regex);
+  return match && match[1];
+}
+assert.AssertionError = function AssertionError(options) {
+  this.name = 'AssertionError';
+  this.actual = options.actual;
+  this.expected = options.expected;
+  this.operator = options.operator;
+  if (options.message) {
+    this.message = options.message;
+    this.generatedMessage = false;
+  } else {
+    this.message = getMessage(this);
+    this.generatedMessage = true;
+  }
+  var stackStartFunction = options.stackStartFunction || fail;
+  if (Error.captureStackTrace) {
+    Error.captureStackTrace(this, stackStartFunction);
+  } else {
+    // non v8 browsers so we can have a stacktrace
+    var err = new Error();
+    if (err.stack) {
+      var out = err.stack;
+
+      // try to strip useless frames
+      var fn_name = getName(stackStartFunction);
+      var idx = out.indexOf('\n' + fn_name);
+      if (idx >= 0) {
+        // once we have located the function frame
+        // we need to strip out everything before it (and its line)
+        var next_line = out.indexOf('\n', idx + 1);
+        out = out.substring(next_line + 1);
+      }
+
+      this.stack = out;
+    }
+  }
+};
+
+// assert.AssertionError instanceof Error
+util.inherits(assert.AssertionError, Error);
+
+function truncate(s, n) {
+  if (typeof s === 'string') {
+    return s.length < n ? s : s.slice(0, n);
+  } else {
+    return s;
+  }
+}
+function inspect(something) {
+  if (functionsHaveNames || !util.isFunction(something)) {
+    return util.inspect(something);
+  }
+  var rawname = getName(something);
+  var name = rawname ? ': ' + rawname : '';
+  return '[Function' +  name + ']';
+}
+function getMessage(self) {
+  return truncate(inspect(self.actual), 128) + ' ' +
+         self.operator + ' ' +
+         truncate(inspect(self.expected), 128);
+}
+
+// At present only the three keys mentioned above are used and
+// understood by the spec. Implementations or sub modules can pass
+// other keys to the AssertionError's constructor - they will be
+// ignored.
+
+// 3. All of the following functions must throw an AssertionError
+// when a corresponding condition is not met, with a message that
+// may be undefined if not provided.  All assertion methods provide
+// both the actual and expected values to the assertion error for
+// display purposes.
+
+function fail(actual, expected, message, operator, stackStartFunction) {
+  throw new assert.AssertionError({
+    message: message,
+    actual: actual,
+    expected: expected,
+    operator: operator,
+    stackStartFunction: stackStartFunction
+  });
+}
+
+// EXTENSION! allows for well behaved errors defined elsewhere.
+assert.fail = fail;
+
+// 4. Pure assertion tests whether a value is truthy, as determined
+// by !!guard.
+// assert.ok(guard, message_opt);
+// This statement is equivalent to assert.equal(true, !!guard,
+// message_opt);. To test strictly for the value true, use
+// assert.strictEqual(true, guard, message_opt);.
+
+function ok(value, message) {
+  if (!value) fail(value, true, message, '==', assert.ok);
+}
+assert.ok = ok;
+
+// 5. The equality assertion tests shallow, coercive equality with
+// ==.
+// assert.equal(actual, expected, message_opt);
+
+assert.equal = function equal(actual, expected, message) {
+  if (actual != expected) fail(actual, expected, message, '==', assert.equal);
+};
+
+// 6. The non-equality assertion tests for whether two objects are not equal
+// with != assert.notEqual(actual, expected, message_opt);
+
+assert.notEqual = function notEqual(actual, expected, message) {
+  if (actual == expected) {
+    fail(actual, expected, message, '!=', assert.notEqual);
+  }
+};
+
+// 7. The equivalence assertion tests a deep equality relation.
+// assert.deepEqual(actual, expected, message_opt);
+
+assert.deepEqual = function deepEqual(actual, expected, message) {
+  if (!_deepEqual(actual, expected, false)) {
+    fail(actual, expected, message, 'deepEqual', assert.deepEqual);
+  }
+};
+
+assert.deepStrictEqual = function deepStrictEqual(actual, expected, message) {
+  if (!_deepEqual(actual, expected, true)) {
+    fail(actual, expected, message, 'deepStrictEqual', assert.deepStrictEqual);
+  }
+};
+
+function _deepEqual(actual, expected, strict, memos) {
+  // 7.1. All identical values are equivalent, as determined by ===.
+  if (actual === expected) {
+    return true;
+  } else if (isBuffer(actual) && isBuffer(expected)) {
+    return compare(actual, expected) === 0;
+
+  // 7.2. If the expected value is a Date object, the actual value is
+  // equivalent if it is also a Date object that refers to the same time.
+  } else if (util.isDate(actual) && util.isDate(expected)) {
+    return actual.getTime() === expected.getTime();
+
+  // 7.3 If the expected value is a RegExp object, the actual value is
+  // equivalent if it is also a RegExp object with the same source and
+  // properties (`global`, `multiline`, `lastIndex`, `ignoreCase`).
+  } else if (util.isRegExp(actual) && util.isRegExp(expected)) {
+    return actual.source === expected.source &&
+           actual.global === expected.global &&
+           actual.multiline === expected.multiline &&
+           actual.lastIndex === expected.lastIndex &&
+           actual.ignoreCase === expected.ignoreCase;
+
+  // 7.4. Other pairs that do not both pass typeof value == 'object',
+  // equivalence is determined by ==.
+  } else if ((actual === null || typeof actual !== 'object') &&
+             (expected === null || typeof expected !== 'object')) {
+    return strict ? actual === expected : actual == expected;
+
+  // If both values are instances of typed arrays, wrap their underlying
+  // ArrayBuffers in a Buffer each to increase performance
+  // This optimization requires the arrays to have the same type as checked by
+  // Object.prototype.toString (aka pToString). Never perform binary
+  // comparisons for Float*Arrays, though, since e.g. +0 === -0 but their
+  // bit patterns are not identical.
+  } else if (isView(actual) && isView(expected) &&
+             pToString(actual) === pToString(expected) &&
+             !(actual instanceof Float32Array ||
+               actual instanceof Float64Array)) {
+    return compare(new Uint8Array(actual.buffer),
+                   new Uint8Array(expected.buffer)) === 0;
+
+  // 7.5 For all other Object pairs, including Array objects, equivalence is
+  // determined by having the same number of owned properties (as verified
+  // with Object.prototype.hasOwnProperty.call), the same set of keys
+  // (although not necessarily the same order), equivalent values for every
+  // corresponding key, and an identical 'prototype' property. Note: this
+  // accounts for both named and indexed properties on Arrays.
+  } else if (isBuffer(actual) !== isBuffer(expected)) {
+    return false;
+  } else {
+    memos = memos || {actual: [], expected: []};
+
+    var actualIndex = memos.actual.indexOf(actual);
+    if (actualIndex !== -1) {
+      if (actualIndex === memos.expected.indexOf(expected)) {
+        return true;
+      }
+    }
+
+    memos.actual.push(actual);
+    memos.expected.push(expected);
+
+    return objEquiv(actual, expected, strict, memos);
+  }
+}
+
+function isArguments(object) {
+  return Object.prototype.toString.call(object) == '[object Arguments]';
+}
+
+function objEquiv(a, b, strict, actualVisitedObjects) {
+  if (a === null || a === undefined || b === null || b === undefined)
+    return false;
+  // if one is a primitive, the other must be same
+  if (util.isPrimitive(a) || util.isPrimitive(b))
+    return a === b;
+  if (strict && Object.getPrototypeOf(a) !== Object.getPrototypeOf(b))
+    return false;
+  var aIsArgs = isArguments(a);
+  var bIsArgs = isArguments(b);
+  if ((aIsArgs && !bIsArgs) || (!aIsArgs && bIsArgs))
+    return false;
+  if (aIsArgs) {
+    a = pSlice.call(a);
+    b = pSlice.call(b);
+    return _deepEqual(a, b, strict);
+  }
+  var ka = objectKeys(a);
+  var kb = objectKeys(b);
+  var key, i;
+  // having the same number of owned properties (keys incorporates
+  // hasOwnProperty)
+  if (ka.length !== kb.length)
+    return false;
+  //the same set of keys (although not necessarily the same order),
+  ka.sort();
+  kb.sort();
+  //~~~cheap key test
+  for (i = ka.length - 1; i >= 0; i--) {
+    if (ka[i] !== kb[i])
+      return false;
+  }
+  //equivalent values for every corresponding key, and
+  //~~~possibly expensive deep test
+  for (i = ka.length - 1; i >= 0; i--) {
+    key = ka[i];
+    if (!_deepEqual(a[key], b[key], strict, actualVisitedObjects))
+      return false;
+  }
+  return true;
+}
+
+// 8. The non-equivalence assertion tests for any deep inequality.
+// assert.notDeepEqual(actual, expected, message_opt);
+
+assert.notDeepEqual = function notDeepEqual(actual, expected, message) {
+  if (_deepEqual(actual, expected, false)) {
+    fail(actual, expected, message, 'notDeepEqual', assert.notDeepEqual);
+  }
+};
+
+assert.notDeepStrictEqual = notDeepStrictEqual;
+function notDeepStrictEqual(actual, expected, message) {
+  if (_deepEqual(actual, expected, true)) {
+    fail(actual, expected, message, 'notDeepStrictEqual', notDeepStrictEqual);
+  }
+}
+
+
+// 9. The strict equality assertion tests strict equality, as determined by ===.
+// assert.strictEqual(actual, expected, message_opt);
+
+assert.strictEqual = function strictEqual(actual, expected, message) {
+  if (actual !== expected) {
+    fail(actual, expected, message, '===', assert.strictEqual);
+  }
+};
+
+// 10. The strict non-equality assertion tests for strict inequality, as
+// determined by !==.  assert.notStrictEqual(actual, expected, message_opt);
+
+assert.notStrictEqual = function notStrictEqual(actual, expected, message) {
+  if (actual === expected) {
+    fail(actual, expected, message, '!==', assert.notStrictEqual);
+  }
+};
+
+function expectedException(actual, expected) {
+  if (!actual || !expected) {
+    return false;
+  }
+
+  if (Object.prototype.toString.call(expected) == '[object RegExp]') {
+    return expected.test(actual);
+  }
+
+  try {
+    if (actual instanceof expected) {
+      return true;
+    }
+  } catch (e) {
+    // Ignore.  The instanceof check doesn't work for arrow functions.
+  }
+
+  if (Error.isPrototypeOf(expected)) {
+    return false;
+  }
+
+  return expected.call({}, actual) === true;
+}
+
+function _tryBlock(block) {
+  var error;
+  try {
+    block();
+  } catch (e) {
+    error = e;
+  }
+  return error;
+}
+
+function _throws(shouldThrow, block, expected, message) {
+  var actual;
+
+  if (typeof block !== 'function') {
+    throw new TypeError('"block" argument must be a function');
+  }
+
+  if (typeof expected === 'string') {
+    message = expected;
+    expected = null;
+  }
+
+  actual = _tryBlock(block);
+
+  message = (expected && expected.name ? ' (' + expected.name + ').' : '.') +
+            (message ? ' ' + message : '.');
+
+  if (shouldThrow && !actual) {
+    fail(actual, expected, 'Missing expected exception' + message);
+  }
+
+  var userProvidedMessage = typeof message === 'string';
+  var isUnwantedException = !shouldThrow && util.isError(actual);
+  var isUnexpectedException = !shouldThrow && actual && !expected;
+
+  if ((isUnwantedException &&
+      userProvidedMessage &&
+      expectedException(actual, expected)) ||
+      isUnexpectedException) {
+    fail(actual, expected, 'Got unwanted exception' + message);
+  }
+
+  if ((shouldThrow && actual && expected &&
+      !expectedException(actual, expected)) || (!shouldThrow && actual)) {
+    throw actual;
+  }
+}
+
+// 11. Expected to throw an error:
+// assert.throws(block, Error_opt, message_opt);
+
+assert.throws = function(block, /*optional*/error, /*optional*/message) {
+  _throws(true, block, error, message);
+};
+
+// EXTENSION! This is annoying to write outside this module.
+assert.doesNotThrow = function(block, /*optional*/error, /*optional*/message) {
+  _throws(false, block, error, message);
+};
+
+assert.ifError = function(err) { if (err) throw err; };
+
+var objectKeys = Object.keys || function (obj) {
+  var keys = [];
+  for (var key in obj) {
+    if (hasOwn.call(obj, key)) keys.push(key);
+  }
+  return keys;
+};
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+
+/***/ }),
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2090,7 +3454,7 @@ function fromByteArray (uint8) {
 
 
 /***/ }),
-/* 5 */
+/* 12 */
 /***/ (function(module, exports) {
 
 var toString = {}.toString;
@@ -2101,7 +3465,315 @@ module.exports = Array.isArray || function (arr) {
 
 
 /***/ }),
-/* 6 */
+/* 13 */
+/***/ (function(module, exports) {
+
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+function EventEmitter() {
+  this._events = this._events || {};
+  this._maxListeners = this._maxListeners || undefined;
+}
+module.exports = EventEmitter;
+
+// Backwards-compat with node 0.10.x
+EventEmitter.EventEmitter = EventEmitter;
+
+EventEmitter.prototype._events = undefined;
+EventEmitter.prototype._maxListeners = undefined;
+
+// By default EventEmitters will print a warning if more than 10 listeners are
+// added to it. This is a useful default which helps finding memory leaks.
+EventEmitter.defaultMaxListeners = 10;
+
+// Obviously not all Emitters should be limited to 10. This function allows
+// that to be increased. Set to zero for unlimited.
+EventEmitter.prototype.setMaxListeners = function(n) {
+  if (!isNumber(n) || n < 0 || isNaN(n))
+    throw TypeError('n must be a positive number');
+  this._maxListeners = n;
+  return this;
+};
+
+EventEmitter.prototype.emit = function(type) {
+  var er, handler, len, args, i, listeners;
+
+  if (!this._events)
+    this._events = {};
+
+  // If there is no 'error' event listener then throw.
+  if (type === 'error') {
+    if (!this._events.error ||
+        (isObject(this._events.error) && !this._events.error.length)) {
+      er = arguments[1];
+      if (er instanceof Error) {
+        throw er; // Unhandled 'error' event
+      } else {
+        // At least give some kind of context to the user
+        var err = new Error('Uncaught, unspecified "error" event. (' + er + ')');
+        err.context = er;
+        throw err;
+      }
+    }
+  }
+
+  handler = this._events[type];
+
+  if (isUndefined(handler))
+    return false;
+
+  if (isFunction(handler)) {
+    switch (arguments.length) {
+      // fast cases
+      case 1:
+        handler.call(this);
+        break;
+      case 2:
+        handler.call(this, arguments[1]);
+        break;
+      case 3:
+        handler.call(this, arguments[1], arguments[2]);
+        break;
+      // slower
+      default:
+        args = Array.prototype.slice.call(arguments, 1);
+        handler.apply(this, args);
+    }
+  } else if (isObject(handler)) {
+    args = Array.prototype.slice.call(arguments, 1);
+    listeners = handler.slice();
+    len = listeners.length;
+    for (i = 0; i < len; i++)
+      listeners[i].apply(this, args);
+  }
+
+  return true;
+};
+
+EventEmitter.prototype.addListener = function(type, listener) {
+  var m;
+
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  if (!this._events)
+    this._events = {};
+
+  // To avoid recursion in the case that type === "newListener"! Before
+  // adding it to the listeners, first emit "newListener".
+  if (this._events.newListener)
+    this.emit('newListener', type,
+              isFunction(listener.listener) ?
+              listener.listener : listener);
+
+  if (!this._events[type])
+    // Optimize the case of one listener. Don't need the extra array object.
+    this._events[type] = listener;
+  else if (isObject(this._events[type]))
+    // If we've already got an array, just append.
+    this._events[type].push(listener);
+  else
+    // Adding the second element, need to change to array.
+    this._events[type] = [this._events[type], listener];
+
+  // Check for listener leak
+  if (isObject(this._events[type]) && !this._events[type].warned) {
+    if (!isUndefined(this._maxListeners)) {
+      m = this._maxListeners;
+    } else {
+      m = EventEmitter.defaultMaxListeners;
+    }
+
+    if (m && m > 0 && this._events[type].length > m) {
+      this._events[type].warned = true;
+      console.error('(node) warning: possible EventEmitter memory ' +
+                    'leak detected. %d listeners added. ' +
+                    'Use emitter.setMaxListeners() to increase limit.',
+                    this._events[type].length);
+      if (typeof console.trace === 'function') {
+        // not supported in IE 10
+        console.trace();
+      }
+    }
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.on = EventEmitter.prototype.addListener;
+
+EventEmitter.prototype.once = function(type, listener) {
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  var fired = false;
+
+  function g() {
+    this.removeListener(type, g);
+
+    if (!fired) {
+      fired = true;
+      listener.apply(this, arguments);
+    }
+  }
+
+  g.listener = listener;
+  this.on(type, g);
+
+  return this;
+};
+
+// emits a 'removeListener' event iff the listener was removed
+EventEmitter.prototype.removeListener = function(type, listener) {
+  var list, position, length, i;
+
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  if (!this._events || !this._events[type])
+    return this;
+
+  list = this._events[type];
+  length = list.length;
+  position = -1;
+
+  if (list === listener ||
+      (isFunction(list.listener) && list.listener === listener)) {
+    delete this._events[type];
+    if (this._events.removeListener)
+      this.emit('removeListener', type, listener);
+
+  } else if (isObject(list)) {
+    for (i = length; i-- > 0;) {
+      if (list[i] === listener ||
+          (list[i].listener && list[i].listener === listener)) {
+        position = i;
+        break;
+      }
+    }
+
+    if (position < 0)
+      return this;
+
+    if (list.length === 1) {
+      list.length = 0;
+      delete this._events[type];
+    } else {
+      list.splice(position, 1);
+    }
+
+    if (this._events.removeListener)
+      this.emit('removeListener', type, listener);
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.removeAllListeners = function(type) {
+  var key, listeners;
+
+  if (!this._events)
+    return this;
+
+  // not listening for removeListener, no need to emit
+  if (!this._events.removeListener) {
+    if (arguments.length === 0)
+      this._events = {};
+    else if (this._events[type])
+      delete this._events[type];
+    return this;
+  }
+
+  // emit removeListener for all listeners on all events
+  if (arguments.length === 0) {
+    for (key in this._events) {
+      if (key === 'removeListener') continue;
+      this.removeAllListeners(key);
+    }
+    this.removeAllListeners('removeListener');
+    this._events = {};
+    return this;
+  }
+
+  listeners = this._events[type];
+
+  if (isFunction(listeners)) {
+    this.removeListener(type, listeners);
+  } else if (listeners) {
+    // LIFO order
+    while (listeners.length)
+      this.removeListener(type, listeners[listeners.length - 1]);
+  }
+  delete this._events[type];
+
+  return this;
+};
+
+EventEmitter.prototype.listeners = function(type) {
+  var ret;
+  if (!this._events || !this._events[type])
+    ret = [];
+  else if (isFunction(this._events[type]))
+    ret = [this._events[type]];
+  else
+    ret = this._events[type].slice();
+  return ret;
+};
+
+EventEmitter.prototype.listenerCount = function(type) {
+  if (this._events) {
+    var evlistener = this._events[type];
+
+    if (isFunction(evlistener))
+      return 1;
+    else if (evlistener)
+      return evlistener.length;
+  }
+  return 0;
+};
+
+EventEmitter.listenerCount = function(emitter, type) {
+  return emitter.listenerCount(type);
+};
+
+function isFunction(arg) {
+  return typeof arg === 'function';
+}
+
+function isNumber(arg) {
+  return typeof arg === 'number';
+}
+
+function isObject(arg) {
+  return typeof arg === 'object' && arg !== null;
+}
+
+function isUndefined(arg) {
+  return arg === void 0;
+}
+
+
+/***/ }),
+/* 14 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -2191,7 +3863,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
-/* 7 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var util = __webpack_require__(1);
@@ -2230,7 +3902,7 @@ module.exports = {
 
 
 /***/ }),
-/* 8 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var util = __webpack_require__(1);
@@ -2285,7 +3957,7 @@ module.exports = {
 
 
 /***/ }),
-/* 9 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {// ndef.js
@@ -2294,8 +3966,8 @@ module.exports = {
 // This code is from phonegap-nfc.js https://github.com/don/phonegap-nfc
 
 var util = __webpack_require__(1),
-    textHelper = __webpack_require__(7),
-    uriHelper = __webpack_require__(8);
+    textHelper = __webpack_require__(15),
+    uriHelper = __webpack_require__(16);
 
 var ndef = {
 
@@ -2845,197 +4517,7 @@ module.exports = ndef;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 10 */
-/***/ (function(module, exports) {
-
-// shim for using process in browser
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-process.prependListener = noop;
-process.prependOnceListener = noop;
-
-process.listeners = function (name) { return [] }
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-
-/***/ }),
-/* 11 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3076,8 +4558,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var exec = __webpack_require__(3);
-var ndef = __webpack_require__(2);
+var exec = __webpack_require__(9);
+var ndef = __webpack_require__(7);
+var ndef_lib_1 = __webpack_require__(8);
 function noop() {
     // empty
 }
@@ -3213,60 +4696,6 @@ module.exports = {
             console.log('ERROR: FlomioPlugin.addNdefListener: ' + failure);
         }, 'FlomioPlugin', 'setNdefDiscoveredCallback', []);
     },
-    readNdef: function (resultCallback, deviceId) {
-        var _this = this;
-        var fullResponse = '';
-        var apdus = [];
-        var numberOfPages;
-        this.readCapabilityContainer(devices[0].deviceId).then(function (capabilityContainer) {
-            capabilityContainer = capabilityContainer.replace(/\s/g, ''); // remove spaces
-            if (capabilityContainer.substring(0, 2) === 'E1') {
-                var length_1 = parseInt(capabilityContainer.substring(4, 6), 16);
-                console.log('capabilityContainer: ' + capabilityContainer);
-                console.log('length: ' + length_1);
-                var numberOfBytes = length_1 * 8;
-                numberOfPages = numberOfBytes / 4;
-                console.log('number of pages: ' + numberOfPages);
-                // E1 00 byteSize (divided by 8) 00... eg E1 10 06 00 = 48 bytes
-                // length * 8 = number of bytes
-                // number of bytes / 4 = number of pages
-            }
-            console.log(JSON.stringify(numberOfPages));
-            for (var page = 4; page < numberOfPages; page += 4) {
-                var n = '';
-                page >= 16 ? n = '' + page.toString(16) : n = '0' + page.toString(16);
-                var apdu = 'FFB000' + n + '10';
-                // store each sendApdu promise
-                apdus.push(_this.sendApdu(noop, deviceId, apdu).then(function (responseApdu) {
-                    console.log('response apdu: ' + responseApdu);
-                    fullResponse = fullResponse.concat(responseApdu.slice(0, -5));
-                }, function (err) {
-                    console.error(err);
-                }));
-            }
-            // send all apdus and capture result
-            Promise.all(apdus).then(function () {
-                fullResponse = fullResponse.replace(/\s/g, ''); // remove spaces
-                if (fullResponse.substring(0, 2) === '03') {
-                    var length_2 = parseInt(fullResponse.substring(2, 4), 16);
-                    var payloadOffset = 4;
-                    var payload = fullResponse.substring(payloadOffset, (length_2 * 2) + payloadOffset);
-                    console.log('length: ' + length_2 + ' payload: ' + payload);
-                    var byteArray = new Buffer(payload, 'hex').toJSON().data;
-                    console.log('byteArray: ' + byteArray);
-                    var ndefMessage = ndef.decodeMessage(byteArray);
-                    resultCallback({ ndefMessage: ndefMessage });
-                }
-                else {
-                    resultCallback({ rawData: fullResponse });
-                }
-            }, function (reason) {
-                console.log(reason);
-            });
-        }, function (err) {
-            console.log(err);
-        });
-    },
     writeNdef: function (resultCallback, deviceId, ndefMessage) {
         console.log('writeNdef');
         console.log(deviceId);
@@ -3306,6 +4735,66 @@ module.exports = {
                 reject();
                 console.log('ERROR: FlomioPlugin.launchNativeNfc: ' + failure);
             }, 'FlomioPlugin', 'launchNativeNfc', []);
+        });
+    },
+    readNdef: function (resultCallback, deviceId) {
+        return __awaiter(this, void 0, void 0, function () {
+            var fullResponse, apdus, numberOfPages, capabilityContainer, length_1, numberOfBytes, parser, messages, page, n, apdu, response, buffer;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        fullResponse = '';
+                        apdus = [];
+                        return [4 /*yield*/, this.readCapabilityContainer(devices[0].deviceId)];
+                    case 1:
+                        capabilityContainer = _a.sent();
+                        capabilityContainer = util.removeSpaces(capabilityContainer);
+                        if (capabilityContainer.substring(0, 2) === 'E1') {
+                            length_1 = parseInt(capabilityContainer.substring(4, 6), 16);
+                            console.log('capabilityContainer: ' + capabilityContainer);
+                            console.log('length: ' + length_1);
+                            numberOfBytes = length_1 * 8;
+                            numberOfPages = numberOfBytes / 4;
+                            console.log('number of pages: ' + numberOfPages);
+                            // E1 00 byteSize (divided by 8) 00... eg E1 10 06 00 = 48 bytes
+                            // length * 8 = number of bytes
+                            // number of bytes / 4 = number of pages
+                        }
+                        else {
+                            console.log('capabilityContainer not formatted correctly');
+                        }
+                        parser = new ndef_lib_1.PushParser();
+                        messages = [];
+                        parser.on('record', function (record) {
+                            console.log('found record');
+                            messages.push(record);
+                        });
+                        parser.on('messageEnd', function () {
+                            resultCallback({ ndefMessage: messages });
+                        });
+                        console.log(JSON.stringify(numberOfPages));
+                        page = 4;
+                        _a.label = 2;
+                    case 2:
+                        if (!(page < numberOfPages)) return [3 /*break*/, 5];
+                        n = '';
+                        page >= 16 ? n = '' + page.toString(16) : n = '0' + page.toString(16);
+                        apdu = 'FFB000' + n + '10';
+                        console.log('send apdu ' + apdu);
+                        return [4 /*yield*/, this.sendApdu(noop, devices[0].deviceId, apdu)];
+                    case 3:
+                        response = _a.sent();
+                        console.log('response apdu ' + response);
+                        buffer = util.responseToBuffer(response);
+                        console.log('buffer ' + buffer.toJSON().data);
+                        parser.push(buffer);
+                        _a.label = 4;
+                    case 4:
+                        page += 4;
+                        return [3 /*break*/, 2];
+                    case 5: return [2 /*return*/];
+                }
+            });
         });
     },
     readPage: function (deviceId, page) {
@@ -3612,6 +5101,14 @@ var util = {
             return (util.bytesToString(record.type) === recordType);
         }
         return false;
+    },
+    responseToBuffer: function (response) {
+        response = util.removeSpaces(response);
+        response = response.slice(0, -4);
+        return Buffer.from(response, 'hex');
+    },
+    removeSpaces: function (stringWithSpaces) {
+        return stringWithSpaces.replace(/\s/g, '');
     }
 };
 // this is a module in ndef-js
@@ -3696,31 +5193,950 @@ ndef.textHelper = textHelper;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 12 */
+/* 19 */
 /***/ (function(module, exports) {
 
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1,eval)("this");
-} catch(e) {
-	// This works if the window reference is available
-	if(typeof window === "object")
-		g = window;
+if (typeof Object.create === 'function') {
+  // implementation from standard node.js 'util' module
+  module.exports = function inherits(ctor, superCtor) {
+    ctor.super_ = superCtor
+    ctor.prototype = Object.create(superCtor.prototype, {
+      constructor: {
+        value: ctor,
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }
+    });
+  };
+} else {
+  // old school shim for old browsers
+  module.exports = function inherits(ctor, superCtor) {
+    ctor.super_ = superCtor
+    var TempCtor = function () {}
+    TempCtor.prototype = superCtor.prototype
+    ctor.prototype = new TempCtor()
+    ctor.prototype.constructor = ctor
+  }
 }
 
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
 
-module.exports = g;
+/***/ }),
+/* 20 */
+/***/ (function(module, exports) {
 
+module.exports = function isBuffer(arg) {
+  return arg && typeof arg === 'object'
+    && typeof arg.copy === 'function'
+    && typeof arg.fill === 'function'
+    && typeof arg.readUInt8 === 'function';
+}
+
+/***/ }),
+/* 21 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(global, process) {// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+var formatRegExp = /%[sdj%]/g;
+exports.format = function(f) {
+  if (!isString(f)) {
+    var objects = [];
+    for (var i = 0; i < arguments.length; i++) {
+      objects.push(inspect(arguments[i]));
+    }
+    return objects.join(' ');
+  }
+
+  var i = 1;
+  var args = arguments;
+  var len = args.length;
+  var str = String(f).replace(formatRegExp, function(x) {
+    if (x === '%%') return '%';
+    if (i >= len) return x;
+    switch (x) {
+      case '%s': return String(args[i++]);
+      case '%d': return Number(args[i++]);
+      case '%j':
+        try {
+          return JSON.stringify(args[i++]);
+        } catch (_) {
+          return '[Circular]';
+        }
+      default:
+        return x;
+    }
+  });
+  for (var x = args[i]; i < len; x = args[++i]) {
+    if (isNull(x) || !isObject(x)) {
+      str += ' ' + x;
+    } else {
+      str += ' ' + inspect(x);
+    }
+  }
+  return str;
+};
+
+
+// Mark that a method should not be used.
+// Returns a modified function which warns once by default.
+// If --no-deprecation is set, then it is a no-op.
+exports.deprecate = function(fn, msg) {
+  // Allow for deprecating things in the process of starting up.
+  if (isUndefined(global.process)) {
+    return function() {
+      return exports.deprecate(fn, msg).apply(this, arguments);
+    };
+  }
+
+  if (process.noDeprecation === true) {
+    return fn;
+  }
+
+  var warned = false;
+  function deprecated() {
+    if (!warned) {
+      if (process.throwDeprecation) {
+        throw new Error(msg);
+      } else if (process.traceDeprecation) {
+        console.trace(msg);
+      } else {
+        console.error(msg);
+      }
+      warned = true;
+    }
+    return fn.apply(this, arguments);
+  }
+
+  return deprecated;
+};
+
+
+var debugs = {};
+var debugEnviron;
+exports.debuglog = function(set) {
+  if (isUndefined(debugEnviron))
+    debugEnviron = process.env.NODE_DEBUG || '';
+  set = set.toUpperCase();
+  if (!debugs[set]) {
+    if (new RegExp('\\b' + set + '\\b', 'i').test(debugEnviron)) {
+      var pid = process.pid;
+      debugs[set] = function() {
+        var msg = exports.format.apply(exports, arguments);
+        console.error('%s %d: %s', set, pid, msg);
+      };
+    } else {
+      debugs[set] = function() {};
+    }
+  }
+  return debugs[set];
+};
+
+
+/**
+ * Echos the value of a value. Trys to print the value out
+ * in the best way possible given the different types.
+ *
+ * @param {Object} obj The object to print out.
+ * @param {Object} opts Optional options object that alters the output.
+ */
+/* legacy: obj, showHidden, depth, colors*/
+function inspect(obj, opts) {
+  // default options
+  var ctx = {
+    seen: [],
+    stylize: stylizeNoColor
+  };
+  // legacy...
+  if (arguments.length >= 3) ctx.depth = arguments[2];
+  if (arguments.length >= 4) ctx.colors = arguments[3];
+  if (isBoolean(opts)) {
+    // legacy...
+    ctx.showHidden = opts;
+  } else if (opts) {
+    // got an "options" object
+    exports._extend(ctx, opts);
+  }
+  // set default options
+  if (isUndefined(ctx.showHidden)) ctx.showHidden = false;
+  if (isUndefined(ctx.depth)) ctx.depth = 2;
+  if (isUndefined(ctx.colors)) ctx.colors = false;
+  if (isUndefined(ctx.customInspect)) ctx.customInspect = true;
+  if (ctx.colors) ctx.stylize = stylizeWithColor;
+  return formatValue(ctx, obj, ctx.depth);
+}
+exports.inspect = inspect;
+
+
+// http://en.wikipedia.org/wiki/ANSI_escape_code#graphics
+inspect.colors = {
+  'bold' : [1, 22],
+  'italic' : [3, 23],
+  'underline' : [4, 24],
+  'inverse' : [7, 27],
+  'white' : [37, 39],
+  'grey' : [90, 39],
+  'black' : [30, 39],
+  'blue' : [34, 39],
+  'cyan' : [36, 39],
+  'green' : [32, 39],
+  'magenta' : [35, 39],
+  'red' : [31, 39],
+  'yellow' : [33, 39]
+};
+
+// Don't use 'blue' not visible on cmd.exe
+inspect.styles = {
+  'special': 'cyan',
+  'number': 'yellow',
+  'boolean': 'yellow',
+  'undefined': 'grey',
+  'null': 'bold',
+  'string': 'green',
+  'date': 'magenta',
+  // "name": intentionally not styling
+  'regexp': 'red'
+};
+
+
+function stylizeWithColor(str, styleType) {
+  var style = inspect.styles[styleType];
+
+  if (style) {
+    return '\u001b[' + inspect.colors[style][0] + 'm' + str +
+           '\u001b[' + inspect.colors[style][1] + 'm';
+  } else {
+    return str;
+  }
+}
+
+
+function stylizeNoColor(str, styleType) {
+  return str;
+}
+
+
+function arrayToHash(array) {
+  var hash = {};
+
+  array.forEach(function(val, idx) {
+    hash[val] = true;
+  });
+
+  return hash;
+}
+
+
+function formatValue(ctx, value, recurseTimes) {
+  // Provide a hook for user-specified inspect functions.
+  // Check that value is an object with an inspect function on it
+  if (ctx.customInspect &&
+      value &&
+      isFunction(value.inspect) &&
+      // Filter out the util module, it's inspect function is special
+      value.inspect !== exports.inspect &&
+      // Also filter out any prototype objects using the circular check.
+      !(value.constructor && value.constructor.prototype === value)) {
+    var ret = value.inspect(recurseTimes, ctx);
+    if (!isString(ret)) {
+      ret = formatValue(ctx, ret, recurseTimes);
+    }
+    return ret;
+  }
+
+  // Primitive types cannot have properties
+  var primitive = formatPrimitive(ctx, value);
+  if (primitive) {
+    return primitive;
+  }
+
+  // Look up the keys of the object.
+  var keys = Object.keys(value);
+  var visibleKeys = arrayToHash(keys);
+
+  if (ctx.showHidden) {
+    keys = Object.getOwnPropertyNames(value);
+  }
+
+  // IE doesn't make error fields non-enumerable
+  // http://msdn.microsoft.com/en-us/library/ie/dww52sbt(v=vs.94).aspx
+  if (isError(value)
+      && (keys.indexOf('message') >= 0 || keys.indexOf('description') >= 0)) {
+    return formatError(value);
+  }
+
+  // Some type of object without properties can be shortcutted.
+  if (keys.length === 0) {
+    if (isFunction(value)) {
+      var name = value.name ? ': ' + value.name : '';
+      return ctx.stylize('[Function' + name + ']', 'special');
+    }
+    if (isRegExp(value)) {
+      return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
+    }
+    if (isDate(value)) {
+      return ctx.stylize(Date.prototype.toString.call(value), 'date');
+    }
+    if (isError(value)) {
+      return formatError(value);
+    }
+  }
+
+  var base = '', array = false, braces = ['{', '}'];
+
+  // Make Array say that they are Array
+  if (isArray(value)) {
+    array = true;
+    braces = ['[', ']'];
+  }
+
+  // Make functions say that they are functions
+  if (isFunction(value)) {
+    var n = value.name ? ': ' + value.name : '';
+    base = ' [Function' + n + ']';
+  }
+
+  // Make RegExps say that they are RegExps
+  if (isRegExp(value)) {
+    base = ' ' + RegExp.prototype.toString.call(value);
+  }
+
+  // Make dates with properties first say the date
+  if (isDate(value)) {
+    base = ' ' + Date.prototype.toUTCString.call(value);
+  }
+
+  // Make error with message first say the error
+  if (isError(value)) {
+    base = ' ' + formatError(value);
+  }
+
+  if (keys.length === 0 && (!array || value.length == 0)) {
+    return braces[0] + base + braces[1];
+  }
+
+  if (recurseTimes < 0) {
+    if (isRegExp(value)) {
+      return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
+    } else {
+      return ctx.stylize('[Object]', 'special');
+    }
+  }
+
+  ctx.seen.push(value);
+
+  var output;
+  if (array) {
+    output = formatArray(ctx, value, recurseTimes, visibleKeys, keys);
+  } else {
+    output = keys.map(function(key) {
+      return formatProperty(ctx, value, recurseTimes, visibleKeys, key, array);
+    });
+  }
+
+  ctx.seen.pop();
+
+  return reduceToSingleString(output, base, braces);
+}
+
+
+function formatPrimitive(ctx, value) {
+  if (isUndefined(value))
+    return ctx.stylize('undefined', 'undefined');
+  if (isString(value)) {
+    var simple = '\'' + JSON.stringify(value).replace(/^"|"$/g, '')
+                                             .replace(/'/g, "\\'")
+                                             .replace(/\\"/g, '"') + '\'';
+    return ctx.stylize(simple, 'string');
+  }
+  if (isNumber(value))
+    return ctx.stylize('' + value, 'number');
+  if (isBoolean(value))
+    return ctx.stylize('' + value, 'boolean');
+  // For some reason typeof null is "object", so special case here.
+  if (isNull(value))
+    return ctx.stylize('null', 'null');
+}
+
+
+function formatError(value) {
+  return '[' + Error.prototype.toString.call(value) + ']';
+}
+
+
+function formatArray(ctx, value, recurseTimes, visibleKeys, keys) {
+  var output = [];
+  for (var i = 0, l = value.length; i < l; ++i) {
+    if (hasOwnProperty(value, String(i))) {
+      output.push(formatProperty(ctx, value, recurseTimes, visibleKeys,
+          String(i), true));
+    } else {
+      output.push('');
+    }
+  }
+  keys.forEach(function(key) {
+    if (!key.match(/^\d+$/)) {
+      output.push(formatProperty(ctx, value, recurseTimes, visibleKeys,
+          key, true));
+    }
+  });
+  return output;
+}
+
+
+function formatProperty(ctx, value, recurseTimes, visibleKeys, key, array) {
+  var name, str, desc;
+  desc = Object.getOwnPropertyDescriptor(value, key) || { value: value[key] };
+  if (desc.get) {
+    if (desc.set) {
+      str = ctx.stylize('[Getter/Setter]', 'special');
+    } else {
+      str = ctx.stylize('[Getter]', 'special');
+    }
+  } else {
+    if (desc.set) {
+      str = ctx.stylize('[Setter]', 'special');
+    }
+  }
+  if (!hasOwnProperty(visibleKeys, key)) {
+    name = '[' + key + ']';
+  }
+  if (!str) {
+    if (ctx.seen.indexOf(desc.value) < 0) {
+      if (isNull(recurseTimes)) {
+        str = formatValue(ctx, desc.value, null);
+      } else {
+        str = formatValue(ctx, desc.value, recurseTimes - 1);
+      }
+      if (str.indexOf('\n') > -1) {
+        if (array) {
+          str = str.split('\n').map(function(line) {
+            return '  ' + line;
+          }).join('\n').substr(2);
+        } else {
+          str = '\n' + str.split('\n').map(function(line) {
+            return '   ' + line;
+          }).join('\n');
+        }
+      }
+    } else {
+      str = ctx.stylize('[Circular]', 'special');
+    }
+  }
+  if (isUndefined(name)) {
+    if (array && key.match(/^\d+$/)) {
+      return str;
+    }
+    name = JSON.stringify('' + key);
+    if (name.match(/^"([a-zA-Z_][a-zA-Z_0-9]*)"$/)) {
+      name = name.substr(1, name.length - 2);
+      name = ctx.stylize(name, 'name');
+    } else {
+      name = name.replace(/'/g, "\\'")
+                 .replace(/\\"/g, '"')
+                 .replace(/(^"|"$)/g, "'");
+      name = ctx.stylize(name, 'string');
+    }
+  }
+
+  return name + ': ' + str;
+}
+
+
+function reduceToSingleString(output, base, braces) {
+  var numLinesEst = 0;
+  var length = output.reduce(function(prev, cur) {
+    numLinesEst++;
+    if (cur.indexOf('\n') >= 0) numLinesEst++;
+    return prev + cur.replace(/\u001b\[\d\d?m/g, '').length + 1;
+  }, 0);
+
+  if (length > 60) {
+    return braces[0] +
+           (base === '' ? '' : base + '\n ') +
+           ' ' +
+           output.join(',\n  ') +
+           ' ' +
+           braces[1];
+  }
+
+  return braces[0] + base + ' ' + output.join(', ') + ' ' + braces[1];
+}
+
+
+// NOTE: These type checking functions intentionally don't use `instanceof`
+// because it is fragile and can be easily faked with `Object.create()`.
+function isArray(ar) {
+  return Array.isArray(ar);
+}
+exports.isArray = isArray;
+
+function isBoolean(arg) {
+  return typeof arg === 'boolean';
+}
+exports.isBoolean = isBoolean;
+
+function isNull(arg) {
+  return arg === null;
+}
+exports.isNull = isNull;
+
+function isNullOrUndefined(arg) {
+  return arg == null;
+}
+exports.isNullOrUndefined = isNullOrUndefined;
+
+function isNumber(arg) {
+  return typeof arg === 'number';
+}
+exports.isNumber = isNumber;
+
+function isString(arg) {
+  return typeof arg === 'string';
+}
+exports.isString = isString;
+
+function isSymbol(arg) {
+  return typeof arg === 'symbol';
+}
+exports.isSymbol = isSymbol;
+
+function isUndefined(arg) {
+  return arg === void 0;
+}
+exports.isUndefined = isUndefined;
+
+function isRegExp(re) {
+  return isObject(re) && objectToString(re) === '[object RegExp]';
+}
+exports.isRegExp = isRegExp;
+
+function isObject(arg) {
+  return typeof arg === 'object' && arg !== null;
+}
+exports.isObject = isObject;
+
+function isDate(d) {
+  return isObject(d) && objectToString(d) === '[object Date]';
+}
+exports.isDate = isDate;
+
+function isError(e) {
+  return isObject(e) &&
+      (objectToString(e) === '[object Error]' || e instanceof Error);
+}
+exports.isError = isError;
+
+function isFunction(arg) {
+  return typeof arg === 'function';
+}
+exports.isFunction = isFunction;
+
+function isPrimitive(arg) {
+  return arg === null ||
+         typeof arg === 'boolean' ||
+         typeof arg === 'number' ||
+         typeof arg === 'string' ||
+         typeof arg === 'symbol' ||  // ES6 symbol
+         typeof arg === 'undefined';
+}
+exports.isPrimitive = isPrimitive;
+
+exports.isBuffer = __webpack_require__(20);
+
+function objectToString(o) {
+  return Object.prototype.toString.call(o);
+}
+
+
+function pad(n) {
+  return n < 10 ? '0' + n.toString(10) : n.toString(10);
+}
+
+
+var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep',
+              'Oct', 'Nov', 'Dec'];
+
+// 26 Feb 16:19:34
+function timestamp() {
+  var d = new Date();
+  var time = [pad(d.getHours()),
+              pad(d.getMinutes()),
+              pad(d.getSeconds())].join(':');
+  return [d.getDate(), months[d.getMonth()], time].join(' ');
+}
+
+
+// log is just a thin wrapper to console.log that prepends a timestamp
+exports.log = function() {
+  console.log('%s - %s', timestamp(), exports.format.apply(exports, arguments));
+};
+
+
+/**
+ * Inherit the prototype methods from one constructor into another.
+ *
+ * The Function.prototype.inherits from lang.js rewritten as a standalone
+ * function (not on Function.prototype). NOTE: If this file is to be loaded
+ * during bootstrapping this function needs to be rewritten using some native
+ * functions as prototype setup using normal JavaScript does not work as
+ * expected during bootstrapping (see mirror.js in r114903).
+ *
+ * @param {function} ctor Constructor function which needs to inherit the
+ *     prototype.
+ * @param {function} superCtor Constructor function to inherit prototype from.
+ */
+exports.inherits = __webpack_require__(19);
+
+exports._extend = function(origin, add) {
+  // Don't do anything if add isn't an object
+  if (!add || !isObject(add)) return origin;
+
+  var keys = Object.keys(add);
+  var i = keys.length;
+  while (i--) {
+    origin[keys[i]] = add[keys[i]];
+  }
+  return origin;
+};
+
+function hasOwnProperty(obj, prop) {
+  return Object.prototype.hasOwnProperty.call(obj, prop);
+}
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(2)))
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var util = __webpack_require__(4);
+// decode text bytes from ndef record payload
+// @returns a string
+function decodePayload(data) {
+    var // 6 LSBs
+    languageCodeLength = (data[0] & 0x3F); // assuming UTF-16BE
+    // TODO need to deal with UTF in the future
+    // console.log("lang " + languageCode + (utf16 ? " utf16" : " utf8"));
+    var languageCode = data.slice(1, 1 + languageCodeLength);
+    var utf16 = (data[0] & 0x80) !== 0;
+    return util.bytesToString(data.slice(languageCodeLength + 1));
+}
+exports.decodePayload = decodePayload;
+// encode text payload
+// @returns an array of bytes
+function encodePayload(text, lang, encoding) {
+    // ISO/IANA language code, but we're not enforcing
+    if (!lang) {
+        lang = 'en';
+    }
+    var encoded = util.stringToBytes(lang + text);
+    encoded.unshift(lang.length);
+    return encoded;
+}
+exports.encodePayload = encodePayload;
+//# sourceMappingURL=ndef-text.js.map
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var util = __webpack_require__(4);
+// URI identifier codes from URI Record Type Definition NFCForum-TS-RTD_URI_1.0 2006-07-24
+// index in array matches code in the spec
+var protocols = ['', 'http://www.', 'https://www.', 'http://', 'https://', 'tel:', 'mailto:', 'ftp://anonymous:anonymous@', 'ftp://ftp.', 'ftps://', 'sftp://', 'smb://', 'nfs://', 'ftp://', 'dav://', 'news:', 'telnet://', 'imap:', 'rtsp://', 'urn:', 'pop:', 'sip:', 'sips:', 'tftp:', 'btspp://', 'btl2cap://', 'btgoep://', 'tcpobex://', 'irdaobex://', 'file://', 'urn:epc:id:', 'urn:epc:tag:', 'urn:epc:pat:', 'urn:epc:raw:', 'urn:epc:', 'urn:nfc:'];
+// decode a URI payload bytes
+// @returns a string
+function decodePayload(data) {
+    var prefix = protocols[data[0]];
+    if (!prefix) {
+        prefix = '';
+    }
+    return prefix + util.bytesToString(data.slice(1));
+}
+exports.decodePayload = decodePayload;
+// shorten a URI with standard prefix
+// @returns an array of bytes
+function encodePayload(uri) {
+    var prefix;
+    // check each protocol, unless we've found a match
+    // "urn:" is the one exception where we need to keep checking
+    // slice so we don't check ""
+    var protocolCode;
+    var encoded;
+    protocols.slice(1).forEach(function (protocol) {
+        if ((!prefix || prefix === 'urn:') && uri.indexOf(protocol) === 0) {
+            prefix = protocol;
+        }
+    });
+    if (!prefix) {
+        prefix = '';
+    }
+    encoded = util.stringToBytes(uri.slice(prefix.length));
+    protocolCode = protocols.indexOf(prefix);
+    // prepend protocol code
+    encoded.unshift(protocolCode);
+    return encoded;
+}
+exports.encodePayload = encodePayload;
+//# sourceMappingURL=ndef-uri.js.map
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(Buffer) {
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+var events = __webpack_require__(13);
+var assert = __webpack_require__(10);
+var ndef_1 = __webpack_require__(6);
+var ParseState;
+(function (ParseState) {
+    ParseState[ParseState["expectingStopByte"] = 0] = "expectingStopByte";
+    ParseState[ParseState["expectingPayload"] = 1] = "expectingPayload";
+    ParseState[ParseState["expectingId"] = 2] = "expectingId";
+    ParseState[ParseState["expectingType"] = 3] = "expectingType";
+    ParseState[ParseState["expectingIdLength"] = 4] = "expectingIdLength";
+    ParseState[ParseState["expectingPayloadLengthFourByte"] = 5] = "expectingPayloadLengthFourByte";
+    ParseState[ParseState["expectingPayloadLengthOneByte"] = 6] = "expectingPayloadLengthOneByte";
+    ParseState[ParseState["expectingTypeLength"] = 7] = "expectingTypeLength";
+    ParseState[ParseState["expectingTag"] = 8] = "expectingTag";
+    ParseState[ParseState["expectingLength"] = 9] = "expectingLength";
+    ParseState[ParseState["expectingValue"] = 10] = "expectingValue";
+})(ParseState = exports.ParseState || (exports.ParseState = {}));
+function decodeTnf(tnf_byte) {
+    return {
+        mb: (tnf_byte & 0x80) !== 0,
+        me: (tnf_byte & 0x40) !== 0,
+        cf: (tnf_byte & 0x20) !== 0,
+        sr: (tnf_byte & 0x10) !== 0,
+        il: (tnf_byte & 0x8) !== 0,
+        tnf: (tnf_byte & 0x7)
+    };
+}
+var PushParser = /** @class */ (function (_super) {
+    __extends(PushParser, _super);
+    function PushParser(initialState) {
+        if (initialState === void 0) { initialState = ParseState.expectingTag; }
+        var _this = _super.call(this) || this;
+        _this.buffers = [];
+        _this.cursor = 0;
+        _this.currentCursor = 0;
+        _this.totalLength = 0;
+        _this.currentBuffer = 0;
+        _this.state = initialState;
+        return _this;
+    }
+    PushParser.prototype.push = function (buffer) {
+        this.pushBuffer(buffer);
+        this.process();
+    };
+    PushParser.prototype.process = function () {
+        var self = this;
+        // noinspection FallThroughInSwitchStatementJS
+        if (self.state === ParseState.expectingTag) {
+            if (self.canRead(1)) {
+                var tag = self.readUint8();
+                if (tag === 0x03) {
+                    self.state = ParseState.expectingLength;
+                    self.emit('foundNdefTag');
+                }
+                else {
+                    self.emit('foundUnknownTag');
+                }
+            }
+        }
+        if (self.state === ParseState.expectingLength) {
+            if (self.canRead(3)) {
+                var length_1 = self.readUint8();
+                if (length_1 === 0xFF) {
+                    length_1 = self.readUint16BE();
+                    self.expectedLength = length_1;
+                }
+                self.state = ParseState.expectingValue;
+            }
+            else {
+                return;
+            }
+        }
+        if (self.state === ParseState.expectingValue) {
+            if (self.canRead(1)) {
+                var tnf_byte = self.readUint8();
+                var header = decodeTnf(tnf_byte);
+                self.header = header;
+                self.state = ParseState.expectingTypeLength;
+                if (header.mb) {
+                    self.emit('messageBegin');
+                }
+            }
+        }
+        if (self.state === ParseState.expectingTypeLength) {
+            if (self.canRead(1)) {
+                self.typeLength = self.readUint8();
+                if (self.header.sr) {
+                    self.state = ParseState.expectingPayloadLengthOneByte;
+                }
+                else {
+                    self.state = ParseState.expectingPayloadLengthFourByte;
+                }
+            }
+        }
+        if (self.state === ParseState.expectingPayloadLengthOneByte) {
+            if (self.canRead(1)) {
+                self.payloadLength = self.readUint8();
+                self.state = ParseState.expectingIdLength;
+            }
+        }
+        if (self.state === ParseState.expectingPayloadLengthFourByte) {
+            if (self.canRead(4)) {
+                self.payloadLength = self.readUint32BE();
+                self.state = ParseState.expectingIdLength;
+            }
+        }
+        if (self.state === ParseState.expectingIdLength) {
+            if (self.header.il) {
+                if (self.canRead(1)) {
+                    self.idLength = self.readUint8();
+                    self.state = ParseState.expectingType;
+                }
+            }
+            else {
+                self.idLength = 0;
+                self.state = ParseState.expectingType;
+            }
+        }
+        if (self.state === ParseState.expectingType) {
+            if (self.canRead(self.typeLength)) {
+                self.typeBytes = self.read(self.typeLength);
+                self.state = ParseState.expectingId;
+            }
+        }
+        if (self.state === ParseState.expectingId) {
+            if (self.canRead(self.idLength)) {
+                self.idBytes = self.read(self.idLength);
+                self.state = ParseState.expectingPayload;
+            }
+        }
+        if (self.state === ParseState.expectingPayload) {
+            if (self.canRead(self.payloadLength)) {
+                self.payloadBytes = self.read(self.payloadLength);
+                self.emit('record', self.getRecord());
+                if (!self.header.me) {
+                    self.state = ParseState.expectingValue;
+                    self.process();
+                }
+                else {
+                    self.emit('messageEnd');
+                    self.state = ParseState.expectingStopByte;
+                }
+            }
+        }
+        if (self.state == ParseState.expectingStopByte) {
+            if (this.canRead(1)) {
+                this.read(1);
+            }
+            // go to next ...
+        }
+        // noinspection FallThroughInSwitchStatementJS
+    };
+    PushParser.prototype.getRecord = function () {
+        // TODO: use bytes
+        var getBytes = function (buf) { return buf.toJSON().data; };
+        return ndef_1.record(this.header.tnf, getBytes(this.typeBytes), getBytes(this.idBytes), getBytes(this.payloadBytes));
+    };
+    PushParser.prototype.pushBuffer = function (buffer) {
+        this.buffers.push(buffer);
+        this.totalLength += buffer.length;
+    };
+    PushParser.prototype.canRead = function (n) {
+        return (this.cursor + n) <= this.totalLength;
+    };
+    PushParser.prototype.read = function (n) {
+        // cursor is zero based indexing, so cursor + n should be less than total
+        assert(this.canRead(n));
+        if (n === 0) {
+            return Buffer.alloc(0);
+        }
+        this.cursor += n;
+        var buffers = [];
+        while (n > this.availableInTopBuffer()) {
+            var current = this.current();
+            var buf = this.currentCursor !== 0 ?
+                // take what's left of the current buffer
+                current.slice(this.currentCursor) :
+                // take the whole buffer
+                current;
+            buffers.push(buf);
+            n -= buf.length;
+            this.currentBuffer++;
+            this.currentCursor = 0;
+        }
+        if (n) {
+            // Take part
+            buffers.push(this.current().slice(this.currentCursor, this.currentCursor + n));
+            this.currentCursor += n;
+        }
+        return Buffer.concat(buffers);
+    };
+    PushParser.prototype.readUint32BE = function () {
+        var buf = this.read(4);
+        return buf.readUInt32BE(0);
+    };
+    PushParser.prototype.readUint8 = function () {
+        var buf = this.read(1);
+        return buf.readUInt8(0);
+    };
+    PushParser.prototype.availableInTopBuffer = function () {
+        return this.current().length - this.currentCursor;
+    };
+    PushParser.prototype.current = function () {
+        return this.buffers[this.currentBuffer];
+    };
+    PushParser.prototype.readUint16BE = function () {
+        var buf = this.read(2);
+        return buf.readUInt16BE(0);
+    };
+    return PushParser;
+}(events.EventEmitter));
+exports.PushParser = PushParser;
+//# sourceMappingURL=push-parser.js.map
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ })
 /******/ ])));
