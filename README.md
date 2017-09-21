@@ -1,4 +1,4 @@
-# Flomio Cordova Plugin for SDK v2.2
+# Flomio Cordova Plugin for SDK v2.3
 
 Flomio's plugin for Cordova / Meteor, for use with the v2.2 of the Flomio SDK. [Get yours here.]
 (http://flomio.com/shop/apps/flomio-sdk-basic-turnkey-oem-support/)
@@ -24,23 +24,21 @@ cordova plugin add https://github.com/flomio/flomio_cordova_plugin#<latest-commi
 meteor add cordova:com.flomio.sdk@https://github.com/flomio/flomio_cordova_plugin/tarball/<latest-commit-code>
 ```
 
-- Register plugin within `config.xml` of your app in Cordova. Meteor takes care of this for you (so skip this step).
-
-```xml
-<feature name="FlomioPlugin">
-    <param name="ios-package" value="FlomioPlugin" />
-</feature>
-```
-
 - Implement a simple code snippet to test your setup.
 
 ```
-function resultCallback(result)
-{
-	console.log(result);
+flomioPlugin.selectDeviceType("floble-plus");
+let configuration = {};
+configuration = {
+    scanPeriod: 1000, // scan period in ms
+    scanSound: false, // toggle scan sound on/off
+    readerState: 'read-data', //read-data or read-uuid
+    powerOperation: 'auto-polling-control' //bluetooth-connection-control or auto-polling-control
 }
-flomioPlugin.selectDeviceType("floble-plus");  
+flomioPlugin.setConfiguration(configuration);
 flomioPlugin.init();
+flomioPlugin.addConnectedDevicesListener(this.flomioConnectedDevicesListener.bind(this));
+flomioPlugin.addTagDiscoveredListener(this.flomioTagDiscovered.bind(this))
 ```
 
 - Prepare the app.
@@ -68,9 +66,7 @@ meteor add-platform ios
 * `init()`
 
 	Initialises the plugin, preparing it for first use in the current session
-	
-	
-**Optional methods**
+
 
 * `setConfiguration(configuration)`
 
@@ -92,9 +88,12 @@ meteor add-platform ios
         powerOperation: 'auto-polling-control'  //bluetooth-connection-control or auto-polling-control
       }
 
-      flomioPlugin.setConfiguration(configuration);
+  flomioPlugin.setConfiguration(configuration);
 	```
 	
+**Optional methods**
+
+
 * `getConfiguration(resultCallback)`
 
 	Retrieves settings for the current session
@@ -163,38 +162,19 @@ meteor add-platform ios
 	}
 	```
 
-* `addNdefListener(resultCallback)`
+* `readNdef(resultCallback, deviceId)`
 
 	Retrieve NDEF formatted data from a tag in proximity of a specified target device.
-	Configuration must be "read-data" upon initialization.
-	Only supported for FloBLE Plus
+	When a tag is found, in your flomioTagDiscovered callback, call 
 	```
-	function resultCallback(result)
-	Object result
-	{
-		String deviceId,
-		Object payload  //Dictionary with keys 'Uuid', 'Raw Data', 'Ndef'
-	}
+    flomioTagDiscovered: function(result) {
+        flomioPlugin.readNdef(this.flomioNdefListener.bind(this), result.deviceId)
+    }	
+    ```
 	
-	example usage: 	
-		flomioPlugin.addNdefListener(this.didFindTagData)
-		
-		didFindTagData(dict){
-			var returnedData  = dict.payload
-			if ('Uuid' in returnedData){
-				console.log('Uuid :' + returnedData['Uuid'])
-			}
-			if ('Raw Data' in returnedData){
-				console.log('Raw Data' + returnedData['Raw Data'])
-			}
-			if (returnedData['Ndef']){
-				var ndefMessage = returnedData['Ndef'];
-				for (var i = 0; ndefMessage.length > i; i++) {
-					var ndefRecord = ndefMessage[i];
-					for (var key in ndefRecord){
-						console.log(key + ": " + ndefRecord[key])
-					}
-				}
-			}
-		}	
+	and in that callback 
 	```
+	flomioNdefListener: function(data) {
+        console.log(JSON.stringify(data.ndefMessage));
+    }
+    ```
