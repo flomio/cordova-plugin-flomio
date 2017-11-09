@@ -12,6 +12,7 @@
 
 @interface FmNdefManager : NSObject
 
++ (NSData *)addTLVValues:(NSData *)apdu;
 + (NSString *)selectNdefTagApplication;
 + (NSString *)selectCcFile;
 + (NSString *)readCcFile;

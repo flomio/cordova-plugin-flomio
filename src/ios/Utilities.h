@@ -17,5 +17,6 @@
 
 + (NSString *)hexStringFromByteArray:(const uint8_t *)buffer length:(NSUInteger)length;
 + (NSString *)hexStringFromByteArray:(NSData *)buffer;
++ (int)extractNumberFromString:(NSString *)string;
 
 @end

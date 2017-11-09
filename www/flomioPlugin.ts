@@ -220,6 +220,7 @@ module.exports = {
     // send all apdus and capture result
     Promise.all(apdus).then(function () {
       console.log('fullResponse: ' + fullResponse)
+      
     }, reason => {
       console.log(reason)
     })
@@ -263,9 +264,10 @@ module.exports = {
       messages.push(record)
     })
     parser.on('messageEnd', () => {
+      console.log('messageEnd')
       resultCallback({ndefMessage: messages})
     })
-    for (let page = 4; page < numberOfPages; page += 4) {
+    for (let page = 4; page <= numberOfPages; page += 4) {
       let n = ''
       page >= 16 ? n = '' + page.toString(16) : n = '0' + page.toString(16)
       const apdu = 'FFB000' + n + '10'

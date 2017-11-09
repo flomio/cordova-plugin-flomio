@@ -19,6 +19,7 @@
 #import "FmConfiguration.h"
 #import "FmErrorManager.h"
 #import "FmApduTransceiver.h"
+#import "FmNdefManager.h"
 
 @protocol FmReaderDelegate<NSObject>
 
@@ -69,6 +70,7 @@
 
 - (void)wakeReader;
 - (void)reconnectBluetoothReader;
+- (void)updateCeNdef:(NdefMessage *)ndef;
 
 //General Methods exclusive to FmReader superclass
 - (BOOL)determineIfNewUuid:(NSString *)uuid;

@@ -49,6 +49,7 @@
 - (void)startReader:(NSString *)deviceUuid;
 - (void)stopReader:(NSString *)deviceUuid;
 - (void)sleepReader:(NSString *)deviceUuid;
+- (void)updateCeNdef:(NdefMessage *)ndef withDeviceUuid:(NSString *)deviceUuid;
 
 - (void)setConfiguration:(FmConfiguration *)configuration; //initialize all devices configuration with this
 - (void)setConfiguration:(FmConfiguration *)configuration ofDevice:(NSString *)deviceUuid;

@@ -61,6 +61,7 @@
 @property (nonatomic, assign) TransmitPower transmitPower;
 @property (nonatomic, assign) PowerOperation powerOperation;
 @property(nonatomic, copy) void (^completionBlock)(NSString *);
+@property (nonatomic, assign) BOOL isCeMode;
 
 
 @end

@@ -86,5 +86,6 @@
 - (void)stopReader;
 - (void)sleepReader;
 - (void)reconnectBluetoothReader;
+- (void)updateCeNdef:(NdefMessage *)ndef;
 
 @end
