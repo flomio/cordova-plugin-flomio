@@ -27,6 +27,7 @@
 }
 
 @property (nonatomic) DeviceType selectedDeviceType;
+@property (strong, nonatomic) NSNumber *latestBatteryLevel;
 @property (strong, nonatomic) NSString *specificDeviceUuid;
 @property (strong, nonatomic) NFCNDEFReaderSession *session;
 
@@ -41,6 +42,7 @@
 // - (void)setConfiguration:(NSDictionary *)configurationDictionary ofDevice:(NSString *)deviceSerialNumber;
 // - (NSDictionary *)getConfigurationOfDevice:(NSString *)deviceSerialNumber;
 - (void)getConfiguration:(CDVInvokedUrlCommand*)command;
+- (void)getBatteryLevel:(CDVInvokedUrlCommand*)command;
 - (void)sendApdu:(NSString *)apdu toDevice:(NSString *)deviceSerialNumber;
 
 // Internal functions (that also perform input validation)

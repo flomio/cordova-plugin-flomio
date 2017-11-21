@@ -115,6 +115,19 @@ module.exports = {
     })
   },
 
+  getBatteryLevel: () => {
+    return new Promise((resolve, reject) => {
+      exec(
+          (batteryLevel) => {
+            resolve(batteryLevel)
+          },
+          (failure) => {
+            reject(failure)
+          },
+          'FlomioPlugin', 'getBatteryLevel', [])
+    })
+  },
+
   // Delegate/Event Listeners
   addConnectedDevicesListener: (resultCallback, success, failure) => {
     exec(
@@ -272,6 +285,10 @@ module.exports = {
       page >= 16 ? n = '' + page.toString(16) : n = '0' + page.toString(16)
       const apdu = 'FFB000' + n + '10'
       let response: string = await this.sendApdu(noop, devices[0].deviceId, apdu)
+      if (response.substr(response.length - 5) !== '90 00') {
+        resultCallback({error: 'Tag Removed'})
+        return
+      }
       const buffer = util.responseToBuffer(response)
       parser.push(buffer)
     }

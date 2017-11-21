@@ -174,7 +174,40 @@ meteor add-platform ios
 	
 	and in that callback 
 	```
-	flomioNdefListener: function(data) {
-        console.log(JSON.stringify(data.ndefMessage));
+	flomioNdefListener: function(response) {
+        console.log(JSON.stringify(response.ndefMessage));
     }
     ```
+    Use response.error to indicate to users if a tag was removed too early while reading.
+ 
+ * `getBatteryLevel()`
+ 
+ 	Returns a promise containing most recent battery level of device.
+ 	
+
+**Add Pro SDK for Offline usage**
+
+- Add libSDKClassesPro.a to a folder named resources. Add this and the scripts folder from this repo to the root of your project (same directory as package.json). 
+  So your project structure looks like this
+  
+  ```
+  ProjectName
+  - scripts
+    - copyProSDK.js
+  - resources
+    - libSDKClassesPro.a
+  - package.json
+  - node_modules
+  ```
+    
+    Add
+    ```
+    <hook src="scripts/copyProSDK.js" type="after_plugin_install" />
+
+    ```
+    after  
+    ```
+    <platform name="ios">
+    ```
+   
+   Then when you add the Flomio Cordova Plugin, the ProSDK will be added to your project instead of the Basic SDK.

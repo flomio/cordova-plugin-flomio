@@ -4647,6 +4647,15 @@ module.exports = {
             }, 'FlomioPlugin', 'sendApdu', [deviceId, apdu]);
         });
     },
+    getBatteryLevel: function () {
+        return new Promise(function (resolve, reject) {
+            exec(function (batteryLevel) {
+                resolve(batteryLevel);
+            }, function (failure) {
+                reject(failure);
+            }, 'FlomioPlugin', 'getBatteryLevel', []);
+        });
+    },
     // Delegate/Event Listeners
     addConnectedDevicesListener: function (resultCallback, success, failure) {
         exec(function (device) {
@@ -4784,6 +4793,10 @@ module.exports = {
                         return [4 /*yield*/, this.sendApdu(noop, devices[0].deviceId, apdu)];
                     case 3:
                         response = _a.sent();
+                        if (response.substr(response.length - 5) !== '90 00') {
+                            resultCallback({ error: 'Tag Removed' });
+                            return [2 /*return*/];
+                        }
                         buffer = util.responseToBuffer(response);
                         parser.push(buffer);
                         _a.label = 4;

@@ -33,7 +33,6 @@ NSString * NSDataToHex(NSData *data) {
 
 /** Initialise the plugin */
 - (void)init:(CDVInvokedUrlCommand*)command {
-
     if (!sharedManager) {
         // Initialise flomioSDK
         FmConfiguration *defaultConfiguration = [[FmConfiguration alloc] init];
@@ -97,6 +96,13 @@ NSString * NSDataToHex(NSData *data) {
 //        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:settings];
 //        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     });
+}
+
+- (void)getBatteryLevel:(CDVInvokedUrlCommand *)command {
+    NSArray* result = @[self.latestBatteryLevel];
+    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
+    [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 - (void)setConfiguration:(CDVInvokedUrlCommand*)command {
@@ -241,6 +247,7 @@ NSString * NSDataToHex(NSData *data) {
     NSMutableDictionary *deviceDictionary = [NSMutableDictionary new];
     deviceDictionary[@"Device ID"] = deviceUuid;
     deviceDictionary[@"Battery Level"] = batteryLevel;
+    self.latestBatteryLevel = batteryLevel;
     deviceDictionary[@"Hardware Revision"] = hardwareRev;
     deviceDictionary[@"Firmware Revision"] = firmwareRev;
     deviceDictionary[@"Communication Status"] = [NSNumber numberWithInt: communicationStatus];
