@@ -18,6 +18,7 @@ module.exports = function(ctx) {
       console.error(err)
       deferral.reject('xcode could not parse project')
     } else{
+      project.removeFramework('libSDKClasses.a')
       project.addFramework('libSDKClassesPro.a')
       project.addToLibrarySearchPaths(projectRoot + '/resources/')
       fs.writeFileSync(projectPath, project.writeSync())
