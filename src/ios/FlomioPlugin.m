@@ -71,7 +71,7 @@ NSString * NSDataToHex(NSData *data) {
     }
 }
 
-- (void )launchNativeNfc:(CDVInvokedUrlCommand*)command {
+- (void )launchNativeNfc:(CDVInvokedUrlCommand*)command API_AVAILABLE(ios(11.0)) {
     [self startNfc];
     NSArray* result = @[@"Launch attempted"];
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
@@ -116,20 +116,11 @@ NSString * NSDataToHex(NSData *data) {
     } else { // default to @"auto-polling-control"
         powerOperation = [NSNumber numberWithInt:kAutoPollingControl];
     }
-    configurationDictionary = @{
-                                @"Scan Period" : [NSNumber numberWithInt:[scanPeriod intValue]],
-                                @"Scan Sound" : [NSNumber numberWithBool:scanSound],
-                                @"Power Operation" : powerOperation, //kBluetoothConnectionControl low power usage
-                                @"Transmit Power" : [NSNumber numberWithInt: kHighPower],
-                                @"Allow Multiconnect" : @0, //control whether multiple FloBLE devices can connect
-                                };
     FmConfiguration *configuration = [[FmConfiguration alloc] init];
     configuration.scanSound = [NSNumber numberWithBool:scanSound ];
     configuration.scanPeriod = [NSNumber numberWithInt:[scanPeriod intValue]];
     configuration.powerOperation = kHighPower;
     [sharedManager setConfiguration:configuration];
-
-    NSString* callbackId = command.callbackId;
 }
 
 /** Send an APDU to a specific reader */
@@ -369,18 +360,15 @@ NSString * NSDataToHex(NSData *data) {
 }
 
 
-- (void)startNfc {
+- (void)startNfc API_AVAILABLE(ios(11.0)){
     NSLog(@"In startNFC");
-//    [self.commandDelegate runInBackground:^{
-        self.session = [[NFCNDEFReaderSession alloc] initWithDelegate:self queue:nil invalidateAfterFirstRead:YES];
-        [self.session beginSession];
-//    }];
-
+    self.session = [[NFCNDEFReaderSession alloc] initWithDelegate:self queue:nil invalidateAfterFirstRead:YES];
+    [self.session beginSession];
 }
 
 // NFCNDEFReaderSessionDelegate delegates
 
-- (void) readerSession:(nonnull NFCNDEFReaderSession *)session didDetectNDEFs:(nonnull NSArray<NFCNDEFMessage *> *)messages {
+- (void) readerSession:(nonnull NFCNDEFReaderSession *)session didDetectNDEFs:(nonnull NSArray<NFCNDEFMessage *> *)messages API_AVAILABLE(ios(11.0)){
     dispatch_async(dispatch_get_main_queue(), ^{
         if (messages[0]){
             NSArray *jsonNdef = [self ndefToJson: messages[0]]; //need to change to add multiple messages returned
@@ -394,12 +382,11 @@ NSString * NSDataToHex(NSData *data) {
     });
 }
 
-
-- (void) readerSession:(nonnull NFCNDEFReaderSession *)session didInvalidateWithError:(nonnull NSError *)error {
+- (void) readerSession:(nonnull NFCNDEFReaderSession *)session didInvalidateWithError:(nonnull NSError *)error API_AVAILABLE(ios(11.0)) {
     NSLog(@"error: %@", error.description);
 }
 
-- (NSArray *)ndefToJson:(NFCNDEFMessage *)message {
+- (NSArray *)ndefToJson:(NFCNDEFMessage *)message API_AVAILABLE(ios(11.0)){
     NSMutableArray *ndefMessage = [[NSMutableArray alloc] init];
     
     for (NFCNDEFPayload *record in message.records){

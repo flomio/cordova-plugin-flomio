@@ -44,7 +44,6 @@ typedef NS_ENUM(NSInteger, DispatchTimerCommands) {
 - (void)wakeReader;
 - (void)reset;
 - (void)transmitCommandApdu:(NSData *)apdu;
-- (void)getData;
 - (void)playNotification;
 - (void)resetTimerSource;
 - (void)controlTimerSource:(int)tCommand;

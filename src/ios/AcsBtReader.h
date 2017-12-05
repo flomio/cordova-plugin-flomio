@@ -25,7 +25,7 @@
 
 @end
 
-@interface AcsBtReader : FmReader <ABTBluetoothReaderManagerDelegate, ABTBluetoothReaderDelegate, FmApduTransceiverDelegate> {
+@interface AcsBtReader : FmReader <ABTBluetoothReaderManagerDelegate, ABTBluetoothReaderDelegate> {
 
     NSArray *connectedPeripherals;
     BOOL isRequestingUuid;
@@ -61,7 +61,7 @@
 @property (nonatomic, assign) TransmitPower transmitPower;
 @property (nonatomic, assign) PowerOperation powerOperation;
 @property(nonatomic, copy) void (^completionBlock)(NSString *);
-@property (nonatomic, assign) BOOL isCeMode;
+@property (nonatomic, assign) NSNumber *isCeMode;
 
 
 @end

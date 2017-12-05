@@ -37,7 +37,6 @@
     BOOL isAppLaunching;
     
     //2.0
-    NSMutableArray *sessions;
 }
 
 + (id)flomioMW; //flomioMW singleton
@@ -50,6 +49,8 @@
 - (void)stopReader:(NSString *)deviceUuid;
 - (void)sleepReader:(NSString *)deviceUuid;
 - (void)updateCeNdef:(NdefMessage *)ndef withDeviceUuid:(NSString *)deviceUuid;
+- (void)writeRfidTag:(NSData *)data withOffset:(int)offset success:(void (^)(NSString *))completionBlock;
+- (void)readRfidTag:(int)offset success:(void (^)(NSString *))completionBlock;
 
 - (void)setConfiguration:(FmConfiguration *)configuration; //initialize all devices configuration with this
 - (void)setConfiguration:(FmConfiguration *)configuration ofDevice:(NSString *)deviceUuid;
@@ -59,6 +60,6 @@
 @property (nonatomic, strong) id<FmSessionManagerDelegate> delegate;
 @property (nonatomic, strong) FmConnectionsManager *connectionsManager;
 @property (nonatomic, strong) FmConfiguration *configuration;
-
+@property (nonatomic, strong) NSMutableArray<FmSession *> *sessions;
 @end
 

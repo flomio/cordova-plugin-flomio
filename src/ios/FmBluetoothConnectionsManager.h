@@ -25,6 +25,7 @@
 - (void)didConnectPeripheral:(CBPeripheral *)peripheral;
 - (void)didReconnectPeripheral:(CBPeripheral *)peripheral;
 - (void)didDisconnectPeripheral:(CBPeripheral *)peripheral;
+- (void)didTurnOfBluetooth;
 
 @end
 

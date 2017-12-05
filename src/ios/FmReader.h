@@ -18,8 +18,8 @@
 #import <CoreBluetooth/CoreBluetooth.h>
 #import "FmConfiguration.h"
 #import "FmErrorManager.h"
-#import "FmApduTransceiver.h"
 #import "FmNdefManager.h"
+#import "Utilities.h"
 
 @protocol FmReaderDelegate<NSObject>
 
@@ -51,7 +51,6 @@
 @property (nonatomic, strong) NSString *currentApdu;
 @property (nonatomic, strong) NSString *currentResponse;
 @property (nonatomic, strong) NSString *apduRequestUuid;
-@property (nonatomic, strong) FmApduTransceiver *apduTransceiver;
 
 //These methods which must be overwritten by subclassess
 
@@ -76,5 +75,7 @@
 - (BOOL)determineIfNewUuid:(NSString *)uuid;
 - (void)addUuidToTagInventory:(NSString *)uuid;
 - (NSString *)handleApduResponse:(NSString *)responseString;
+- (void)writeRfidTag:(NSData *)data withOffset:(int)offset success:(void (^)(NSString *))completionBlock;
+- (void)readRfidTag:(int)offset success:(void (^)(NSString *))completionBlock;
 
 @end

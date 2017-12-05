@@ -7,17 +7,16 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "FmReader.h"
 #import "UgiInventoryDelegate.h"
 #import "Ugi.h"
 #import "UgiUtil.h"
 #import "UgiRfMicron.h"
-#import "Ugi_regions.h"
 #import "UgiInventory.h"
 #import "UgiFooterView.h"
 #import "UgiTitleView.h"
 #import "UgiTagReadHistoryView.h"
 #import "UgiTagCell.h"
-#import "FmReader.h"
 
 @import AudioToolbox;
 #import <AudioToolbox/AudioToolbox.h>
@@ -41,12 +40,13 @@
 - (void)stopReader;
 - (void)sleepReader;
 - (NSString *)sendApduCommand:(NSString *)command;
-- (NSString *)transmitAsyncApdu:(NSString *)command;
-
+- (void)writeRfidTag:(NSData *)data withOffset:(int)offset success:(void (^)(NSString *))completionBlock;
+- (void)readRfidTag:(int)offset success:(void (^)(NSString *))completionBlock;
 
 @property (retain, nonatomic) IBOutlet UgiFooterView *footer;
 @property (nonatomic) UgiInventoryTypes inventoryType;
 @property (nonatomic) int specialFunction;
+@property (nonatomic, strong) UgiTag *currentTag;
 
 @property (retain, nonatomic) NSMutableArray<UgiTag *> *displayedTags;
 @property (retain, nonatomic) NSMutableDictionary<UgiEpc *, NSMutableString *> *epcToDetailString;

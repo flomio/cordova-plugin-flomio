@@ -87,5 +87,7 @@
 - (void)sleepReader;
 - (void)reconnectBluetoothReader;
 - (void)updateCeNdef:(NdefMessage *)ndef;
+- (void)writeRfidTag:(NSData *)data withOffset:(int)offset success:(void (^)(NSString *))completionBlock;
+- (void)readRfidTag:(int)offset success:(void (^)(NSString *))completionBlock;
 
 @end

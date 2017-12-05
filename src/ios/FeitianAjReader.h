@@ -46,8 +46,6 @@ typedef NS_ENUM(NSInteger, bzrDispatchTimerCommands) {
 + (instancetype)initSharedInstanceWithParent:(id)parent andConfiguration:(FmConfiguration *)confuration;
 - (void)transmitCommandApdu:(NSString *)sendApdu;
 - (void)getDeviceInfo;
-- (void)getUuid;
-- (void)getData;
 - (void)startReader;
 - (void)stopReader;
 - (void)reset;
