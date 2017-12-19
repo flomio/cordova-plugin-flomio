@@ -253,23 +253,24 @@ module.exports = {
   },
 
   async readNdef (resultCallback, deviceId: string) {
-    let fullResponse = ''
-    const apdus = []
     let numberOfPages: number
-    let capabilityContainer = await this.readCapabilityContainer(devices[0].deviceId)
+    let capabilityContainer = await this.readCapabilityContainer(deviceId)
     capabilityContainer = util.removeSpaces(capabilityContainer)
     if (capabilityContainer.substring(0, 2) === 'E1') {
       const length = parseInt(capabilityContainer.substring(4,6), 16)
-      console.log('capabilityContainer: ' + capabilityContainer)
-      console.log('length: ' + length)
       const numberOfBytes = length * 8
       numberOfPages = numberOfBytes / 4
       console.log('number of pages: ' + numberOfPages)
       // E1 00 byteSize (divided by 8) 00... eg E1 10 06 00 = 48 bytes
       // length * 8 = number of bytes
       // number of bytes / 4 = number of pages
+    } else if (capabilityContainer.substr(capabilityContainer.length - 4) !== '9000') {
+      resultCallback(null, new Error('Tag Removed'))
+      return
     } else {
       console.log('capabilityContainer not formatted correctly')
+      resultCallback(null, new Error('Capability Container not formatted correctly'))
+      return
     }
     const parser = new PushParser()
     let messages = []
@@ -277,17 +278,23 @@ module.exports = {
       messages.push(record)
     })
     parser.on('messageEnd', () => {
-      console.log('messageEnd')
-      resultCallback({ndefMessage: messages})
+      resultCallback({ndefMessage: messages}, null)
     })
+    parser.on('skipping', () => {
+      resultCallback(null, new Error('Tag is not NDEF formatted'))
+    })
+
     for (let page = 4; page <= numberOfPages; page += 4) {
+      if (parser.finishedMessage()) {
+        break
+      }
       let n = ''
       page >= 16 ? n = '' + page.toString(16) : n = '0' + page.toString(16)
       const apdu = 'FFB000' + n + '10'
-      let response: string = await this.sendApdu(noop, devices[0].deviceId, apdu)
+      let response: string = await this.sendApdu(noop, deviceId, apdu)
       if (response.substr(response.length - 5) !== '90 00') {
-        resultCallback({error: 'Tag Removed'})
-        return
+        resultCallback(null, new Error('Tag Removed'))
+        break
       }
       const buffer = util.responseToBuffer(response)
       parser.push(buffer)

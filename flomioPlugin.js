@@ -225,20 +225,15 @@ module.exports = {
     },
     readNdef: function (resultCallback, deviceId) {
         return __awaiter(this, void 0, void 0, function () {
-            var fullResponse, apdus, numberOfPages, capabilityContainer, length_1, numberOfBytes, parser, messages, page, n, apdu, response, buffer;
+            var numberOfPages, capabilityContainer, length_1, numberOfBytes, parser, messages, page, n, apdu, response, buffer;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        fullResponse = '';
-                        apdus = [];
-                        return [4 /*yield*/, this.readCapabilityContainer(devices[0].deviceId)];
+                    case 0: return [4 /*yield*/, this.readCapabilityContainer(deviceId)];
                     case 1:
                         capabilityContainer = _a.sent();
                         capabilityContainer = util.removeSpaces(capabilityContainer);
                         if (capabilityContainer.substring(0, 2) === 'E1') {
                             length_1 = parseInt(capabilityContainer.substring(4, 6), 16);
-                            console.log('capabilityContainer: ' + capabilityContainer);
-                            console.log('length: ' + length_1);
                             numberOfBytes = length_1 * 8;
                             numberOfPages = numberOfBytes / 4;
                             console.log('number of pages: ' + numberOfPages);
@@ -246,8 +241,14 @@ module.exports = {
                             // length * 8 = number of bytes
                             // number of bytes / 4 = number of pages
                         }
+                        else if (capabilityContainer.substr(capabilityContainer.length - 4) !== '9000') {
+                            resultCallback(null, new Error('Tag Removed'));
+                            return [2 /*return*/];
+                        }
                         else {
                             console.log('capabilityContainer not formatted correctly');
+                            resultCallback(null, new Error('Capability Container not formatted correctly'));
+                            return [2 /*return*/];
                         }
                         parser = new ndef_lib_1.PushParser();
                         messages = [];
@@ -255,22 +256,27 @@ module.exports = {
                             messages.push(record);
                         });
                         parser.on('messageEnd', function () {
-                            console.log('messageEnd');
-                            resultCallback({ ndefMessage: messages });
+                            resultCallback({ ndefMessage: messages }, null);
+                        });
+                        parser.on('skipping', function () {
+                            resultCallback(null, new Error('Tag is not NDEF formatted'));
                         });
                         page = 4;
                         _a.label = 2;
                     case 2:
                         if (!(page <= numberOfPages)) return [3 /*break*/, 5];
+                        if (parser.finishedMessage()) {
+                            return [3 /*break*/, 5];
+                        }
                         n = '';
                         page >= 16 ? n = '' + page.toString(16) : n = '0' + page.toString(16);
                         apdu = 'FFB000' + n + '10';
-                        return [4 /*yield*/, this.sendApdu(noop, devices[0].deviceId, apdu)];
+                        return [4 /*yield*/, this.sendApdu(noop, deviceId, apdu)];
                     case 3:
                         response = _a.sent();
                         if (response.substr(response.length - 5) !== '90 00') {
-                            resultCallback({ error: 'Tag Removed' });
-                            return [2 /*return*/];
+                            resultCallback(null, new Error('Tag Removed'));
+                            return [3 /*break*/, 5];
                         }
                         buffer = util.responseToBuffer(response);
                         parser.push(buffer);

@@ -174,7 +174,11 @@ meteor add-platform ios
 	
 	and in that callback 
 	```
-	flomioNdefListener: function(response) {
+	flomioNdefListener: function(response, error) {
+	    if (error) {
+	        console.log(error.message)
+	        return
+	    }
         console.log(JSON.stringify(response.ndefMessage));
     }
     ```
