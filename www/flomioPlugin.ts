@@ -69,47 +69,34 @@ module.exports = {
       'FlomioPlugin', 'getConfiguration', [])
   },
 
-  stopReaders: (resultCallback, success, failure) => {
-    exec(
-      // TODO: deviceId
-      (scanPeriod, scanSound) => {
-        resultCallback({deviceId: undefined})
-      },
-      (failure) => {
-        console.log('ERROR: FlomioPlugin.stopReaders: ' + failure)
-      },
-      'FlomioPlugin', 'stopReaders', [])
+  stopReaders: (success, failure) => {
+    execPromise(success, failure, 'FlomioPlugin', 'stopReaders', [])
   },
 
-  sleepReaders: (resultCallback, success, failure) => {
-    exec(
-      noop,
-      (failure) => {
-        console.log('ERROR: FlomioPlugin.sleepReaders: ' + failure)
-      },
-      'FlomioPlugin', 'sleepReaders', [])
+  sleepReaders: (success, failure) => {
+    execPromise(success, failure, 'FlomioPlugin', 'sleepReaders', [])
   },
 
-  startReaders: (resultCallback, success, failure) => {
-    exec(
-      noop,
-      (failure) => {
-        console.log('ERROR: FlomioPlugin.startReaders: ' + failure)
-      },
-      'FlomioPlugin', 'startReaders', [])
+  startReaders: (success, failure) => {
+    execPromise(success, failure, 'FlomioPlugin', 'startReaders', [])
   },
 
-  sendApdu: (resultCallback, deviceId, apdu, success, failure) => {
+  sendApdu: (resultCallback, deviceId, apdu) => {
     console.log('in send apdu: ' + apdu + ' device: ' + deviceId)
     return new Promise((resolve, reject) => {
       exec(
         (deviceId, responseApdu) => {
           console.log('In response apdu: ' + responseApdu)
+          if (responseApdu.substr(responseApdu.length - 5) !== '90 00') {
+            reject()
+            return
+          }
           resolve(responseApdu)
           resultCallback({deviceId: deviceId, responseApdu: responseApdu})
         },
         (failure) => {
           console.log('ERROR: FlomioPlugin.sendApdu: ' + failure)
+          reject()
         },
         'FlomioPlugin', 'sendApdu', [deviceId, apdu])
     })
@@ -125,6 +112,19 @@ module.exports = {
             reject(failure)
           },
           'FlomioPlugin', 'getBatteryLevel', [])
+    })
+  },
+
+  getCommunicationStatus: () => {
+    return new Promise((resolve, reject) => {
+      exec(
+          (communicationStatus) => {
+            resolve(communicationStatus)
+          },
+          (failure) => {
+            reject(failure)
+          },
+          'FlomioPlugin', 'getCommunicationStatus', [])
     })
   },
 
@@ -209,33 +209,20 @@ module.exports = {
     console.log('bytes' + bytes)
     const hexString = util.bytesToHexString(bytes)
     console.log('hexString' + hexString)
+    console.log('deviceId:' + deviceId)
+    console.log('ndefMessage:' + ndefMessage)
     this.write(resultCallback, deviceId, hexString)
   },
 
-  write: function (resultCallback, deviceId, dataHexString, success, failure) {
-    // var apdus = []
+  write: async function (resultCallback, deviceId, dataHexString) {
     let hex = ndef.tlvEncodeNdef(dataHexString)
-    const apduStrings = ndef.makeWriteApdus(hex, 4)
-  
-    let fullResponse = ''
-    const apdus = []
-    for (let i in apduStrings) {
-      // store each sendApdu promise
-      console.log(apduStrings[i])
-      apdus.push(this.sendApdu(noop, deviceId, apduStrings[i]).then((responseApdu) => {
-        console.log('response apdu: ' + responseApdu)
-        fullResponse = fullResponse.concat(responseApdu.slice(0, -5))
-      }, (err) => {
-        console.error(err)
-      }))
-    }
-
-    // send all apdus and capture result
-    Promise.all(apdus).then(function () {
-      console.log('fullResponse: ' + fullResponse)
-      
-    }, reason => {
-      console.log(reason)
+    const apduArray = ndef.makeWriteApdus(hex, 4)
+    await Promise.all(apduArray.map(async (apdu) => {
+      await this.sendApdu(noop, deviceId, apdu)
+    })).then(() => {
+      resultCallback('Tag written successfully', null)
+    }).catch(() => {
+      resultCallback(null, new Error('Tag not written successfully'))
     })
   },
 
@@ -694,6 +681,22 @@ module.exports.util = util
 // textHelper and uriHelper aren't exported, add a property
 ndef.uriHelper = uriHelper
 ndef.textHelper = textHelper
+
+function execPromise (success, error, pluginName, method, args) {
+  return new Promise(function (resolve, reject) {
+    exec(function (result) {
+      resolve(result)
+      if (typeof success === 'function') {
+        success(result)
+      }
+    }, function (reason) {
+      reject(reason)
+      if (typeof error === 'function') {
+        error(reason)
+      }
+    }, pluginName, method, args)
+  })
+}
 
 // create aliases
 // util.bytesToString = util.bytesToString;

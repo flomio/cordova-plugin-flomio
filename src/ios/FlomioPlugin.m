@@ -101,7 +101,12 @@ NSString * NSDataToHex(NSData *data) {
 - (void)getBatteryLevel:(CDVInvokedUrlCommand *)command {
     NSArray* result = @[self.latestBatteryLevel];
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
-    [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+- (void)getCommunicationStatus:(CDVInvokedUrlCommand *)command {
+    NSArray* result = @[self.latestCommunicationStatus];
+    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
@@ -168,6 +173,8 @@ NSString * NSDataToHex(NSData *data) {
 - (void)stopReaders:(CDVInvokedUrlCommand *)command {
     [sharedManager stopReaders];
 }
+
+
 
 //- (void)write:(CDVInvokedUrlCommand *)command {
 //    int currentPage;
@@ -242,6 +249,7 @@ NSString * NSDataToHex(NSData *data) {
     deviceDictionary[@"Hardware Revision"] = hardwareRev;
     deviceDictionary[@"Firmware Revision"] = firmwareRev;
     deviceDictionary[@"Communication Status"] = [NSNumber numberWithInt: communicationStatus];
+    self.latestCommunicationStatus = [NSNumber numberWithInt: communicationStatus];
     [devices addObject: deviceDictionary];
     dispatch_async(dispatch_get_main_queue(), ^{
         if (didUpdateConnectedDevicesCallbackId)

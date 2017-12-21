@@ -4893,34 +4893,29 @@ module.exports = {
             console.log('ERROR: FlomioPlugin.getConfiguration: ' + failure);
         }, 'FlomioPlugin', 'getConfiguration', []);
     },
-    stopReaders: function (resultCallback, success, failure) {
-        exec(
-        // TODO: deviceId
-        function (scanPeriod, scanSound) {
-            resultCallback({ deviceId: undefined });
-        }, function (failure) {
-            console.log('ERROR: FlomioPlugin.stopReaders: ' + failure);
-        }, 'FlomioPlugin', 'stopReaders', []);
+    stopReaders: function (success, failure) {
+        execPromise(success, failure, 'FlomioPlugin', 'stopReaders', []);
     },
-    sleepReaders: function (resultCallback, success, failure) {
-        exec(noop, function (failure) {
-            console.log('ERROR: FlomioPlugin.sleepReaders: ' + failure);
-        }, 'FlomioPlugin', 'sleepReaders', []);
+    sleepReaders: function (success, failure) {
+        execPromise(success, failure, 'FlomioPlugin', 'sleepReaders', []);
     },
-    startReaders: function (resultCallback, success, failure) {
-        exec(noop, function (failure) {
-            console.log('ERROR: FlomioPlugin.startReaders: ' + failure);
-        }, 'FlomioPlugin', 'startReaders', []);
+    startReaders: function (success, failure) {
+        execPromise(success, failure, 'FlomioPlugin', 'startReaders', []);
     },
-    sendApdu: function (resultCallback, deviceId, apdu, success, failure) {
+    sendApdu: function (resultCallback, deviceId, apdu) {
         console.log('in send apdu: ' + apdu + ' device: ' + deviceId);
         return new Promise(function (resolve, reject) {
             exec(function (deviceId, responseApdu) {
                 console.log('In response apdu: ' + responseApdu);
+                if (responseApdu.substr(responseApdu.length - 5) !== '90 00') {
+                    reject();
+                    return;
+                }
                 resolve(responseApdu);
                 resultCallback({ deviceId: deviceId, responseApdu: responseApdu });
             }, function (failure) {
                 console.log('ERROR: FlomioPlugin.sendApdu: ' + failure);
+                reject();
             }, 'FlomioPlugin', 'sendApdu', [deviceId, apdu]);
         });
     },
@@ -4931,6 +4926,15 @@ module.exports = {
             }, function (failure) {
                 reject(failure);
             }, 'FlomioPlugin', 'getBatteryLevel', []);
+        });
+    },
+    getCommunicationStatus: function () {
+        return new Promise(function (resolve, reject) {
+            exec(function (communicationStatus) {
+                resolve(communicationStatus);
+            }, function (failure) {
+                reject(failure);
+            }, 'FlomioPlugin', 'getCommunicationStatus', []);
         });
     },
     // Delegate/Event Listeners
@@ -4991,29 +4995,38 @@ module.exports = {
         console.log('bytes' + bytes);
         var hexString = util.bytesToHexString(bytes);
         console.log('hexString' + hexString);
+        console.log('deviceId:' + deviceId);
+        console.log('ndefMessage:' + ndefMessage);
         this.write(resultCallback, deviceId, hexString);
     },
-    write: function (resultCallback, deviceId, dataHexString, success, failure) {
-        // var apdus = []
-        var hex = ndef.tlvEncodeNdef(dataHexString);
-        var apduStrings = ndef.makeWriteApdus(hex, 4);
-        var fullResponse = '';
-        var apdus = [];
-        for (var i in apduStrings) {
-            // store each sendApdu promise
-            console.log(apduStrings[i]);
-            apdus.push(this.sendApdu(noop, deviceId, apduStrings[i]).then(function (responseApdu) {
-                console.log('response apdu: ' + responseApdu);
-                fullResponse = fullResponse.concat(responseApdu.slice(0, -5));
-            }, function (err) {
-                console.error(err);
-            }));
-        }
-        // send all apdus and capture result
-        Promise.all(apdus).then(function () {
-            console.log('fullResponse: ' + fullResponse);
-        }, function (reason) {
-            console.log(reason);
+    write: function (resultCallback, deviceId, dataHexString) {
+        return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
+            var hex, apduArray;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        hex = ndef.tlvEncodeNdef(dataHexString);
+                        apduArray = ndef.makeWriteApdus(hex, 4);
+                        return [4 /*yield*/, Promise.all(apduArray.map(function (apdu) { return __awaiter(_this, void 0, void 0, function () {
+                                return __generator(this, function (_a) {
+                                    switch (_a.label) {
+                                        case 0: return [4 /*yield*/, this.sendApdu(noop, deviceId, apdu)];
+                                        case 1:
+                                            _a.sent();
+                                            return [2 /*return*/];
+                                    }
+                                });
+                            }); })).then(function () {
+                                resultCallback('Tag written successfully', null);
+                            }).catch(function () {
+                                resultCallback(null, new Error('Tag not written successfully'));
+                            })];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
         });
     },
     launchNativeNfc: function (success, failure) {
@@ -5479,6 +5492,21 @@ module.exports.util = util;
 // textHelper and uriHelper aren't exported, add a property
 ndef.uriHelper = uriHelper;
 ndef.textHelper = textHelper;
+function execPromise(success, error, pluginName, method, args) {
+    return new Promise(function (resolve, reject) {
+        exec(function (result) {
+            resolve(result);
+            if (typeof success === 'function') {
+                success(result);
+            }
+        }, function (reason) {
+            reject(reason);
+            if (typeof error === 'function') {
+                error(reason);
+            }
+        }, pluginName, method, args);
+    });
+}
 // create aliases
 // util.bytesToString = util.bytesToString;
 // util.stringToBytes = util.stringToBytes;

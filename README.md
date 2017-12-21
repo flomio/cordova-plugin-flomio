@@ -182,12 +182,48 @@ meteor add-platform ios
         console.log(JSON.stringify(response.ndefMessage));
     }
     ```
-    Use response.error to indicate to users if a tag was removed too early while reading.
+    Use error to indicate to users if a tag was removed too early while reading.
+    
+    
+* `writeNdef(resultCallback, deviceId, message)`
+
+	Write NDEF formatted data to a tag in proximity of a specified target device.
+	```
+    write: function(result) {
+        flomioPlugin.writeNdef(this.writeCallback.bind(this), deviceId, message)
+    }
+    ```
+	and in that callback 
+	```
+	writeCallback: function(result, error) {
+	    if (error) {
+	        console.log(error.message)
+	        return
+	    }
+        console.log(result);
+    }
+    ```
+    Use error to indicate to users if a tag was removed too early while reading.
  
  * `getBatteryLevel()`
  
  	Returns a promise containing most recent battery level of device.
  	
+* `getCommunicationStatus()`
+ 
+    Returns a promise containing most recent communication status of device.
+    Responses:  
+    0 = Polling for tags
+    1 = Connected but not polling for tags
+    2 = Disconnected
+    
+* `stopReaders()`
+ 
+    Turn off polling for tags, use `startReaders()` to turn it back on.
+ 	
+*  `startReaders()`
+
+    Turn back on polling for tags after `stopReaders()` is called
 
 **Add Pro SDK for Offline usage**
 

@@ -26,12 +26,14 @@
 
 @property (nonatomic) DeviceType selectedDeviceType;
 @property (strong, nonatomic) NSNumber *latestBatteryLevel;
+@property (strong, nonatomic) NSNumber *latestCommunicationStatus;
 @property (strong, nonatomic) NSString *specificDeviceUuid;
 @property (strong, nonatomic) NFCNDEFReaderSession *session API_AVAILABLE(ios(11.0));
 
 // Cordova functions
 - (void)init:(CDVInvokedUrlCommand*)command;
 - (void)selectDeviceType:(CDVInvokedUrlCommand*)command;
+- (void)startReaders:(CDVInvokedUrlCommand*)command;
 - (void)stopReaders:(CDVInvokedUrlCommand*)command;
 - (void)sleepReaders:(CDVInvokedUrlCommand*)command;
 - (void)setConfiguration:(CDVInvokedUrlCommand*)command; //initialize all devices configuration with this
