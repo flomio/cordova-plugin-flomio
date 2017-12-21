@@ -203,14 +203,8 @@ module.exports = {
   },
 
   writeNdef: function (resultCallback, deviceId, ndefMessage) {
-    console.log('writeNdef')
-    console.log(deviceId)
     const bytes = ndef.encodeMessage(ndefMessage)
-    console.log('bytes' + bytes)
     const hexString = util.bytesToHexString(bytes)
-    console.log('hexString' + hexString)
-    console.log('deviceId:' + deviceId)
-    console.log('ndefMessage:' + ndefMessage)
     this.write(resultCallback, deviceId, hexString)
   },
 

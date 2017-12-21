@@ -4989,14 +4989,8 @@ module.exports = {
         }, 'FlomioPlugin', 'setNdefDiscoveredCallback', []);
     },
     writeNdef: function (resultCallback, deviceId, ndefMessage) {
-        console.log('writeNdef');
-        console.log(deviceId);
         var bytes = ndef.encodeMessage(ndefMessage);
-        console.log('bytes' + bytes);
         var hexString = util.bytesToHexString(bytes);
-        console.log('hexString' + hexString);
-        console.log('deviceId:' + deviceId);
-        console.log('ndefMessage:' + ndefMessage);
         this.write(resultCallback, deviceId, hexString);
     },
     write: function (resultCallback, deviceId, dataHexString) {
