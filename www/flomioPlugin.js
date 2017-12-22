@@ -33,9 +33,6 @@
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
 /******/
-/******/ 	// identity function for calling harmony imports with the correct context
-/******/ 	__webpack_require__.i = function(value) { return value; };
-/******/
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
 /******/ 		if(!__webpack_require__.o(exports, name)) {
@@ -63,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 22);
+/******/ 	return __webpack_require__(__webpack_require__.s = 8);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -81,9 +78,9 @@
 
 
 
-var base64 = __webpack_require__(11)
-var ieee754 = __webpack_require__(13)
-var isArray = __webpack_require__(14)
+var base64 = __webpack_require__(9)
+var ieee754 = __webpack_require__(10)
+var isArray = __webpack_require__(11)
 
 exports.Buffer = Buffer
 exports.SlowBuffer = SlowBuffer
@@ -1861,191 +1858,37 @@ function isnan (val) {
   return val !== val // eslint-disable-line no-self-compare
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
 /* 1 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-"use strict";
+var g;
 
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.TNF_EMPTY = 0x0;
-exports.TNF_WELL_KNOWN = 0x01;
-exports.TNF_MIME_MEDIA = 0x02;
-exports.TNF_ABSOLUTE_URI = 0x03;
-exports.TNF_EXTERNAL_TYPE = 0x04;
-exports.TNF_UNKNOWN = 0x05;
-exports.TNF_UNCHANGED = 0x06;
-exports.TNF_RESERVED = 0x07;
-exports.RTD_TEXT = 'T'; // [0x54]
-exports.RTD_URI = 'U'; // [0x55]
-exports.RTD_SMART_POSTER = 'Sp'; // [0x53, 0x70]
-exports.RTD_ALTERNATIVE_CARRIER = 'ac'; // [0x61, 0x63]
-exports.RTD_HANDOVER_CARRIER = 'Hc'; // [0x48, 0x63]
-exports.RTD_HANDOVER_REQUEST = 'Hr'; // [0x48, 0x72]
-exports.RTD_HANDOVER_SELECT = 'Hs'; // [0x48, 0x73]
-exports.MESSAGE_STOP_BYTE = 0xfe;
-exports.MESSAGE_START_TAG = 0x03;
-//# sourceMappingURL=consts.js.map
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
 
 /***/ }),
 /* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(Buffer) {
-// ndef-util.js
-// Copyright 2013 Don Coleman
-//
-Object.defineProperty(exports, "__esModule", { value: true });
-// This is from phonegap-nfc.js and is a combination of helpers in nfc and util
-// https://github.com/chariotsolutions/phonegap-nfc/blob/master/www/phonegap-nfc.js
-function stringToBytes(string) {
-    var bytes = Buffer.from(string).toJSON();
-    if (bytes.hasOwnProperty('data')) {
-        // Node 0.12.x
-        return bytes.data;
-    }
-    else {
-        // Node 0.10.x
-        return bytes;
-    }
-}
-exports.stringToBytes = stringToBytes;
-function bytesToString(bytes) {
-    return Buffer.from(bytes).toString();
-}
-exports.bytesToString = bytesToString;
-// useful for readable version of Tag UID
-function bytesToHexString(bytes) {
-    var dec;
-    var hexstring;
-    var bytesAsHexString = '';
-    for (var i = 0; i < bytes.length; i++) {
-        if (bytes[i] >= 0) {
-            dec = bytes[i];
-        }
-        else {
-            dec = 256 + bytes[i];
-        }
-        hexstring = dec.toString(16);
-        // zero padding
-        if (hexstring.length == 1) {
-            hexstring = '0' + hexstring;
-        }
-        bytesAsHexString += hexstring;
-    }
-    return bytesAsHexString;
-}
-exports.bytesToHexString = bytesToHexString;
-// i must be <= 256
-function toHex(i) {
-    var hex;
-    if (i < 0) {
-        i += 256;
-    }
-    hex = i.toString(16);
-    // zero padding
-    if (hex.length == 1) {
-        hex = '0' + hex;
-    }
-    return hex;
-}
-exports.toHex = toHex;
-function toPrintable(i) {
-    if (i >= 0x20 && i <= 0x7F) {
-        return String.fromCharCode(i);
-    }
-    else {
-        return '.';
-    }
-}
-exports.toPrintable = toPrintable;
-//# sourceMappingURL=ndef-util.js.map
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(Buffer) {// ndef-util.js
-// Copyright 2013 Don Coleman
-//
-
-// This is from phonegap-nfc.js and is a combination of helpers in nfc and util
-// https://github.com/chariotsolutions/phonegap-nfc/blob/master/www/phonegap-nfc.js
-
-function stringToBytes(string) {
-    var bytes = Buffer(string).toJSON();
-    if (bytes.hasOwnProperty('data')) {
-        // Node 0.12.x
-        return bytes.data;
-    } else {
-        // Node 0.10.x
-        return bytes;
-    }
-}
-
-function bytesToString(bytes) {
-    return Buffer(bytes).toString();
-}
-
-// useful for readable version of Tag UID
-function bytesToHexString(bytes) {
-    var dec, hexstring, bytesAsHexString = "";
-    for (var i = 0; i < bytes.length; i++) {
-       if (bytes[i] >= 0) {
-           dec = bytes[i];
-       } else {
-           dec = 256 + bytes[i];
-       }
-       hexstring = dec.toString(16);
-       // zero padding
-       if (hexstring.length == 1) {
-           hexstring = "0" + hexstring;
-       }
-       bytesAsHexString += hexstring;
-    }
-    return bytesAsHexString;
-}
-
-// i must be <= 256
-function toHex(i) {
-    var hex;
-
-    if (i < 0) {
-        i += 256;
-    }
-    hex = i.toString(16);
-
-    // zero padding
-    if (hex.length == 1) {
-        hex = "0" + hex;
-    }
-    return hex;
-}
-
-function toPrintable(i) {
-    if (i >= 0x20 & i <= 0x7F) {
-        return String.fromCharCode(i);
-    } else {
-        return '.';
-    }
-}
-
-module.exports = {
-    stringToBytes: stringToBytes,
-    bytesToString: bytesToString,
-    bytesToHexString: bytesToHexString,
-    toHex: toHex,
-    toPrintable: toPrintable
-};
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
-
-/***/ }),
-/* 4 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -2235,532 +2078,188 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 5 */
-/***/ (function(module, exports) {
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
 
-var g;
+/* WEBPACK VAR INJECTION */(function(Buffer) {// ndef-util.js
+// Copyright 2013 Don Coleman
+//
 
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
+// This is from phonegap-nfc.js and is a combination of helpers in nfc and util
+// https://github.com/chariotsolutions/phonegap-nfc/blob/master/www/phonegap-nfc.js
 
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1,eval)("this");
-} catch(e) {
-	// This works if the window reference is available
-	if(typeof window === "object")
-		g = window;
+function stringToBytes(string) {
+    var bytes = Buffer(string).toJSON();
+    if (bytes.hasOwnProperty('data')) {
+        // Node 0.12.x
+        return bytes.data;
+    } else {
+        // Node 0.10.x
+        return bytes;
+    }
 }
 
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
+function bytesToString(bytes) {
+    return Buffer(bytes).toString();
+}
 
-module.exports = g;
+// useful for readable version of Tag UID
+function bytesToHexString(bytes) {
+    var dec, hexstring, bytesAsHexString = "";
+    for (var i = 0; i < bytes.length; i++) {
+       if (bytes[i] >= 0) {
+           dec = bytes[i];
+       } else {
+           dec = 256 + bytes[i];
+       }
+       hexstring = dec.toString(16);
+       // zero padding
+       if (hexstring.length == 1) {
+           hexstring = "0" + hexstring;
+       }
+       bytesAsHexString += hexstring;
+    }
+    return bytesAsHexString;
+}
 
+// i must be <= 256
+function toHex(i) {
+    var hex;
+
+    if (i < 0) {
+        i += 256;
+    }
+    hex = i.toString(16);
+
+    // zero padding
+    if (hex.length == 1) {
+        hex = "0" + hex;
+    }
+    return hex;
+}
+
+function toPrintable(i) {
+    if (i >= 0x20 & i <= 0x7F) {
+        return String.fromCharCode(i);
+    } else {
+        return '.';
+    }
+}
+
+module.exports = {
+    stringToBytes: stringToBytes,
+    bytesToString: bytesToString,
+    bytesToHexString: bytesToHexString,
+    toHex: toHex,
+    toPrintable: toPrintable
+};
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 6 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(global) {
-
-// compare and isBuffer taken from https://github.com/feross/buffer/blob/680e9e5e488f22aac27599a57dc844a6315928dd/index.js
-// original notice:
-
-/*!
- * The buffer module from node.js, for the browser.
- *
- * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
- * @license  MIT
- */
-function compare(a, b) {
-  if (a === b) {
-    return 0;
-  }
-
-  var x = a.length;
-  var y = b.length;
-
-  for (var i = 0, len = Math.min(x, y); i < len; ++i) {
-    if (a[i] !== b[i]) {
-      x = a[i];
-      y = b[i];
-      break;
+/* WEBPACK VAR INJECTION */(function(Buffer) {
+// ndef-util.js
+// Copyright 2013 Don Coleman
+//
+Object.defineProperty(exports, "__esModule", { value: true });
+// This is from phonegap-nfc.js and is a combination of helpers in nfc and util
+// https://github.com/chariotsolutions/phonegap-nfc/blob/master/www/phonegap-nfc.js
+function stringToBytes(string) {
+    var bytes = Buffer.from(string).toJSON();
+    if (bytes.hasOwnProperty('data')) {
+        // Node 0.12.x
+        return bytes.data;
     }
-  }
-
-  if (x < y) {
-    return -1;
-  }
-  if (y < x) {
-    return 1;
-  }
-  return 0;
-}
-function isBuffer(b) {
-  if (global.Buffer && typeof global.Buffer.isBuffer === 'function') {
-    return global.Buffer.isBuffer(b);
-  }
-  return !!(b != null && b._isBuffer);
-}
-
-// based on node assert, original notice:
-
-// http://wiki.commonjs.org/wiki/Unit_Testing/1.0
-//
-// THIS IS NOT TESTED NOR LIKELY TO WORK OUTSIDE V8!
-//
-// Originally from narwhal.js (http://narwhaljs.org)
-// Copyright (c) 2009 Thomas Robinson <280north.com>
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the 'Software'), to
-// deal in the Software without restriction, including without limitation the
-// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
-// sell copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
-// ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-var util = __webpack_require__(25);
-var hasOwn = Object.prototype.hasOwnProperty;
-var pSlice = Array.prototype.slice;
-var functionsHaveNames = (function () {
-  return function foo() {}.name === 'foo';
-}());
-function pToString (obj) {
-  return Object.prototype.toString.call(obj);
-}
-function isView(arrbuf) {
-  if (isBuffer(arrbuf)) {
-    return false;
-  }
-  if (typeof global.ArrayBuffer !== 'function') {
-    return false;
-  }
-  if (typeof ArrayBuffer.isView === 'function') {
-    return ArrayBuffer.isView(arrbuf);
-  }
-  if (!arrbuf) {
-    return false;
-  }
-  if (arrbuf instanceof DataView) {
-    return true;
-  }
-  if (arrbuf.buffer && arrbuf.buffer instanceof ArrayBuffer) {
-    return true;
-  }
-  return false;
-}
-// 1. The assert module provides functions that throw
-// AssertionError's when particular conditions are not met. The
-// assert module must conform to the following interface.
-
-var assert = module.exports = ok;
-
-// 2. The AssertionError is defined in assert.
-// new assert.AssertionError({ message: message,
-//                             actual: actual,
-//                             expected: expected })
-
-var regex = /\s*function\s+([^\(\s]*)\s*/;
-// based on https://github.com/ljharb/function.prototype.name/blob/adeeeec8bfcc6068b187d7d9fb3d5bb1d3a30899/implementation.js
-function getName(func) {
-  if (!util.isFunction(func)) {
-    return;
-  }
-  if (functionsHaveNames) {
-    return func.name;
-  }
-  var str = func.toString();
-  var match = str.match(regex);
-  return match && match[1];
-}
-assert.AssertionError = function AssertionError(options) {
-  this.name = 'AssertionError';
-  this.actual = options.actual;
-  this.expected = options.expected;
-  this.operator = options.operator;
-  if (options.message) {
-    this.message = options.message;
-    this.generatedMessage = false;
-  } else {
-    this.message = getMessage(this);
-    this.generatedMessage = true;
-  }
-  var stackStartFunction = options.stackStartFunction || fail;
-  if (Error.captureStackTrace) {
-    Error.captureStackTrace(this, stackStartFunction);
-  } else {
-    // non v8 browsers so we can have a stacktrace
-    var err = new Error();
-    if (err.stack) {
-      var out = err.stack;
-
-      // try to strip useless frames
-      var fn_name = getName(stackStartFunction);
-      var idx = out.indexOf('\n' + fn_name);
-      if (idx >= 0) {
-        // once we have located the function frame
-        // we need to strip out everything before it (and its line)
-        var next_line = out.indexOf('\n', idx + 1);
-        out = out.substring(next_line + 1);
-      }
-
-      this.stack = out;
+    else {
+        // Node 0.10.x
+        return bytes;
     }
-  }
-};
-
-// assert.AssertionError instanceof Error
-util.inherits(assert.AssertionError, Error);
-
-function truncate(s, n) {
-  if (typeof s === 'string') {
-    return s.length < n ? s : s.slice(0, n);
-  } else {
-    return s;
-  }
 }
-function inspect(something) {
-  if (functionsHaveNames || !util.isFunction(something)) {
-    return util.inspect(something);
-  }
-  var rawname = getName(something);
-  var name = rawname ? ': ' + rawname : '';
-  return '[Function' +  name + ']';
+exports.stringToBytes = stringToBytes;
+function bytesToString(bytes) {
+    return Buffer.from(bytes).toString();
 }
-function getMessage(self) {
-  return truncate(inspect(self.actual), 128) + ' ' +
-         self.operator + ' ' +
-         truncate(inspect(self.expected), 128);
-}
-
-// At present only the three keys mentioned above are used and
-// understood by the spec. Implementations or sub modules can pass
-// other keys to the AssertionError's constructor - they will be
-// ignored.
-
-// 3. All of the following functions must throw an AssertionError
-// when a corresponding condition is not met, with a message that
-// may be undefined if not provided.  All assertion methods provide
-// both the actual and expected values to the assertion error for
-// display purposes.
-
-function fail(actual, expected, message, operator, stackStartFunction) {
-  throw new assert.AssertionError({
-    message: message,
-    actual: actual,
-    expected: expected,
-    operator: operator,
-    stackStartFunction: stackStartFunction
-  });
-}
-
-// EXTENSION! allows for well behaved errors defined elsewhere.
-assert.fail = fail;
-
-// 4. Pure assertion tests whether a value is truthy, as determined
-// by !!guard.
-// assert.ok(guard, message_opt);
-// This statement is equivalent to assert.equal(true, !!guard,
-// message_opt);. To test strictly for the value true, use
-// assert.strictEqual(true, guard, message_opt);.
-
-function ok(value, message) {
-  if (!value) fail(value, true, message, '==', assert.ok);
-}
-assert.ok = ok;
-
-// 5. The equality assertion tests shallow, coercive equality with
-// ==.
-// assert.equal(actual, expected, message_opt);
-
-assert.equal = function equal(actual, expected, message) {
-  if (actual != expected) fail(actual, expected, message, '==', assert.equal);
-};
-
-// 6. The non-equality assertion tests for whether two objects are not equal
-// with != assert.notEqual(actual, expected, message_opt);
-
-assert.notEqual = function notEqual(actual, expected, message) {
-  if (actual == expected) {
-    fail(actual, expected, message, '!=', assert.notEqual);
-  }
-};
-
-// 7. The equivalence assertion tests a deep equality relation.
-// assert.deepEqual(actual, expected, message_opt);
-
-assert.deepEqual = function deepEqual(actual, expected, message) {
-  if (!_deepEqual(actual, expected, false)) {
-    fail(actual, expected, message, 'deepEqual', assert.deepEqual);
-  }
-};
-
-assert.deepStrictEqual = function deepStrictEqual(actual, expected, message) {
-  if (!_deepEqual(actual, expected, true)) {
-    fail(actual, expected, message, 'deepStrictEqual', assert.deepStrictEqual);
-  }
-};
-
-function _deepEqual(actual, expected, strict, memos) {
-  // 7.1. All identical values are equivalent, as determined by ===.
-  if (actual === expected) {
-    return true;
-  } else if (isBuffer(actual) && isBuffer(expected)) {
-    return compare(actual, expected) === 0;
-
-  // 7.2. If the expected value is a Date object, the actual value is
-  // equivalent if it is also a Date object that refers to the same time.
-  } else if (util.isDate(actual) && util.isDate(expected)) {
-    return actual.getTime() === expected.getTime();
-
-  // 7.3 If the expected value is a RegExp object, the actual value is
-  // equivalent if it is also a RegExp object with the same source and
-  // properties (`global`, `multiline`, `lastIndex`, `ignoreCase`).
-  } else if (util.isRegExp(actual) && util.isRegExp(expected)) {
-    return actual.source === expected.source &&
-           actual.global === expected.global &&
-           actual.multiline === expected.multiline &&
-           actual.lastIndex === expected.lastIndex &&
-           actual.ignoreCase === expected.ignoreCase;
-
-  // 7.4. Other pairs that do not both pass typeof value == 'object',
-  // equivalence is determined by ==.
-  } else if ((actual === null || typeof actual !== 'object') &&
-             (expected === null || typeof expected !== 'object')) {
-    return strict ? actual === expected : actual == expected;
-
-  // If both values are instances of typed arrays, wrap their underlying
-  // ArrayBuffers in a Buffer each to increase performance
-  // This optimization requires the arrays to have the same type as checked by
-  // Object.prototype.toString (aka pToString). Never perform binary
-  // comparisons for Float*Arrays, though, since e.g. +0 === -0 but their
-  // bit patterns are not identical.
-  } else if (isView(actual) && isView(expected) &&
-             pToString(actual) === pToString(expected) &&
-             !(actual instanceof Float32Array ||
-               actual instanceof Float64Array)) {
-    return compare(new Uint8Array(actual.buffer),
-                   new Uint8Array(expected.buffer)) === 0;
-
-  // 7.5 For all other Object pairs, including Array objects, equivalence is
-  // determined by having the same number of owned properties (as verified
-  // with Object.prototype.hasOwnProperty.call), the same set of keys
-  // (although not necessarily the same order), equivalent values for every
-  // corresponding key, and an identical 'prototype' property. Note: this
-  // accounts for both named and indexed properties on Arrays.
-  } else if (isBuffer(actual) !== isBuffer(expected)) {
-    return false;
-  } else {
-    memos = memos || {actual: [], expected: []};
-
-    var actualIndex = memos.actual.indexOf(actual);
-    if (actualIndex !== -1) {
-      if (actualIndex === memos.expected.indexOf(expected)) {
-        return true;
-      }
+exports.bytesToString = bytesToString;
+// useful for readable version of Tag UID
+function bytesToHexString(bytes) {
+    var dec;
+    var hexstring;
+    var bytesAsHexString = '';
+    for (var i = 0; i < bytes.length; i++) {
+        if (bytes[i] >= 0) {
+            dec = bytes[i];
+        }
+        else {
+            dec = 256 + bytes[i];
+        }
+        hexstring = dec.toString(16);
+        // zero padding
+        if (hexstring.length == 1) {
+            hexstring = '0' + hexstring;
+        }
+        bytesAsHexString += hexstring;
     }
-
-    memos.actual.push(actual);
-    memos.expected.push(expected);
-
-    return objEquiv(actual, expected, strict, memos);
-  }
+    return bytesAsHexString;
 }
-
-function isArguments(object) {
-  return Object.prototype.toString.call(object) == '[object Arguments]';
-}
-
-function objEquiv(a, b, strict, actualVisitedObjects) {
-  if (a === null || a === undefined || b === null || b === undefined)
-    return false;
-  // if one is a primitive, the other must be same
-  if (util.isPrimitive(a) || util.isPrimitive(b))
-    return a === b;
-  if (strict && Object.getPrototypeOf(a) !== Object.getPrototypeOf(b))
-    return false;
-  var aIsArgs = isArguments(a);
-  var bIsArgs = isArguments(b);
-  if ((aIsArgs && !bIsArgs) || (!aIsArgs && bIsArgs))
-    return false;
-  if (aIsArgs) {
-    a = pSlice.call(a);
-    b = pSlice.call(b);
-    return _deepEqual(a, b, strict);
-  }
-  var ka = objectKeys(a);
-  var kb = objectKeys(b);
-  var key, i;
-  // having the same number of owned properties (keys incorporates
-  // hasOwnProperty)
-  if (ka.length !== kb.length)
-    return false;
-  //the same set of keys (although not necessarily the same order),
-  ka.sort();
-  kb.sort();
-  //~~~cheap key test
-  for (i = ka.length - 1; i >= 0; i--) {
-    if (ka[i] !== kb[i])
-      return false;
-  }
-  //equivalent values for every corresponding key, and
-  //~~~possibly expensive deep test
-  for (i = ka.length - 1; i >= 0; i--) {
-    key = ka[i];
-    if (!_deepEqual(a[key], b[key], strict, actualVisitedObjects))
-      return false;
-  }
-  return true;
-}
-
-// 8. The non-equivalence assertion tests for any deep inequality.
-// assert.notDeepEqual(actual, expected, message_opt);
-
-assert.notDeepEqual = function notDeepEqual(actual, expected, message) {
-  if (_deepEqual(actual, expected, false)) {
-    fail(actual, expected, message, 'notDeepEqual', assert.notDeepEqual);
-  }
-};
-
-assert.notDeepStrictEqual = notDeepStrictEqual;
-function notDeepStrictEqual(actual, expected, message) {
-  if (_deepEqual(actual, expected, true)) {
-    fail(actual, expected, message, 'notDeepStrictEqual', notDeepStrictEqual);
-  }
-}
-
-
-// 9. The strict equality assertion tests strict equality, as determined by ===.
-// assert.strictEqual(actual, expected, message_opt);
-
-assert.strictEqual = function strictEqual(actual, expected, message) {
-  if (actual !== expected) {
-    fail(actual, expected, message, '===', assert.strictEqual);
-  }
-};
-
-// 10. The strict non-equality assertion tests for strict inequality, as
-// determined by !==.  assert.notStrictEqual(actual, expected, message_opt);
-
-assert.notStrictEqual = function notStrictEqual(actual, expected, message) {
-  if (actual === expected) {
-    fail(actual, expected, message, '!==', assert.notStrictEqual);
-  }
-};
-
-function expectedException(actual, expected) {
-  if (!actual || !expected) {
-    return false;
-  }
-
-  if (Object.prototype.toString.call(expected) == '[object RegExp]') {
-    return expected.test(actual);
-  }
-
-  try {
-    if (actual instanceof expected) {
-      return true;
+exports.bytesToHexString = bytesToHexString;
+// i must be <= 256
+function toHex(i) {
+    var hex;
+    if (i < 0) {
+        i += 256;
     }
-  } catch (e) {
-    // Ignore.  The instanceof check doesn't work for arrow functions.
-  }
-
-  if (Error.isPrototypeOf(expected)) {
-    return false;
-  }
-
-  return expected.call({}, actual) === true;
+    hex = i.toString(16);
+    // zero padding
+    if (hex.length == 1) {
+        hex = '0' + hex;
+    }
+    return hex;
 }
-
-function _tryBlock(block) {
-  var error;
-  try {
-    block();
-  } catch (e) {
-    error = e;
-  }
-  return error;
+exports.toHex = toHex;
+function toPrintable(i) {
+    if (i >= 0x20 && i <= 0x7F) {
+        return String.fromCharCode(i);
+    }
+    else {
+        return '.';
+    }
 }
-
-function _throws(shouldThrow, block, expected, message) {
-  var actual;
-
-  if (typeof block !== 'function') {
-    throw new TypeError('"block" argument must be a function');
-  }
-
-  if (typeof expected === 'string') {
-    message = expected;
-    expected = null;
-  }
-
-  actual = _tryBlock(block);
-
-  message = (expected && expected.name ? ' (' + expected.name + ').' : '.') +
-            (message ? ' ' + message : '.');
-
-  if (shouldThrow && !actual) {
-    fail(actual, expected, 'Missing expected exception' + message);
-  }
-
-  var userProvidedMessage = typeof message === 'string';
-  var isUnwantedException = !shouldThrow && util.isError(actual);
-  var isUnexpectedException = !shouldThrow && actual && !expected;
-
-  if ((isUnwantedException &&
-      userProvidedMessage &&
-      expectedException(actual, expected)) ||
-      isUnexpectedException) {
-    fail(actual, expected, 'Got unwanted exception' + message);
-  }
-
-  if ((shouldThrow && actual && expected &&
-      !expectedException(actual, expected)) || (!shouldThrow && actual)) {
-    throw actual;
-  }
-}
-
-// 11. Expected to throw an error:
-// assert.throws(block, Error_opt, message_opt);
-
-assert.throws = function(block, /*optional*/error, /*optional*/message) {
-  _throws(true, block, error, message);
-};
-
-// EXTENSION! This is annoying to write outside this module.
-assert.doesNotThrow = function(block, /*optional*/error, /*optional*/message) {
-  _throws(false, block, error, message);
-};
-
-assert.ifError = function(err) { if (err) throw err; };
-
-var objectKeys = Object.keys || function (obj) {
-  var keys = [];
-  for (var key in obj) {
-    if (hasOwn.call(obj, key)) keys.push(key);
-  }
-  return keys;
-};
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
+exports.toPrintable = toPrintable;
+//# sourceMappingURL=ndef-util.js.map
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 7 */
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TNF_EMPTY = 0x0;
+exports.TNF_WELL_KNOWN = 0x01;
+exports.TNF_MIME_MEDIA = 0x02;
+exports.TNF_ABSOLUTE_URI = 0x03;
+exports.TNF_EXTERNAL_TYPE = 0x04;
+exports.TNF_UNKNOWN = 0x05;
+exports.TNF_UNCHANGED = 0x06;
+exports.TNF_RESERVED = 0x07;
+exports.RTD_TEXT = 'T'; // [0x54]
+exports.RTD_URI = 'U'; // [0x55]
+exports.RTD_SMART_POSTER = 'Sp'; // [0x53, 0x70]
+exports.RTD_ALTERNATIVE_CARRIER = 'ac'; // [0x61, 0x63]
+exports.RTD_HANDOVER_CARRIER = 'Hc'; // [0x48, 0x63]
+exports.RTD_HANDOVER_REQUEST = 'Hr'; // [0x48, 0x72]
+exports.RTD_HANDOVER_SELECT = 'Hs'; // [0x48, 0x73]
+exports.MESSAGE_STOP_BYTE = 0xfe;
+exports.MESSAGE_START_TAG = 0x03;
+//# sourceMappingURL=consts.js.map
+
+/***/ }),
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2770,10 +2269,10 @@ var objectKeys = Object.keys || function (obj) {
 //
 // This code is from phonegap-nfc.js https://github.com/don/phonegap-nfc
 Object.defineProperty(exports, "__esModule", { value: true });
-var utils = __webpack_require__(2);
-var consts = __webpack_require__(1);
-var textHelper = __webpack_require__(16);
-var uriHelper = __webpack_require__(17);
+var utils = __webpack_require__(4);
+var consts = __webpack_require__(5);
+var textHelper = __webpack_require__(18);
+var uriHelper = __webpack_require__(19);
 // import {
 //   RTD_SMART_POSTER, RTD_TEXT, RTD_URI, TNF_ABSOLUTE_URI, TNF_EMPTY,
 //   TNF_EXTERNAL_TYPE, TNF_MIME_MEDIA, TNF_RESERVED, TNF_UNCHANGED, TNF_UNKNOWN,
@@ -3281,1646 +2780,505 @@ exports.stringify = stringifier.stringify;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 8 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(process, Buffer) {
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
-Object.defineProperty(exports, "__esModule", { value: true });
-if (process.version.indexOf('v0.8') === 0) {
-    // Monkey Patch Buffer for Node 0.8 support
-    Buffer.prototype.toJSON = function () {
-        var j = [];
-        for (var i = 0; i < this.length; i++) {
-            j[i] = this[i];
-        }
-        return j;
-    };
-}
-__export(__webpack_require__(7));
-__export(__webpack_require__(1));
-__export(__webpack_require__(15));
-var push_parser_1 = __webpack_require__(18);
-exports.PushParser = push_parser_1.PushParser;
-//# sourceMappingURL=index.js.map
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4), __webpack_require__(0).Buffer))
+/* WEBPACK VAR INJECTION */(function(global) {
 
-/***/ }),
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
+// compare and isBuffer taken from https://github.com/feross/buffer/blob/680e9e5e488f22aac27599a57dc844a6315928dd/index.js
+// original notice:
 
-/* WEBPACK VAR INJECTION */(function(process, Buffer) {var ndef = __webpack_require__(21);
-module.exports = ndef;
-
-if (process.version.indexOf('v0.8') === 0) {
-    // Monkey Patch Buffer for Node 0.8 support
-    Buffer.prototype.toJSON = function() {
-        j = [];
-        for (var i = 0; i < this.length; i++) {
-            j[i] = this[i];
-        }    
-        return j;
-    }
-}
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4), __webpack_require__(0).Buffer))
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports) {
-
-module.exports = require("cordova/exec");
-
-/***/ }),
-/* 11 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-exports.byteLength = byteLength
-exports.toByteArray = toByteArray
-exports.fromByteArray = fromByteArray
-
-var lookup = []
-var revLookup = []
-var Arr = typeof Uint8Array !== 'undefined' ? Uint8Array : Array
-
-var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
-for (var i = 0, len = code.length; i < len; ++i) {
-  lookup[i] = code[i]
-  revLookup[code.charCodeAt(i)] = i
-}
-
-revLookup['-'.charCodeAt(0)] = 62
-revLookup['_'.charCodeAt(0)] = 63
-
-function placeHoldersCount (b64) {
-  var len = b64.length
-  if (len % 4 > 0) {
-    throw new Error('Invalid string. Length must be a multiple of 4')
+/*!
+ * The buffer module from node.js, for the browser.
+ *
+ * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
+ * @license  MIT
+ */
+function compare(a, b) {
+  if (a === b) {
+    return 0;
   }
 
-  // the number of equal signs (place holders)
-  // if there are two placeholders, than the two characters before it
-  // represent one byte
-  // if there is only one, then the three characters before it represent 2 bytes
-  // this is just a cheap hack to not do indexOf twice
-  return b64[len - 2] === '=' ? 2 : b64[len - 1] === '=' ? 1 : 0
-}
+  var x = a.length;
+  var y = b.length;
 
-function byteLength (b64) {
-  // base64 is 4/3 + up to two characters of the original data
-  return (b64.length * 3 / 4) - placeHoldersCount(b64)
-}
-
-function toByteArray (b64) {
-  var i, l, tmp, placeHolders, arr
-  var len = b64.length
-  placeHolders = placeHoldersCount(b64)
-
-  arr = new Arr((len * 3 / 4) - placeHolders)
-
-  // if there are placeholders, only get up to the last complete 4 chars
-  l = placeHolders > 0 ? len - 4 : len
-
-  var L = 0
-
-  for (i = 0; i < l; i += 4) {
-    tmp = (revLookup[b64.charCodeAt(i)] << 18) | (revLookup[b64.charCodeAt(i + 1)] << 12) | (revLookup[b64.charCodeAt(i + 2)] << 6) | revLookup[b64.charCodeAt(i + 3)]
-    arr[L++] = (tmp >> 16) & 0xFF
-    arr[L++] = (tmp >> 8) & 0xFF
-    arr[L++] = tmp & 0xFF
-  }
-
-  if (placeHolders === 2) {
-    tmp = (revLookup[b64.charCodeAt(i)] << 2) | (revLookup[b64.charCodeAt(i + 1)] >> 4)
-    arr[L++] = tmp & 0xFF
-  } else if (placeHolders === 1) {
-    tmp = (revLookup[b64.charCodeAt(i)] << 10) | (revLookup[b64.charCodeAt(i + 1)] << 4) | (revLookup[b64.charCodeAt(i + 2)] >> 2)
-    arr[L++] = (tmp >> 8) & 0xFF
-    arr[L++] = tmp & 0xFF
-  }
-
-  return arr
-}
-
-function tripletToBase64 (num) {
-  return lookup[num >> 18 & 0x3F] + lookup[num >> 12 & 0x3F] + lookup[num >> 6 & 0x3F] + lookup[num & 0x3F]
-}
-
-function encodeChunk (uint8, start, end) {
-  var tmp
-  var output = []
-  for (var i = start; i < end; i += 3) {
-    tmp = (uint8[i] << 16) + (uint8[i + 1] << 8) + (uint8[i + 2])
-    output.push(tripletToBase64(tmp))
-  }
-  return output.join('')
-}
-
-function fromByteArray (uint8) {
-  var tmp
-  var len = uint8.length
-  var extraBytes = len % 3 // if we have 1 byte left, pad 2 bytes
-  var output = ''
-  var parts = []
-  var maxChunkLength = 16383 // must be multiple of 3
-
-  // go through the array every three bytes, we'll deal with trailing stuff later
-  for (var i = 0, len2 = len - extraBytes; i < len2; i += maxChunkLength) {
-    parts.push(encodeChunk(uint8, i, (i + maxChunkLength) > len2 ? len2 : (i + maxChunkLength)))
-  }
-
-  // pad the end with zeros, but make sure to not forget the extra bytes
-  if (extraBytes === 1) {
-    tmp = uint8[len - 1]
-    output += lookup[tmp >> 2]
-    output += lookup[(tmp << 4) & 0x3F]
-    output += '=='
-  } else if (extraBytes === 2) {
-    tmp = (uint8[len - 2] << 8) + (uint8[len - 1])
-    output += lookup[tmp >> 10]
-    output += lookup[(tmp >> 4) & 0x3F]
-    output += lookup[(tmp << 2) & 0x3F]
-    output += '='
-  }
-
-  parts.push(output)
-
-  return parts.join('')
-}
-
-
-/***/ }),
-/* 12 */
-/***/ (function(module, exports) {
-
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-function EventEmitter() {
-  this._events = this._events || {};
-  this._maxListeners = this._maxListeners || undefined;
-}
-module.exports = EventEmitter;
-
-// Backwards-compat with node 0.10.x
-EventEmitter.EventEmitter = EventEmitter;
-
-EventEmitter.prototype._events = undefined;
-EventEmitter.prototype._maxListeners = undefined;
-
-// By default EventEmitters will print a warning if more than 10 listeners are
-// added to it. This is a useful default which helps finding memory leaks.
-EventEmitter.defaultMaxListeners = 10;
-
-// Obviously not all Emitters should be limited to 10. This function allows
-// that to be increased. Set to zero for unlimited.
-EventEmitter.prototype.setMaxListeners = function(n) {
-  if (!isNumber(n) || n < 0 || isNaN(n))
-    throw TypeError('n must be a positive number');
-  this._maxListeners = n;
-  return this;
-};
-
-EventEmitter.prototype.emit = function(type) {
-  var er, handler, len, args, i, listeners;
-
-  if (!this._events)
-    this._events = {};
-
-  // If there is no 'error' event listener then throw.
-  if (type === 'error') {
-    if (!this._events.error ||
-        (isObject(this._events.error) && !this._events.error.length)) {
-      er = arguments[1];
-      if (er instanceof Error) {
-        throw er; // Unhandled 'error' event
-      } else {
-        // At least give some kind of context to the user
-        var err = new Error('Uncaught, unspecified "error" event. (' + er + ')');
-        err.context = er;
-        throw err;
-      }
+  for (var i = 0, len = Math.min(x, y); i < len; ++i) {
+    if (a[i] !== b[i]) {
+      x = a[i];
+      y = b[i];
+      break;
     }
   }
 
-  handler = this._events[type];
-
-  if (isUndefined(handler))
-    return false;
-
-  if (isFunction(handler)) {
-    switch (arguments.length) {
-      // fast cases
-      case 1:
-        handler.call(this);
-        break;
-      case 2:
-        handler.call(this, arguments[1]);
-        break;
-      case 3:
-        handler.call(this, arguments[1], arguments[2]);
-        break;
-      // slower
-      default:
-        args = Array.prototype.slice.call(arguments, 1);
-        handler.apply(this, args);
-    }
-  } else if (isObject(handler)) {
-    args = Array.prototype.slice.call(arguments, 1);
-    listeners = handler.slice();
-    len = listeners.length;
-    for (i = 0; i < len; i++)
-      listeners[i].apply(this, args);
+  if (x < y) {
+    return -1;
   }
-
-  return true;
-};
-
-EventEmitter.prototype.addListener = function(type, listener) {
-  var m;
-
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  if (!this._events)
-    this._events = {};
-
-  // To avoid recursion in the case that type === "newListener"! Before
-  // adding it to the listeners, first emit "newListener".
-  if (this._events.newListener)
-    this.emit('newListener', type,
-              isFunction(listener.listener) ?
-              listener.listener : listener);
-
-  if (!this._events[type])
-    // Optimize the case of one listener. Don't need the extra array object.
-    this._events[type] = listener;
-  else if (isObject(this._events[type]))
-    // If we've already got an array, just append.
-    this._events[type].push(listener);
-  else
-    // Adding the second element, need to change to array.
-    this._events[type] = [this._events[type], listener];
-
-  // Check for listener leak
-  if (isObject(this._events[type]) && !this._events[type].warned) {
-    if (!isUndefined(this._maxListeners)) {
-      m = this._maxListeners;
-    } else {
-      m = EventEmitter.defaultMaxListeners;
-    }
-
-    if (m && m > 0 && this._events[type].length > m) {
-      this._events[type].warned = true;
-      console.error('(node) warning: possible EventEmitter memory ' +
-                    'leak detected. %d listeners added. ' +
-                    'Use emitter.setMaxListeners() to increase limit.',
-                    this._events[type].length);
-      if (typeof console.trace === 'function') {
-        // not supported in IE 10
-        console.trace();
-      }
-    }
-  }
-
-  return this;
-};
-
-EventEmitter.prototype.on = EventEmitter.prototype.addListener;
-
-EventEmitter.prototype.once = function(type, listener) {
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  var fired = false;
-
-  function g() {
-    this.removeListener(type, g);
-
-    if (!fired) {
-      fired = true;
-      listener.apply(this, arguments);
-    }
-  }
-
-  g.listener = listener;
-  this.on(type, g);
-
-  return this;
-};
-
-// emits a 'removeListener' event iff the listener was removed
-EventEmitter.prototype.removeListener = function(type, listener) {
-  var list, position, length, i;
-
-  if (!isFunction(listener))
-    throw TypeError('listener must be a function');
-
-  if (!this._events || !this._events[type])
-    return this;
-
-  list = this._events[type];
-  length = list.length;
-  position = -1;
-
-  if (list === listener ||
-      (isFunction(list.listener) && list.listener === listener)) {
-    delete this._events[type];
-    if (this._events.removeListener)
-      this.emit('removeListener', type, listener);
-
-  } else if (isObject(list)) {
-    for (i = length; i-- > 0;) {
-      if (list[i] === listener ||
-          (list[i].listener && list[i].listener === listener)) {
-        position = i;
-        break;
-      }
-    }
-
-    if (position < 0)
-      return this;
-
-    if (list.length === 1) {
-      list.length = 0;
-      delete this._events[type];
-    } else {
-      list.splice(position, 1);
-    }
-
-    if (this._events.removeListener)
-      this.emit('removeListener', type, listener);
-  }
-
-  return this;
-};
-
-EventEmitter.prototype.removeAllListeners = function(type) {
-  var key, listeners;
-
-  if (!this._events)
-    return this;
-
-  // not listening for removeListener, no need to emit
-  if (!this._events.removeListener) {
-    if (arguments.length === 0)
-      this._events = {};
-    else if (this._events[type])
-      delete this._events[type];
-    return this;
-  }
-
-  // emit removeListener for all listeners on all events
-  if (arguments.length === 0) {
-    for (key in this._events) {
-      if (key === 'removeListener') continue;
-      this.removeAllListeners(key);
-    }
-    this.removeAllListeners('removeListener');
-    this._events = {};
-    return this;
-  }
-
-  listeners = this._events[type];
-
-  if (isFunction(listeners)) {
-    this.removeListener(type, listeners);
-  } else if (listeners) {
-    // LIFO order
-    while (listeners.length)
-      this.removeListener(type, listeners[listeners.length - 1]);
-  }
-  delete this._events[type];
-
-  return this;
-};
-
-EventEmitter.prototype.listeners = function(type) {
-  var ret;
-  if (!this._events || !this._events[type])
-    ret = [];
-  else if (isFunction(this._events[type]))
-    ret = [this._events[type]];
-  else
-    ret = this._events[type].slice();
-  return ret;
-};
-
-EventEmitter.prototype.listenerCount = function(type) {
-  if (this._events) {
-    var evlistener = this._events[type];
-
-    if (isFunction(evlistener))
-      return 1;
-    else if (evlistener)
-      return evlistener.length;
+  if (y < x) {
+    return 1;
   }
   return 0;
-};
-
-EventEmitter.listenerCount = function(emitter, type) {
-  return emitter.listenerCount(type);
-};
-
-function isFunction(arg) {
-  return typeof arg === 'function';
 }
-
-function isNumber(arg) {
-  return typeof arg === 'number';
-}
-
-function isObject(arg) {
-  return typeof arg === 'object' && arg !== null;
-}
-
-function isUndefined(arg) {
-  return arg === void 0;
-}
-
-
-/***/ }),
-/* 13 */
-/***/ (function(module, exports) {
-
-exports.read = function (buffer, offset, isLE, mLen, nBytes) {
-  var e, m
-  var eLen = nBytes * 8 - mLen - 1
-  var eMax = (1 << eLen) - 1
-  var eBias = eMax >> 1
-  var nBits = -7
-  var i = isLE ? (nBytes - 1) : 0
-  var d = isLE ? -1 : 1
-  var s = buffer[offset + i]
-
-  i += d
-
-  e = s & ((1 << (-nBits)) - 1)
-  s >>= (-nBits)
-  nBits += eLen
-  for (; nBits > 0; e = e * 256 + buffer[offset + i], i += d, nBits -= 8) {}
-
-  m = e & ((1 << (-nBits)) - 1)
-  e >>= (-nBits)
-  nBits += mLen
-  for (; nBits > 0; m = m * 256 + buffer[offset + i], i += d, nBits -= 8) {}
-
-  if (e === 0) {
-    e = 1 - eBias
-  } else if (e === eMax) {
-    return m ? NaN : ((s ? -1 : 1) * Infinity)
-  } else {
-    m = m + Math.pow(2, mLen)
-    e = e - eBias
+function isBuffer(b) {
+  if (global.Buffer && typeof global.Buffer.isBuffer === 'function') {
+    return global.Buffer.isBuffer(b);
   }
-  return (s ? -1 : 1) * m * Math.pow(2, e - mLen)
+  return !!(b != null && b._isBuffer);
 }
 
-exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
-  var e, m, c
-  var eLen = nBytes * 8 - mLen - 1
-  var eMax = (1 << eLen) - 1
-  var eBias = eMax >> 1
-  var rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0)
-  var i = isLE ? 0 : (nBytes - 1)
-  var d = isLE ? 1 : -1
-  var s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0
+// based on node assert, original notice:
 
-  value = Math.abs(value)
-
-  if (isNaN(value) || value === Infinity) {
-    m = isNaN(value) ? 1 : 0
-    e = eMax
-  } else {
-    e = Math.floor(Math.log(value) / Math.LN2)
-    if (value * (c = Math.pow(2, -e)) < 1) {
-      e--
-      c *= 2
-    }
-    if (e + eBias >= 1) {
-      value += rt / c
-    } else {
-      value += rt * Math.pow(2, 1 - eBias)
-    }
-    if (value * c >= 2) {
-      e++
-      c /= 2
-    }
-
-    if (e + eBias >= eMax) {
-      m = 0
-      e = eMax
-    } else if (e + eBias >= 1) {
-      m = (value * c - 1) * Math.pow(2, mLen)
-      e = e + eBias
-    } else {
-      m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen)
-      e = 0
-    }
-  }
-
-  for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8) {}
-
-  e = (e << mLen) | m
-  eLen += mLen
-  for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8) {}
-
-  buffer[offset + i - d] |= s * 128
-}
-
-
-/***/ }),
-/* 14 */
-/***/ (function(module, exports) {
-
-var toString = {}.toString;
-
-module.exports = Array.isArray || function (arr) {
-  return toString.call(arr) == '[object Array]';
-};
-
-
-/***/ }),
-/* 15 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(Buffer) {
-Object.defineProperty(exports, "__esModule", { value: true });
-var assert = __webpack_require__(6);
-var consts_1 = __webpack_require__(1);
-function makeSlices(data, pageSize) {
-    if (pageSize === void 0) { pageSize = 4; }
-    var result = [];
-    for (var i = 0; i < data.length; i += pageSize) {
-        result.push(data.slice(i, i + pageSize));
-    }
-    return result;
-}
-exports.makeSlices = makeSlices;
-function tlvDecodeNdef(userData) {
-    var t = userData.readUInt8(0);
-    assert.equal(t, 0x03);
-    var length = userData.readUInt8(1);
-    var starts = 2;
-    if (length === 0xFF) {
-        length = userData.readUInt16BE(2);
-        starts = 4;
-    }
-    return userData.slice(starts, starts + length);
-}
-exports.tlvDecodeNdef = tlvDecodeNdef;
-function tlvEncodeNdef(message) {
-    // Add the ndef message type
-    var buffers = [new Buffer([consts_1.MESSAGE_START_TAG])];
-    var length = message.length;
-    if (length <= 0xFE) {
-        buffers.push(Buffer.from([length]));
-    }
-    else {
-        var length_1 = Buffer.alloc(3);
-        length_1.writeUInt8(0xff, 0);
-        length_1.writeUInt16BE(message.length, 1);
-        buffers.push(length_1);
-    }
-    buffers.push(message);
-    // Add the terminator
-    buffers.push(Buffer.from([consts_1.MESSAGE_STOP_BYTE]));
-    return Buffer.concat(buffers);
-}
-exports.tlvEncodeNdef = tlvEncodeNdef;
-function createWriteApdus(tagType, data) {
-    assert.equal(tagType, 'mifareUltralight');
-    var slices = makeSlices(data, 4);
-    var userDataPageStarts = 4; //
-    return slices.map(function (slice, ix) {
-        if (slice.length < 4) {
-            slice = Buffer.concat([slice, Buffer.alloc(4 - slice.length)]);
-        }
-        return Buffer.concat([
-            new Buffer([0xFF, 0xD6, 0x00, userDataPageStarts + ix, 4]),
-            slice
-        ]);
-    });
-}
-exports.createWriteApdus = createWriteApdus;
-//# sourceMappingURL=apdu-helpers.js.map
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
-
-/***/ }),
-/* 16 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var util = __webpack_require__(2);
-// decode text bytes from ndef record payload
-// @returns a string
-function decodePayload(data) {
-    var // 6 LSBs
-    languageCodeLength = (data[0] & 0x3F); // assuming UTF-16BE
-    // TODO need to deal with UTF in the future
-    // console.log("lang " + languageCode + (utf16 ? " utf16" : " utf8"));
-    var languageCode = data.slice(1, 1 + languageCodeLength);
-    var utf16 = (data[0] & 0x80) !== 0;
-    return util.bytesToString(data.slice(languageCodeLength + 1));
-}
-exports.decodePayload = decodePayload;
-// encode text payload
-// @returns an array of bytes
-function encodePayload(text, lang, encoding) {
-    // ISO/IANA language code, but we're not enforcing
-    if (!lang) {
-        lang = 'en';
-    }
-    var encoded = util.stringToBytes(lang + text);
-    encoded.unshift(lang.length);
-    return encoded;
-}
-exports.encodePayload = encodePayload;
-//# sourceMappingURL=ndef-text.js.map
-
-/***/ }),
-/* 17 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var util = __webpack_require__(2);
-// URI identifier codes from URI Record Type Definition NFCForum-TS-RTD_URI_1.0 2006-07-24
-// index in array matches code in the spec
-var protocols = ['', 'http://www.', 'https://www.', 'http://', 'https://', 'tel:', 'mailto:', 'ftp://anonymous:anonymous@', 'ftp://ftp.', 'ftps://', 'sftp://', 'smb://', 'nfs://', 'ftp://', 'dav://', 'news:', 'telnet://', 'imap:', 'rtsp://', 'urn:', 'pop:', 'sip:', 'sips:', 'tftp:', 'btspp://', 'btl2cap://', 'btgoep://', 'tcpobex://', 'irdaobex://', 'file://', 'urn:epc:id:', 'urn:epc:tag:', 'urn:epc:pat:', 'urn:epc:raw:', 'urn:epc:', 'urn:nfc:'];
-// decode a URI payload bytes
-// @returns a string
-function decodePayload(data) {
-    var prefix = protocols[data[0]];
-    if (!prefix) {
-        prefix = '';
-    }
-    return prefix + util.bytesToString(data.slice(1));
-}
-exports.decodePayload = decodePayload;
-// shorten a URI with standard prefix
-// @returns an array of bytes
-function encodePayload(uri) {
-    var prefix;
-    // check each protocol, unless we've found a match
-    // "urn:" is the one exception where we need to keep checking
-    // slice so we don't check ""
-    var protocolCode;
-    var encoded;
-    protocols.slice(1).forEach(function (protocol) {
-        if ((!prefix || prefix === 'urn:') && uri.indexOf(protocol) === 0) {
-            prefix = protocol;
-        }
-    });
-    if (!prefix) {
-        prefix = '';
-    }
-    encoded = util.stringToBytes(uri.slice(prefix.length));
-    protocolCode = protocols.indexOf(prefix);
-    // prepend protocol code
-    encoded.unshift(protocolCode);
-    return encoded;
-}
-exports.encodePayload = encodePayload;
-//# sourceMappingURL=ndef-uri.js.map
-
-/***/ }),
-/* 18 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(Buffer) {
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-var events = __webpack_require__(12);
-var assert = __webpack_require__(6);
-var ndef_1 = __webpack_require__(7);
-var ParseState;
-(function (ParseState) {
-    ParseState[ParseState["expectingStopByte"] = 0] = "expectingStopByte";
-    ParseState[ParseState["expectingPayload"] = 1] = "expectingPayload";
-    ParseState[ParseState["expectingId"] = 2] = "expectingId";
-    ParseState[ParseState["expectingType"] = 3] = "expectingType";
-    ParseState[ParseState["expectingIdLength"] = 4] = "expectingIdLength";
-    ParseState[ParseState["expectingPayloadLengthFourByte"] = 5] = "expectingPayloadLengthFourByte";
-    ParseState[ParseState["expectingPayloadLengthOneByte"] = 6] = "expectingPayloadLengthOneByte";
-    ParseState[ParseState["expectingTypeLength"] = 7] = "expectingTypeLength";
-    ParseState[ParseState["expectingTag"] = 8] = "expectingTag";
-    ParseState[ParseState["expectingLength"] = 9] = "expectingLength";
-    ParseState[ParseState["expectingValue"] = 10] = "expectingValue";
-})(ParseState = exports.ParseState || (exports.ParseState = {}));
-function decodeTnf(tnf_byte) {
-    return {
-        mb: (tnf_byte & 0x80) !== 0,
-        me: (tnf_byte & 0x40) !== 0,
-        cf: (tnf_byte & 0x20) !== 0,
-        sr: (tnf_byte & 0x10) !== 0,
-        il: (tnf_byte & 0x8) !== 0,
-        tnf: (tnf_byte & 0x7)
-    };
-}
-var PushParser = (function (_super) {
-    __extends(PushParser, _super);
-    function PushParser(initialState) {
-        if (initialState === void 0) { initialState = ParseState.expectingTag; }
-        var _this = _super.call(this) || this;
-        _this.buffers = [];
-        _this.cursor = 0;
-        _this.currentCursor = 0;
-        _this.totalLength = 0;
-        _this.currentBuffer = 0;
-        _this.state = initialState;
-        return _this;
-    }
-    Object.defineProperty(PushParser.prototype, "state", {
-        get: function () {
-            return this._state;
-        },
-        set: function (v) {
-            // console.log('setting state', v, {
-            //   payloadLength: this.payloadLength,
-            //   typeLength: this.typeLength,
-            //   idLength: this.idLength
-            // })
-            this._state = v;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    PushParser.prototype.push = function (buffer) {
-        this.pushBuffer(buffer);
-        this.process();
-    };
-    PushParser.prototype.getState = function () {
-        return this.state;
-    };
-    PushParser.prototype.process = function () {
-        var self = this;
-        // noinspection FallThroughInSwitchStatementJS
-        if (self.state === ParseState.expectingTag) {
-            if (self.canRead(1)) {
-                var tag = self.readUint8();
-                if (tag === 0x03) {
-                    self.state = ParseState.expectingLength;
-                    self.emit('foundNdefTag');
-                }
-                else {
-                    self.emit('skipping');
-                    // self.process()
-                }
-            }
-        }
-        if (self.state === ParseState.expectingLength) {
-            if (self.canRead(3)) {
-                var length_1 = self.readUint8();
-                if (length_1 === 0xFF) {
-                    length_1 = self.readUint16BE();
-                    self.expectedLength = length_1;
-                }
-                self.state = ParseState.expectingValue;
-            }
-            else {
-                return;
-            }
-        }
-        if (self.state === ParseState.expectingValue) {
-            if (self.canRead(1)) {
-                var tnf_byte = self.readUint8();
-                var header = decodeTnf(tnf_byte);
-                self.header = header;
-                self.state = ParseState.expectingTypeLength;
-                if (header.mb) {
-                    self.emit('messageBegin');
-                }
-            }
-        }
-        if (self.state === ParseState.expectingTypeLength) {
-            if (self.canRead(1)) {
-                self.typeLength = self.readUint8();
-                if (self.header.sr) {
-                    self.state = ParseState.expectingPayloadLengthOneByte;
-                }
-                else {
-                    self.state = ParseState.expectingPayloadLengthFourByte;
-                }
-            }
-        }
-        if (self.state === ParseState.expectingPayloadLengthOneByte) {
-            if (self.canRead(1)) {
-                self.payloadLength = self.readUint8();
-                self.state = ParseState.expectingIdLength;
-            }
-        }
-        if (self.state === ParseState.expectingPayloadLengthFourByte) {
-            if (self.canRead(4)) {
-                self.payloadLength = self.readUint32BE();
-                self.state = ParseState.expectingIdLength;
-            }
-        }
-        if (self.state === ParseState.expectingIdLength) {
-            if (self.header.il) {
-                if (self.canRead(1)) {
-                    self.idLength = self.readUint8();
-                    self.state = ParseState.expectingType;
-                }
-            }
-            else {
-                self.idLength = 0;
-                self.state = ParseState.expectingType;
-            }
-        }
-        if (self.state === ParseState.expectingType) {
-            if (self.canRead(self.typeLength)) {
-                self.typeBytes = self.read(self.typeLength);
-                self.state = ParseState.expectingId;
-            }
-        }
-        if (self.state === ParseState.expectingId) {
-            if (self.canRead(self.idLength)) {
-                self.idBytes = self.read(self.idLength);
-                self.state = ParseState.expectingPayload;
-            }
-        }
-        if (self.state === ParseState.expectingPayload) {
-            if (self.canRead(self.payloadLength)) {
-                self.payloadBytes = self.read(self.payloadLength);
-                self.emit('record', self.getRecord());
-                if (!self.header.me) {
-                    self.state = ParseState.expectingValue;
-                    self.process();
-                }
-                else {
-                    self.emit('messageEnd');
-                    self.state = ParseState.expectingStopByte;
-                }
-            }
-        }
-        if (self.state == ParseState.expectingStopByte) {
-            if (this.canRead(1)) {
-            }
-            // go to next ...
-        }
-        // noinspection FallThroughInSwitchStatementJS
-    };
-    PushParser.prototype.getRecord = function () {
-        // TODO: use bytes
-        var getBytes = function (buf) { return buf.toJSON().data; };
-        return ndef_1.record(this.header.tnf, getBytes(this.typeBytes), getBytes(this.idBytes), getBytes(this.payloadBytes));
-    };
-    PushParser.prototype.pushBuffer = function (buffer) {
-        this.buffers.push(buffer);
-        this.totalLength += buffer.length;
-    };
-    PushParser.prototype.canRead = function (n) {
-        return (this.cursor + n) <= this.totalLength;
-    };
-    PushParser.prototype.read = function (n) {
-        // cursor is zero based indexing, so cursor + n should be less than total
-        assert(this.canRead(n));
-        if (n === 0) {
-            return Buffer.alloc(0);
-        }
-        this.cursor += n;
-        var buffers = [];
-        while (n > this.availableInTopBuffer()) {
-            var current = this.current();
-            var buf = this.currentCursor !== 0 ?
-                // take what's left of the current buffer
-                current.slice(this.currentCursor) :
-                // take the whole buffer
-                current;
-            buffers.push(buf);
-            n -= buf.length;
-            this.currentBuffer++;
-            this.currentCursor = 0;
-        }
-        if (n) {
-            // Take part
-            buffers.push(this.current().slice(this.currentCursor, this.currentCursor + n));
-            this.currentCursor += n;
-        }
-        return Buffer.concat(buffers);
-    };
-    PushParser.prototype.readUint32BE = function () {
-        var buf = this.read(4);
-        return buf.readUInt32BE(0);
-    };
-    PushParser.prototype.readUint8 = function () {
-        var buf = this.read(1);
-        return buf.readUInt8(0);
-    };
-    PushParser.prototype.availableInTopBuffer = function () {
-        return this.current().length - this.currentCursor;
-    };
-    PushParser.prototype.current = function () {
-        return this.buffers[this.currentBuffer];
-    };
-    PushParser.prototype.readUint16BE = function () {
-        var buf = this.read(2);
-        return buf.readUInt16BE(0);
-    };
-    PushParser.prototype.finishedMessage = function () {
-        return this.state === ParseState.expectingStopByte;
-    };
-    return PushParser;
-}(events.EventEmitter));
-exports.PushParser = PushParser;
-//# sourceMappingURL=push-parser.js.map
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
-
-/***/ }),
-/* 19 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var util = __webpack_require__(3);
-
-// decode text bytes from ndef record payload
-// @returns a string
-function decode(data) {
-
-    var languageCodeLength = (data[0] & 0x3F), // 6 LSBs
-        languageCode = data.slice(1, 1 + languageCodeLength),
-        utf16 = (data[0] & 0x80) !== 0; // assuming UTF-16BE
-
-    // TODO need to deal with UTF in the future
-    // console.log("lang " + languageCode + (utf16 ? " utf16" : " utf8"));
-
-    return util.bytesToString(data.slice(languageCodeLength + 1));
-}
-
-// encode text payload
-// @returns an array of bytes
-function encode(text, lang, encoding) {
-
-    // ISO/IANA language code, but we're not enforcing
-    if (!lang) { lang = 'en'; }
-
-    var encoded = util.stringToBytes(lang + text);
-    encoded.unshift(lang.length);
-
-    return encoded;
-}
-
-module.exports = {
-    encodePayload: encode,
-    decodePayload: decode
-}
-
-
-/***/ }),
-/* 20 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var util = __webpack_require__(3);
-
-// URI identifier codes from URI Record Type Definition NFCForum-TS-RTD_URI_1.0 2006-07-24
-// index in array matches code in the spec
-var protocols = [ "", "http://www.", "https://www.", "http://", "https://", "tel:", "mailto:", "ftp://anonymous:anonymous@", "ftp://ftp.", "ftps://", "sftp://", "smb://", "nfs://", "ftp://", "dav://", "news:", "telnet://", "imap:", "rtsp://", "urn:", "pop:", "sip:", "sips:", "tftp:", "btspp://", "btl2cap://", "btgoep://", "tcpobex://", "irdaobex://", "file://", "urn:epc:id:", "urn:epc:tag:", "urn:epc:pat:", "urn:epc:raw:", "urn:epc:", "urn:nfc:" ]
-
-// decode a URI payload bytes
-// @returns a string
-function decode(data) {
-    var prefix = protocols[data[0]];
-    if (!prefix) { // 36 to 255 should be ""
-        prefix = "";
-    }    
-    return prefix + util.bytesToString(data.slice(1));      
-} 
-
-// shorten a URI with standard prefix
-// @returns an array of bytes
-function encode(uri) {
-    
-    var prefix,
-        protocolCode,
-        encoded;
-
-    // check each protocol, unless we've found a match
-    // "urn:" is the one exception where we need to keep checking
-    // slice so we don't check ""
-    protocols.slice(1).forEach(function(protocol) {                        
-        if ((!prefix || prefix === "urn:") && uri.indexOf(protocol) === 0) { 
-            prefix = protocol;
-        }
-    });
-
-    if (!prefix) {
-        prefix = "";
-    }
-    
-    encoded = util.stringToBytes(uri.slice(prefix.length));
-    protocolCode = protocols.indexOf(prefix);    
-    // prepend protocol code
-    encoded.unshift(protocolCode);
-    
-    return encoded; 
-}
-
-module.exports = {
-    encodePayload: encode,
-    decodePayload: decode
-}
-
-
-/***/ }),
-/* 21 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(Buffer) {// ndef.js
-// Copyright 2013 Don Coleman
+// http://wiki.commonjs.org/wiki/Unit_Testing/1.0
 //
-// This code is from phonegap-nfc.js https://github.com/don/phonegap-nfc
+// THIS IS NOT TESTED NOR LIKELY TO WORK OUTSIDE V8!
+//
+// Originally from narwhal.js (http://narwhaljs.org)
+// Copyright (c) 2009 Thomas Robinson <280north.com>
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the 'Software'), to
+// deal in the Software without restriction, including without limitation the
+// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+// sell copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+// ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-var util = __webpack_require__(3),
-    textHelper = __webpack_require__(19),
-    uriHelper = __webpack_require__(20);
+var util = __webpack_require__(21);
+var hasOwn = Object.prototype.hasOwnProperty;
+var pSlice = Array.prototype.slice;
+var functionsHaveNames = (function () {
+  return function foo() {}.name === 'foo';
+}());
+function pToString (obj) {
+  return Object.prototype.toString.call(obj);
+}
+function isView(arrbuf) {
+  if (isBuffer(arrbuf)) {
+    return false;
+  }
+  if (typeof global.ArrayBuffer !== 'function') {
+    return false;
+  }
+  if (typeof ArrayBuffer.isView === 'function') {
+    return ArrayBuffer.isView(arrbuf);
+  }
+  if (!arrbuf) {
+    return false;
+  }
+  if (arrbuf instanceof DataView) {
+    return true;
+  }
+  if (arrbuf.buffer && arrbuf.buffer instanceof ArrayBuffer) {
+    return true;
+  }
+  return false;
+}
+// 1. The assert module provides functions that throw
+// AssertionError's when particular conditions are not met. The
+// assert module must conform to the following interface.
 
-var ndef = {
+var assert = module.exports = ok;
 
-    // see android.nfc.NdefRecord for documentation about constants
-    // http://developer.android.com/reference/android/nfc/NdefRecord.html
-    TNF_EMPTY: 0x0,
-    TNF_WELL_KNOWN: 0x01,
-    TNF_MIME_MEDIA: 0x02,
-    TNF_ABSOLUTE_URI: 0x03,
-    TNF_EXTERNAL_TYPE: 0x04,
-    TNF_UNKNOWN: 0x05,
-    TNF_UNCHANGED: 0x06,
-    TNF_RESERVED: 0x07,
+// 2. The AssertionError is defined in assert.
+// new assert.AssertionError({ message: message,
+//                             actual: actual,
+//                             expected: expected })
 
-    RTD_TEXT: "T", // [0x54]
-    RTD_URI: "U", // [0x55]
-    RTD_SMART_POSTER: "Sp", // [0x53, 0x70]
-    RTD_ALTERNATIVE_CARRIER: "ac", //[0x61, 0x63]
-    RTD_HANDOVER_CARRIER: "Hc", // [0x48, 0x63]
-    RTD_HANDOVER_REQUEST: "Hr", // [0x48, 0x72]
-    RTD_HANDOVER_SELECT: "Hs", // [0x48, 0x73]
+var regex = /\s*function\s+([^\(\s]*)\s*/;
+// based on https://github.com/ljharb/function.prototype.name/blob/adeeeec8bfcc6068b187d7d9fb3d5bb1d3a30899/implementation.js
+function getName(func) {
+  if (!util.isFunction(func)) {
+    return;
+  }
+  if (functionsHaveNames) {
+    return func.name;
+  }
+  var str = func.toString();
+  var match = str.match(regex);
+  return match && match[1];
+}
+assert.AssertionError = function AssertionError(options) {
+  this.name = 'AssertionError';
+  this.actual = options.actual;
+  this.expected = options.expected;
+  this.operator = options.operator;
+  if (options.message) {
+    this.message = options.message;
+    this.generatedMessage = false;
+  } else {
+    this.message = getMessage(this);
+    this.generatedMessage = true;
+  }
+  var stackStartFunction = options.stackStartFunction || fail;
+  if (Error.captureStackTrace) {
+    Error.captureStackTrace(this, stackStartFunction);
+  } else {
+    // non v8 browsers so we can have a stacktrace
+    var err = new Error();
+    if (err.stack) {
+      var out = err.stack;
 
-    /**
-     * Creates a JSON representation of a NDEF Record.
-     *
-     * @tnf 3-bit TNF (Type Name Format) - use one of the TNF_* constants
-     * @type byte array, containing zero to 255 bytes, must not be null
-     * @id byte array, containing zero to 255 bytes, must not be null
-     * @payload byte array, containing zero to (2 ** 32 - 1) bytes, must not be null
-     *
-     * @returns JSON representation of a NDEF record
-     *
-     * @see Ndef.textRecord, Ndef.uriRecord and Ndef.mimeMediaRecord for examples
-     */
-    record: function (tnf, type, id, payload) {
+      // try to strip useless frames
+      var fn_name = getName(stackStartFunction);
+      var idx = out.indexOf('\n' + fn_name);
+      if (idx >= 0) {
+        // once we have located the function frame
+        // we need to strip out everything before it (and its line)
+        var next_line = out.indexOf('\n', idx + 1);
+        out = out.substring(next_line + 1);
+      }
 
-        // handle null values
-        if (!tnf) { tnf = ndef.TNF_EMPTY; }
-        if (!type) { type = []; }
-        if (!id) { id = []; }
-        if (!payload) { payload = []; }
-
-        // store type as String so it's easier to compare
-        if(type instanceof Array) {
-            type = util.bytesToString(type);
-        }
-
-        // in the future, id could be a String
-        if (!(id instanceof Array)) {
-           id = util.stringToBytes(id);
-        }
-
-        // Payload must be binary
-        if (!(payload instanceof Array)) {
-           payload = util.stringToBytes(payload);
-        }
-
-        var record = {
-            tnf: tnf,
-            type: type,
-            id: id,
-            payload: payload
-        };
-
-        // Experimental feature
-        // Convert payload to text for Text and URI records
-        if (tnf === ndef.TNF_WELL_KNOWN) {
-            switch(record.type) {
-                case ndef.RTD_TEXT:
-                    record.value = ndef.text.decodePayload(record.payload);
-                    break;
-                case ndef.RTD_URI:
-                    record.value = ndef.uri.decodePayload(record.payload);
-                    break;
-            }
-        }
-
-        return record;
-    },
-
-    /**
-     * Helper that creates an NDEF record containing plain text.
-     *
-     * @text String of text to encode
-     * @languageCode ISO/IANA language code. Examples: “fi”, “en-US”, “fr-CA”, “jp”. (optional)
-     * @id byte[] (optional)
-     */
-    textRecord: function (text, languageCode, id) {
-        var payload = textHelper.encodePayload(text, languageCode);
-        if (!id) { id = []; }
-
-        return ndef.record(ndef.TNF_WELL_KNOWN, ndef.RTD_TEXT, id, payload);
-    },
-
-    /**
-     * Helper that creates a NDEF record containing a URI.
-     *
-     * @uri String
-     * @id byte[] (optional)
-     */
-    uriRecord: function (uri, id) {
-        var payload = uriHelper.encodePayload(uri);
-        if (!id) { id = []; }
-        return ndef.record(ndef.TNF_WELL_KNOWN, ndef.RTD_URI, id, payload);
-    },
-
-    /**
-     * Helper that creates a NDEF record containing an absolute URI.
-     *
-     * An Absolute URI record means the URI describes the payload of the record.
-     *
-     * For example a SOAP message could use "http://schemas.xmlsoap.org/soap/envelope/"
-     * as the type and XML content for the payload.
-     *
-     * Absolute URI can also be used to write LaunchApp records for Windows.
-     *
-     * See 2.4.2 Payload Type of the NDEF Specification
-     * http://www.nfc-forum.org/specs/spec_list#ndefts
-     *
-     * Note that by default, Android will open the URI defined in the type
-     * field of an Absolute URI record (TNF=3) and ignore the payload.
-     * BlackBerry and Windows do not open the browser for TNF=3.
-     *
-     * To write a URI as the payload use ndef.uriRecord(uri)
-     *
-     * @uri String
-     * @payload byte[] or String
-     * @id byte[] (optional)
-     */
-    absoluteUriRecord: function (uri, payload, id) {
-        if (!id) { id = []; }
-        if (!payload) { payload = []; }
-        return ndef.record(ndef.TNF_ABSOLUTE_URI, uri, id, payload);
-    },
-
-    /**
-     * Helper that creates a NDEF record containing an mimeMediaRecord.
-     *
-     * @mimeType String
-     * @payload byte[]
-     * @id byte[] (optional)
-     */
-    mimeMediaRecord: function (mimeType, payload, id) {
-        if (!id) { id = []; }
-        return ndef.record(ndef.TNF_MIME_MEDIA, mimeType, id, payload);
-    },
-
-    /**
-     * Helper that creates an NDEF record containing an Smart Poster.
-     *
-     * @ndefRecords array of NDEF Records
-     * @id byte[] (optional)
-     */
-    smartPoster: function (ndefRecords, id) {
-        var payload = [];
-
-        if (!id) { id = []; }
-
-        if (ndefRecords)
-        {
-            // make sure we have an array of something like NDEF records before encoding
-            if (ndefRecords[0] instanceof Object && ndefRecords[0].hasOwnProperty('tnf')) {
-                payload = ndef.encodeMessage(ndefRecords);
-            } else {
-                // assume the caller has already encoded the NDEF records into a byte array
-                payload = ndefRecords;
-            }
-        } else {
-            console.log("WARNING: Expecting an array of NDEF records");
-        }
-
-        return ndef.record(ndef.TNF_WELL_KNOWN, ndef.RTD_SMART_POSTER, id, payload);
-    },
-
-    /**
-     * Helper that creates an empty NDEF record.
-     *
-     */
-    emptyRecord: function() {
-        return ndef.record(ndef.TNF_EMPTY, [], [], []);
-    },
-
-    /**
-    * Helper that creates an Android Application Record (AAR).
-    * http://developer.android.com/guide/topics/connectivity/nfc/nfc.html#aar
-    *
-    */
-    androidApplicationRecord: function(packageName) {
-        return ndef.record(ndef.TNF_EXTERNAL_TYPE, "android.com:pkg", [], packageName);
-    },
-
-
-    /**
-     * Encodes an NDEF Message into bytes that can be written to a NFC tag.
-     *
-     * @ndefRecords an Array of NDEF Records
-     *
-     * @returns byte array
-     *
-     * @see NFC Data Exchange Format (NDEF) http://www.nfc-forum.org/specs/spec_list/
-     */
-    encodeMessage: function (ndefRecords) {
-
-        var encoded = [],
-            tnf_byte,
-            record_type,
-            payload_length,
-            id_length,
-            i,
-            mb, me, // messageBegin, messageEnd
-            cf = false, // chunkFlag TODO implement
-            sr, // boolean shortRecord
-            il; // boolean idLengthFieldIsPresent
-
-        for(i = 0; i < ndefRecords.length; i++) {
-
-            mb = (i === 0);
-            me = (i === (ndefRecords.length - 1));
-            sr = (ndefRecords[i].payload.length < 0xFF);
-            il = (ndefRecords[i].id.length > 0);
-            tnf_byte = ndef.encodeTnf(mb, me, cf, sr, il, ndefRecords[i].tnf);
-            encoded.push(tnf_byte);
-
-            // type is stored as String, converting to bytes for storage
-            record_type = util.stringToBytes(ndefRecords[i].type);
-            encoded.push(record_type.length);
-
-            if (sr) {
-                payload_length = ndefRecords[i].payload.length;
-                encoded.push(payload_length);
-            } else {
-                payload_length = ndefRecords[i].payload.length;
-                // 4 bytes
-                encoded.push((payload_length >> 24));
-                encoded.push((payload_length >> 16));
-                encoded.push((payload_length >> 8));
-                encoded.push((payload_length & 0xFF));
-            }
-
-            if (il) {
-                id_length = ndefRecords[i].id.length;
-                encoded.push(id_length);
-            }
-
-            encoded = encoded.concat(record_type);
-
-            if (il) {
-                encoded = encoded.concat(ndefRecords[i].id);
-            }
-
-            encoded = encoded.concat(ndefRecords[i].payload);
-        }
-
-        return encoded;
-    },
-
-    /**
-     * Decodes an array bytes into an NDEF Message
-     *
-     * @bytes an array bytes read from a NFC tag
-     *
-     * @returns array of NDEF Records
-     *
-     * @see NFC Data Exchange Format (NDEF) http://www.nfc-forum.org/specs/spec_list/
-     */
-    decodeMessage: function (bytes) {
-
-        var bytes = bytes.slice(0), // clone since parsing is destructive
-            ndef_message = [],
-            tnf_byte,
-            header,
-            type_length = 0,
-            payload_length = 0,
-            id_length = 0,
-            record_type = [],
-            id = [],
-            payload = [];
-
-        while(bytes.length) {
-
-            tnf_byte = bytes.shift();
-            header = ndef.decodeTnf(tnf_byte);
-
-            type_length = bytes.shift();
-
-            if (header.sr) {
-                payload_length = bytes.shift();
-            } else {
-                // next 4 bytes are length
-                payload_length = ((0xFF & bytes.shift()) << 24) |
-                    ((0xFF & bytes.shift()) << 16) |
-                    ((0xFF & bytes.shift()) << 8) |
-                    (0xFF & bytes.shift());
-            }
-
-            if (header.il) {
-                id_length = bytes.shift();
-            }
-
-            record_type = bytes.splice(0, type_length);
-            id = bytes.splice(0, id_length);
-            payload = bytes.splice(0, payload_length);
-
-            ndef_message.push(
-                ndef.record(header.tnf, record_type, id, payload)
-            );
-
-            if (header.me) break; // last message
-        }
-
-        return ndef_message;
-    },
-
-    /**
-     * Decode the bit flags from a TNF Byte.
-     *
-     * @returns object with decoded data
-     *
-     *  See NFC Data Exchange Format (NDEF) Specification Section 3.2 RecordLayout
-     */
-    decodeTnf: function (tnf_byte) {
-        return {
-            mb: (tnf_byte & 0x80) !== 0,
-            me: (tnf_byte & 0x40) !== 0,
-            cf: (tnf_byte & 0x20) !== 0,
-            sr: (tnf_byte & 0x10) !== 0,
-            il: (tnf_byte & 0x8) !== 0,
-            tnf: (tnf_byte & 0x7)
-        };
-    },
-
-    /**
-     * Encode NDEF bit flags into a TNF Byte.
-     *
-     * @returns tnf byte
-     *
-     *  See NFC Data Exchange Format (NDEF) Specification Section 3.2 RecordLayout
-     */
-    encodeTnf: function (mb, me, cf, sr, il, tnf) {
-
-        var value = tnf;
-
-        if (mb) {
-            value = value | 0x80;
-        }
-
-        if (me) {
-            value = value | 0x40;
-        }
-
-        // note if cf: me, mb, li must be false and tnf must be 0x6
-        if (cf) {
-            value = value | 0x20;
-        }
-
-        if (sr) {
-            value = value | 0x10;
-        }
-
-        if (il) {
-            value = value | 0x8;
-        }
-
-        return value;
-    },
-
-    // TODO test with byte[] and string
-    isType: function(record, tnf, type) {
-
-        if (record.tnf === tnf) {
-            return (s(record) === s(type));
-        }
-        return false;
-
+      this.stack = out;
     }
-
+  }
 };
 
-function tnfToString(tnf) {
-    var value = tnf;
+// assert.AssertionError instanceof Error
+util.inherits(assert.AssertionError, Error);
 
-    switch (tnf) {
-        case ndef.TNF_EMPTY:
-            value = "Empty";
-            break;
-        case ndef.TNF_WELL_KNOWN:
-            value = "Well Known";
-            break;
-        case ndef.TNF_MIME_MEDIA:
-            value = "Mime Media";
-            break;
-        case ndef.TNF_ABSOLUTE_URI:
-            value = "Absolute URI";
-            break;
-        case ndef.TNF_EXTERNAL_TYPE:
-            value = "External";
-            break;
-        case ndef.TNF_UNKNOWN:
-            value = "Unknown";
-            break;
-        case ndef.TNF_UNCHANGED:
-            value = "Unchanged";
-            break;
-        case ndef.TNF_RESERVED:
-            value = "Reserved";
-            break;
-    }
-    return value;
+function truncate(s, n) {
+  if (typeof s === 'string') {
+    return s.length < n ? s : s.slice(0, n);
+  } else {
+    return s;
+  }
+}
+function inspect(something) {
+  if (functionsHaveNames || !util.isFunction(something)) {
+    return util.inspect(something);
+  }
+  var rawname = getName(something);
+  var name = rawname ? ': ' + rawname : '';
+  return '[Function' +  name + ']';
+}
+function getMessage(self) {
+  return truncate(inspect(self.actual), 128) + ' ' +
+         self.operator + ' ' +
+         truncate(inspect(self.expected), 128);
 }
 
-// Convert NDEF records and messages to strings
-// This works OK for demos, but real code proably needs
-// a custom implementation. It would be nice to make
-// smarter record objects that can print themselves
-var stringifier = {
+// At present only the three keys mentioned above are used and
+// understood by the spec. Implementations or sub modules can pass
+// other keys to the AssertionError's constructor - they will be
+// ignored.
 
-    stringify: function (data, separator) {
+// 3. All of the following functions must throw an AssertionError
+// when a corresponding condition is not met, with a message that
+// may be undefined if not provided.  All assertion methods provide
+// both the actual and expected values to the assertion error for
+// display purposes.
 
-        if (Array.isArray(data)) {
+function fail(actual, expected, message, operator, stackStartFunction) {
+  throw new assert.AssertionError({
+    message: message,
+    actual: actual,
+    expected: expected,
+    operator: operator,
+    stackStartFunction: stackStartFunction
+  });
+}
 
-            if (typeof data[0] === 'number') {
-                // guessing this message bytes
-                data = ndef.decodeMessage(data);
-            }
+// EXTENSION! allows for well behaved errors defined elsewhere.
+assert.fail = fail;
 
-            return stringifier.printRecords(data, separator);
-        } else {
-            return stringifier.printRecord(data, separator);
-        }
-    },
+// 4. Pure assertion tests whether a value is truthy, as determined
+// by !!guard.
+// assert.ok(guard, message_opt);
+// This statement is equivalent to assert.equal(true, !!guard,
+// message_opt);. To test strictly for the value true, use
+// assert.strictEqual(true, guard, message_opt);.
 
-    // @message - NDEF Message (array of NDEF Records)
-    // @separator - line separator, optional, defaults to \n
-    // @returns string with NDEF Message
-    printRecords: function (message, separator) {
+function ok(value, message) {
+  if (!value) fail(value, true, message, '==', assert.ok);
+}
+assert.ok = ok;
 
-        if(!separator) { separator = "\n"; }
-        result = "";
+// 5. The equality assertion tests shallow, coercive equality with
+// ==.
+// assert.equal(actual, expected, message_opt);
 
-        // Print out the payload for each record
-        message.forEach(function(record) {
-            result += stringifier.printRecord(record, separator);
-            result += separator;
-        });
-
-        return result.slice(0, (-1 * separator.length));
-    },
-
-    // @record - NDEF Record
-    // @separator - line separator, optional, defaults to \n
-    // @returns string with NDEF Record
-    printRecord: function (record, separator) {
-
-        var result = "";
-
-        if(!separator) { separator = "\n"; }
-
-        switch(record.tnf) {
-            case ndef.TNF_EMPTY:
-                result += "Empty Record";
-                result += separator;
-                break;
-            case ndef.TNF_WELL_KNOWN:
-                result += stringifier.printWellKnown(record, separator);
-                break;
-            case ndef.TNF_MIME_MEDIA:
-                result += "MIME Media";
-                result += separator;
-                result += s(record.type);
-                result += separator;
-                result += s(record.payload); // might be binary
-                break;
-            case ndef.TNF_ABSOLUTE_URI:
-                result += "Absolute URI";
-                result += separator;
-                result += s(record.type);    // the URI is the type
-                result += separator;
-                result += s(record.payload); // might be binary
-                break;;
-            case ndef.TNF_EXTERNAL_TYPE:
-                // AAR contains strings, other types could
-                // contain binary data
-                result += "External";
-                result += separator;
-                result += s(record.type);
-                result += separator;
-                result += s(record.payload);
-                break;
-            default:
-                result += s("Can't process TNF " + record.tnf);
-        }
-
-        result += separator;
-        return result;
-    },
-
-    printWellKnown: function (record, separator) {
-
-        var result = "";
-
-        if (record.tnf !== ndef.TNF_WELL_KNOWN) {
-            return "ERROR expecting TNF Well Known";
-        }
-
-        switch(record.type) {
-            case ndef.RTD_TEXT:
-                result += "Text Record";
-                result += separator;
-                result += (ndef.text.decodePayload(record.payload));
-                break;
-            case ndef.RTD_URI:
-                result += "URI Record";
-                result += separator;
-                result += (ndef.uri.decodePayload(record.payload));
-                break;
-            case ndef.RTD_SMART_POSTER:
-                result += "Smart Poster";
-                result += separator;
-                // the payload of a smartposter is a NDEF message
-                result += stringifier.printRecords(ndef.decodeMessage(record.payload));
-                break;
-            default:
-                // attempt to display other types
-                result += record.type + " Record";
-                result += separator;
-                result += s(record.payload);
-        }
-
-        return result;
-    }
+assert.equal = function equal(actual, expected, message) {
+  if (actual != expected) fail(actual, expected, message, '==', assert.equal);
 };
 
-// convert bytes to a String
-function s(bytes) {
-    return new Buffer(bytes).toString();
+// 6. The non-equality assertion tests for whether two objects are not equal
+// with != assert.notEqual(actual, expected, message_opt);
+
+assert.notEqual = function notEqual(actual, expected, message) {
+  if (actual == expected) {
+    fail(actual, expected, message, '!=', assert.notEqual);
+  }
+};
+
+// 7. The equivalence assertion tests a deep equality relation.
+// assert.deepEqual(actual, expected, message_opt);
+
+assert.deepEqual = function deepEqual(actual, expected, message) {
+  if (!_deepEqual(actual, expected, false)) {
+    fail(actual, expected, message, 'deepEqual', assert.deepEqual);
+  }
+};
+
+assert.deepStrictEqual = function deepStrictEqual(actual, expected, message) {
+  if (!_deepEqual(actual, expected, true)) {
+    fail(actual, expected, message, 'deepStrictEqual', assert.deepStrictEqual);
+  }
+};
+
+function _deepEqual(actual, expected, strict, memos) {
+  // 7.1. All identical values are equivalent, as determined by ===.
+  if (actual === expected) {
+    return true;
+  } else if (isBuffer(actual) && isBuffer(expected)) {
+    return compare(actual, expected) === 0;
+
+  // 7.2. If the expected value is a Date object, the actual value is
+  // equivalent if it is also a Date object that refers to the same time.
+  } else if (util.isDate(actual) && util.isDate(expected)) {
+    return actual.getTime() === expected.getTime();
+
+  // 7.3 If the expected value is a RegExp object, the actual value is
+  // equivalent if it is also a RegExp object with the same source and
+  // properties (`global`, `multiline`, `lastIndex`, `ignoreCase`).
+  } else if (util.isRegExp(actual) && util.isRegExp(expected)) {
+    return actual.source === expected.source &&
+           actual.global === expected.global &&
+           actual.multiline === expected.multiline &&
+           actual.lastIndex === expected.lastIndex &&
+           actual.ignoreCase === expected.ignoreCase;
+
+  // 7.4. Other pairs that do not both pass typeof value == 'object',
+  // equivalence is determined by ==.
+  } else if ((actual === null || typeof actual !== 'object') &&
+             (expected === null || typeof expected !== 'object')) {
+    return strict ? actual === expected : actual == expected;
+
+  // If both values are instances of typed arrays, wrap their underlying
+  // ArrayBuffers in a Buffer each to increase performance
+  // This optimization requires the arrays to have the same type as checked by
+  // Object.prototype.toString (aka pToString). Never perform binary
+  // comparisons for Float*Arrays, though, since e.g. +0 === -0 but their
+  // bit patterns are not identical.
+  } else if (isView(actual) && isView(expected) &&
+             pToString(actual) === pToString(expected) &&
+             !(actual instanceof Float32Array ||
+               actual instanceof Float64Array)) {
+    return compare(new Uint8Array(actual.buffer),
+                   new Uint8Array(expected.buffer)) === 0;
+
+  // 7.5 For all other Object pairs, including Array objects, equivalence is
+  // determined by having the same number of owned properties (as verified
+  // with Object.prototype.hasOwnProperty.call), the same set of keys
+  // (although not necessarily the same order), equivalent values for every
+  // corresponding key, and an identical 'prototype' property. Note: this
+  // accounts for both named and indexed properties on Arrays.
+  } else if (isBuffer(actual) !== isBuffer(expected)) {
+    return false;
+  } else {
+    memos = memos || {actual: [], expected: []};
+
+    var actualIndex = memos.actual.indexOf(actual);
+    if (actualIndex !== -1) {
+      if (actualIndex === memos.expected.indexOf(expected)) {
+        return true;
+      }
+    }
+
+    memos.actual.push(actual);
+    memos.expected.push(expected);
+
+    return objEquiv(actual, expected, strict, memos);
+  }
 }
 
-// expose helper objects
-ndef.text = textHelper;
-ndef.uri = uriHelper;
-ndef.tnfToString = tnfToString;
-ndef.util = util;
-ndef.stringify = stringifier.stringify;
+function isArguments(object) {
+  return Object.prototype.toString.call(object) == '[object Arguments]';
+}
 
-module.exports = ndef;
+function objEquiv(a, b, strict, actualVisitedObjects) {
+  if (a === null || a === undefined || b === null || b === undefined)
+    return false;
+  // if one is a primitive, the other must be same
+  if (util.isPrimitive(a) || util.isPrimitive(b))
+    return a === b;
+  if (strict && Object.getPrototypeOf(a) !== Object.getPrototypeOf(b))
+    return false;
+  var aIsArgs = isArguments(a);
+  var bIsArgs = isArguments(b);
+  if ((aIsArgs && !bIsArgs) || (!aIsArgs && bIsArgs))
+    return false;
+  if (aIsArgs) {
+    a = pSlice.call(a);
+    b = pSlice.call(b);
+    return _deepEqual(a, b, strict);
+  }
+  var ka = objectKeys(a);
+  var kb = objectKeys(b);
+  var key, i;
+  // having the same number of owned properties (keys incorporates
+  // hasOwnProperty)
+  if (ka.length !== kb.length)
+    return false;
+  //the same set of keys (although not necessarily the same order),
+  ka.sort();
+  kb.sort();
+  //~~~cheap key test
+  for (i = ka.length - 1; i >= 0; i--) {
+    if (ka[i] !== kb[i])
+      return false;
+  }
+  //equivalent values for every corresponding key, and
+  //~~~possibly expensive deep test
+  for (i = ka.length - 1; i >= 0; i--) {
+    key = ka[i];
+    if (!_deepEqual(a[key], b[key], strict, actualVisitedObjects))
+      return false;
+  }
+  return true;
+}
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
+// 8. The non-equivalence assertion tests for any deep inequality.
+// assert.notDeepEqual(actual, expected, message_opt);
+
+assert.notDeepEqual = function notDeepEqual(actual, expected, message) {
+  if (_deepEqual(actual, expected, false)) {
+    fail(actual, expected, message, 'notDeepEqual', assert.notDeepEqual);
+  }
+};
+
+assert.notDeepStrictEqual = notDeepStrictEqual;
+function notDeepStrictEqual(actual, expected, message) {
+  if (_deepEqual(actual, expected, true)) {
+    fail(actual, expected, message, 'notDeepStrictEqual', notDeepStrictEqual);
+  }
+}
+
+
+// 9. The strict equality assertion tests strict equality, as determined by ===.
+// assert.strictEqual(actual, expected, message_opt);
+
+assert.strictEqual = function strictEqual(actual, expected, message) {
+  if (actual !== expected) {
+    fail(actual, expected, message, '===', assert.strictEqual);
+  }
+};
+
+// 10. The strict non-equality assertion tests for strict inequality, as
+// determined by !==.  assert.notStrictEqual(actual, expected, message_opt);
+
+assert.notStrictEqual = function notStrictEqual(actual, expected, message) {
+  if (actual === expected) {
+    fail(actual, expected, message, '!==', assert.notStrictEqual);
+  }
+};
+
+function expectedException(actual, expected) {
+  if (!actual || !expected) {
+    return false;
+  }
+
+  if (Object.prototype.toString.call(expected) == '[object RegExp]') {
+    return expected.test(actual);
+  }
+
+  try {
+    if (actual instanceof expected) {
+      return true;
+    }
+  } catch (e) {
+    // Ignore.  The instanceof check doesn't work for arrow functions.
+  }
+
+  if (Error.isPrototypeOf(expected)) {
+    return false;
+  }
+
+  return expected.call({}, actual) === true;
+}
+
+function _tryBlock(block) {
+  var error;
+  try {
+    block();
+  } catch (e) {
+    error = e;
+  }
+  return error;
+}
+
+function _throws(shouldThrow, block, expected, message) {
+  var actual;
+
+  if (typeof block !== 'function') {
+    throw new TypeError('"block" argument must be a function');
+  }
+
+  if (typeof expected === 'string') {
+    message = expected;
+    expected = null;
+  }
+
+  actual = _tryBlock(block);
+
+  message = (expected && expected.name ? ' (' + expected.name + ').' : '.') +
+            (message ? ' ' + message : '.');
+
+  if (shouldThrow && !actual) {
+    fail(actual, expected, 'Missing expected exception' + message);
+  }
+
+  var userProvidedMessage = typeof message === 'string';
+  var isUnwantedException = !shouldThrow && util.isError(actual);
+  var isUnexpectedException = !shouldThrow && actual && !expected;
+
+  if ((isUnwantedException &&
+      userProvidedMessage &&
+      expectedException(actual, expected)) ||
+      isUnexpectedException) {
+    fail(actual, expected, 'Got unwanted exception' + message);
+  }
+
+  if ((shouldThrow && actual && expected &&
+      !expectedException(actual, expected)) || (!shouldThrow && actual)) {
+    throw actual;
+  }
+}
+
+// 11. Expected to throw an error:
+// assert.throws(block, Error_opt, message_opt);
+
+assert.throws = function(block, /*optional*/error, /*optional*/message) {
+  _throws(true, block, error, message);
+};
+
+// EXTENSION! This is annoying to write outside this module.
+assert.doesNotThrow = function(block, /*optional*/error, /*optional*/message) {
+  _throws(false, block, error, message);
+};
+
+assert.ifError = function(err) { if (err) throw err; };
+
+var objectKeys = Object.keys || function (obj) {
+  var keys = [];
+  for (var key in obj) {
+    if (hasOwn.call(obj, key)) keys.push(key);
+  }
+  return keys;
+};
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 22 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4961,13 +3319,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var exec = __webpack_require__(10);
-var ndef = __webpack_require__(9);
-var ndef_lib_1 = __webpack_require__(8);
+var exec = __webpack_require__(12);
+var ndef = __webpack_require__(13);
+var ndef_lib_1 = __webpack_require__(17);
 function noop() {
     // empty
 }
-var Device = (function () {
+var Device = /** @class */ (function () {
     function Device(deviceId, batteryLevel, hardwareRevision, firmwareRevision, communicationStatus) {
         this.deviceId = deviceId;
         this.batteryLevel = batteryLevel;
@@ -5633,47 +3991,1085 @@ function execPromise(success, error, pluginName, method, args) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 23 */
-/***/ (function(module, exports) {
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
 
-if (typeof Object.create === 'function') {
-  // implementation from standard node.js 'util' module
-  module.exports = function inherits(ctor, superCtor) {
-    ctor.super_ = superCtor
-    ctor.prototype = Object.create(superCtor.prototype, {
-      constructor: {
-        value: ctor,
-        enumerable: false,
-        writable: true,
-        configurable: true
-      }
-    });
-  };
-} else {
-  // old school shim for old browsers
-  module.exports = function inherits(ctor, superCtor) {
-    ctor.super_ = superCtor
-    var TempCtor = function () {}
-    TempCtor.prototype = superCtor.prototype
-    ctor.prototype = new TempCtor()
-    ctor.prototype.constructor = ctor
+"use strict";
+
+
+exports.byteLength = byteLength
+exports.toByteArray = toByteArray
+exports.fromByteArray = fromByteArray
+
+var lookup = []
+var revLookup = []
+var Arr = typeof Uint8Array !== 'undefined' ? Uint8Array : Array
+
+var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+for (var i = 0, len = code.length; i < len; ++i) {
+  lookup[i] = code[i]
+  revLookup[code.charCodeAt(i)] = i
+}
+
+revLookup['-'.charCodeAt(0)] = 62
+revLookup['_'.charCodeAt(0)] = 63
+
+function placeHoldersCount (b64) {
+  var len = b64.length
+  if (len % 4 > 0) {
+    throw new Error('Invalid string. Length must be a multiple of 4')
   }
+
+  // the number of equal signs (place holders)
+  // if there are two placeholders, than the two characters before it
+  // represent one byte
+  // if there is only one, then the three characters before it represent 2 bytes
+  // this is just a cheap hack to not do indexOf twice
+  return b64[len - 2] === '=' ? 2 : b64[len - 1] === '=' ? 1 : 0
+}
+
+function byteLength (b64) {
+  // base64 is 4/3 + up to two characters of the original data
+  return (b64.length * 3 / 4) - placeHoldersCount(b64)
+}
+
+function toByteArray (b64) {
+  var i, l, tmp, placeHolders, arr
+  var len = b64.length
+  placeHolders = placeHoldersCount(b64)
+
+  arr = new Arr((len * 3 / 4) - placeHolders)
+
+  // if there are placeholders, only get up to the last complete 4 chars
+  l = placeHolders > 0 ? len - 4 : len
+
+  var L = 0
+
+  for (i = 0; i < l; i += 4) {
+    tmp = (revLookup[b64.charCodeAt(i)] << 18) | (revLookup[b64.charCodeAt(i + 1)] << 12) | (revLookup[b64.charCodeAt(i + 2)] << 6) | revLookup[b64.charCodeAt(i + 3)]
+    arr[L++] = (tmp >> 16) & 0xFF
+    arr[L++] = (tmp >> 8) & 0xFF
+    arr[L++] = tmp & 0xFF
+  }
+
+  if (placeHolders === 2) {
+    tmp = (revLookup[b64.charCodeAt(i)] << 2) | (revLookup[b64.charCodeAt(i + 1)] >> 4)
+    arr[L++] = tmp & 0xFF
+  } else if (placeHolders === 1) {
+    tmp = (revLookup[b64.charCodeAt(i)] << 10) | (revLookup[b64.charCodeAt(i + 1)] << 4) | (revLookup[b64.charCodeAt(i + 2)] >> 2)
+    arr[L++] = (tmp >> 8) & 0xFF
+    arr[L++] = tmp & 0xFF
+  }
+
+  return arr
+}
+
+function tripletToBase64 (num) {
+  return lookup[num >> 18 & 0x3F] + lookup[num >> 12 & 0x3F] + lookup[num >> 6 & 0x3F] + lookup[num & 0x3F]
+}
+
+function encodeChunk (uint8, start, end) {
+  var tmp
+  var output = []
+  for (var i = start; i < end; i += 3) {
+    tmp = (uint8[i] << 16) + (uint8[i + 1] << 8) + (uint8[i + 2])
+    output.push(tripletToBase64(tmp))
+  }
+  return output.join('')
+}
+
+function fromByteArray (uint8) {
+  var tmp
+  var len = uint8.length
+  var extraBytes = len % 3 // if we have 1 byte left, pad 2 bytes
+  var output = ''
+  var parts = []
+  var maxChunkLength = 16383 // must be multiple of 3
+
+  // go through the array every three bytes, we'll deal with trailing stuff later
+  for (var i = 0, len2 = len - extraBytes; i < len2; i += maxChunkLength) {
+    parts.push(encodeChunk(uint8, i, (i + maxChunkLength) > len2 ? len2 : (i + maxChunkLength)))
+  }
+
+  // pad the end with zeros, but make sure to not forget the extra bytes
+  if (extraBytes === 1) {
+    tmp = uint8[len - 1]
+    output += lookup[tmp >> 2]
+    output += lookup[(tmp << 4) & 0x3F]
+    output += '=='
+  } else if (extraBytes === 2) {
+    tmp = (uint8[len - 2] << 8) + (uint8[len - 1])
+    output += lookup[tmp >> 10]
+    output += lookup[(tmp >> 4) & 0x3F]
+    output += lookup[(tmp << 2) & 0x3F]
+    output += '='
+  }
+
+  parts.push(output)
+
+  return parts.join('')
 }
 
 
 /***/ }),
-/* 24 */
+/* 10 */
 /***/ (function(module, exports) {
 
-module.exports = function isBuffer(arg) {
-  return arg && typeof arg === 'object'
-    && typeof arg.copy === 'function'
-    && typeof arg.fill === 'function'
-    && typeof arg.readUInt8 === 'function';
+exports.read = function (buffer, offset, isLE, mLen, nBytes) {
+  var e, m
+  var eLen = nBytes * 8 - mLen - 1
+  var eMax = (1 << eLen) - 1
+  var eBias = eMax >> 1
+  var nBits = -7
+  var i = isLE ? (nBytes - 1) : 0
+  var d = isLE ? -1 : 1
+  var s = buffer[offset + i]
+
+  i += d
+
+  e = s & ((1 << (-nBits)) - 1)
+  s >>= (-nBits)
+  nBits += eLen
+  for (; nBits > 0; e = e * 256 + buffer[offset + i], i += d, nBits -= 8) {}
+
+  m = e & ((1 << (-nBits)) - 1)
+  e >>= (-nBits)
+  nBits += mLen
+  for (; nBits > 0; m = m * 256 + buffer[offset + i], i += d, nBits -= 8) {}
+
+  if (e === 0) {
+    e = 1 - eBias
+  } else if (e === eMax) {
+    return m ? NaN : ((s ? -1 : 1) * Infinity)
+  } else {
+    m = m + Math.pow(2, mLen)
+    e = e - eBias
+  }
+  return (s ? -1 : 1) * m * Math.pow(2, e - mLen)
 }
 
+exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
+  var e, m, c
+  var eLen = nBytes * 8 - mLen - 1
+  var eMax = (1 << eLen) - 1
+  var eBias = eMax >> 1
+  var rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0)
+  var i = isLE ? 0 : (nBytes - 1)
+  var d = isLE ? 1 : -1
+  var s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0
+
+  value = Math.abs(value)
+
+  if (isNaN(value) || value === Infinity) {
+    m = isNaN(value) ? 1 : 0
+    e = eMax
+  } else {
+    e = Math.floor(Math.log(value) / Math.LN2)
+    if (value * (c = Math.pow(2, -e)) < 1) {
+      e--
+      c *= 2
+    }
+    if (e + eBias >= 1) {
+      value += rt / c
+    } else {
+      value += rt * Math.pow(2, 1 - eBias)
+    }
+    if (value * c >= 2) {
+      e++
+      c /= 2
+    }
+
+    if (e + eBias >= eMax) {
+      m = 0
+      e = eMax
+    } else if (e + eBias >= 1) {
+      m = (value * c - 1) * Math.pow(2, mLen)
+      e = e + eBias
+    } else {
+      m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen)
+      e = 0
+    }
+  }
+
+  for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8) {}
+
+  e = (e << mLen) | m
+  eLen += mLen
+  for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8) {}
+
+  buffer[offset + i - d] |= s * 128
+}
+
+
 /***/ }),
-/* 25 */
+/* 11 */
+/***/ (function(module, exports) {
+
+var toString = {}.toString;
+
+module.exports = Array.isArray || function (arr) {
+  return toString.call(arr) == '[object Array]';
+};
+
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports) {
+
+module.exports = require("cordova/exec");
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(process, Buffer) {var ndef = __webpack_require__(14);
+module.exports = ndef;
+
+if (process.version.indexOf('v0.8') === 0) {
+    // Monkey Patch Buffer for Node 0.8 support
+    Buffer.prototype.toJSON = function() {
+        j = [];
+        for (var i = 0; i < this.length; i++) {
+            j[i] = this[i];
+        }    
+        return j;
+    }
+}
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(0).Buffer))
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(Buffer) {// ndef.js
+// Copyright 2013 Don Coleman
+//
+// This code is from phonegap-nfc.js https://github.com/don/phonegap-nfc
+
+var util = __webpack_require__(3),
+    textHelper = __webpack_require__(15),
+    uriHelper = __webpack_require__(16);
+
+var ndef = {
+
+    // see android.nfc.NdefRecord for documentation about constants
+    // http://developer.android.com/reference/android/nfc/NdefRecord.html
+    TNF_EMPTY: 0x0,
+    TNF_WELL_KNOWN: 0x01,
+    TNF_MIME_MEDIA: 0x02,
+    TNF_ABSOLUTE_URI: 0x03,
+    TNF_EXTERNAL_TYPE: 0x04,
+    TNF_UNKNOWN: 0x05,
+    TNF_UNCHANGED: 0x06,
+    TNF_RESERVED: 0x07,
+
+    RTD_TEXT: "T", // [0x54]
+    RTD_URI: "U", // [0x55]
+    RTD_SMART_POSTER: "Sp", // [0x53, 0x70]
+    RTD_ALTERNATIVE_CARRIER: "ac", //[0x61, 0x63]
+    RTD_HANDOVER_CARRIER: "Hc", // [0x48, 0x63]
+    RTD_HANDOVER_REQUEST: "Hr", // [0x48, 0x72]
+    RTD_HANDOVER_SELECT: "Hs", // [0x48, 0x73]
+
+    /**
+     * Creates a JSON representation of a NDEF Record.
+     *
+     * @tnf 3-bit TNF (Type Name Format) - use one of the TNF_* constants
+     * @type byte array, containing zero to 255 bytes, must not be null
+     * @id byte array, containing zero to 255 bytes, must not be null
+     * @payload byte array, containing zero to (2 ** 32 - 1) bytes, must not be null
+     *
+     * @returns JSON representation of a NDEF record
+     *
+     * @see Ndef.textRecord, Ndef.uriRecord and Ndef.mimeMediaRecord for examples
+     */
+    record: function (tnf, type, id, payload) {
+
+        // handle null values
+        if (!tnf) { tnf = ndef.TNF_EMPTY; }
+        if (!type) { type = []; }
+        if (!id) { id = []; }
+        if (!payload) { payload = []; }
+
+        // store type as String so it's easier to compare
+        if(type instanceof Array) {
+            type = util.bytesToString(type);
+        }
+
+        // in the future, id could be a String
+        if (!(id instanceof Array)) {
+           id = util.stringToBytes(id);
+        }
+
+        // Payload must be binary
+        if (!(payload instanceof Array)) {
+           payload = util.stringToBytes(payload);
+        }
+
+        var record = {
+            tnf: tnf,
+            type: type,
+            id: id,
+            payload: payload
+        };
+
+        // Experimental feature
+        // Convert payload to text for Text and URI records
+        if (tnf === ndef.TNF_WELL_KNOWN) {
+            switch(record.type) {
+                case ndef.RTD_TEXT:
+                    record.value = ndef.text.decodePayload(record.payload);
+                    break;
+                case ndef.RTD_URI:
+                    record.value = ndef.uri.decodePayload(record.payload);
+                    break;
+            }
+        }
+
+        return record;
+    },
+
+    /**
+     * Helper that creates an NDEF record containing plain text.
+     *
+     * @text String of text to encode
+     * @languageCode ISO/IANA language code. Examples: “fi”, “en-US”, “fr-CA”, “jp”. (optional)
+     * @id byte[] (optional)
+     */
+    textRecord: function (text, languageCode, id) {
+        var payload = textHelper.encodePayload(text, languageCode);
+        if (!id) { id = []; }
+
+        return ndef.record(ndef.TNF_WELL_KNOWN, ndef.RTD_TEXT, id, payload);
+    },
+
+    /**
+     * Helper that creates a NDEF record containing a URI.
+     *
+     * @uri String
+     * @id byte[] (optional)
+     */
+    uriRecord: function (uri, id) {
+        var payload = uriHelper.encodePayload(uri);
+        if (!id) { id = []; }
+        return ndef.record(ndef.TNF_WELL_KNOWN, ndef.RTD_URI, id, payload);
+    },
+
+    /**
+     * Helper that creates a NDEF record containing an absolute URI.
+     *
+     * An Absolute URI record means the URI describes the payload of the record.
+     *
+     * For example a SOAP message could use "http://schemas.xmlsoap.org/soap/envelope/"
+     * as the type and XML content for the payload.
+     *
+     * Absolute URI can also be used to write LaunchApp records for Windows.
+     *
+     * See 2.4.2 Payload Type of the NDEF Specification
+     * http://www.nfc-forum.org/specs/spec_list#ndefts
+     *
+     * Note that by default, Android will open the URI defined in the type
+     * field of an Absolute URI record (TNF=3) and ignore the payload.
+     * BlackBerry and Windows do not open the browser for TNF=3.
+     *
+     * To write a URI as the payload use ndef.uriRecord(uri)
+     *
+     * @uri String
+     * @payload byte[] or String
+     * @id byte[] (optional)
+     */
+    absoluteUriRecord: function (uri, payload, id) {
+        if (!id) { id = []; }
+        if (!payload) { payload = []; }
+        return ndef.record(ndef.TNF_ABSOLUTE_URI, uri, id, payload);
+    },
+
+    /**
+     * Helper that creates a NDEF record containing an mimeMediaRecord.
+     *
+     * @mimeType String
+     * @payload byte[]
+     * @id byte[] (optional)
+     */
+    mimeMediaRecord: function (mimeType, payload, id) {
+        if (!id) { id = []; }
+        return ndef.record(ndef.TNF_MIME_MEDIA, mimeType, id, payload);
+    },
+
+    /**
+     * Helper that creates an NDEF record containing an Smart Poster.
+     *
+     * @ndefRecords array of NDEF Records
+     * @id byte[] (optional)
+     */
+    smartPoster: function (ndefRecords, id) {
+        var payload = [];
+
+        if (!id) { id = []; }
+
+        if (ndefRecords)
+        {
+            // make sure we have an array of something like NDEF records before encoding
+            if (ndefRecords[0] instanceof Object && ndefRecords[0].hasOwnProperty('tnf')) {
+                payload = ndef.encodeMessage(ndefRecords);
+            } else {
+                // assume the caller has already encoded the NDEF records into a byte array
+                payload = ndefRecords;
+            }
+        } else {
+            console.log("WARNING: Expecting an array of NDEF records");
+        }
+
+        return ndef.record(ndef.TNF_WELL_KNOWN, ndef.RTD_SMART_POSTER, id, payload);
+    },
+
+    /**
+     * Helper that creates an empty NDEF record.
+     *
+     */
+    emptyRecord: function() {
+        return ndef.record(ndef.TNF_EMPTY, [], [], []);
+    },
+
+    /**
+    * Helper that creates an Android Application Record (AAR).
+    * http://developer.android.com/guide/topics/connectivity/nfc/nfc.html#aar
+    *
+    */
+    androidApplicationRecord: function(packageName) {
+        return ndef.record(ndef.TNF_EXTERNAL_TYPE, "android.com:pkg", [], packageName);
+    },
+
+
+    /**
+     * Encodes an NDEF Message into bytes that can be written to a NFC tag.
+     *
+     * @ndefRecords an Array of NDEF Records
+     *
+     * @returns byte array
+     *
+     * @see NFC Data Exchange Format (NDEF) http://www.nfc-forum.org/specs/spec_list/
+     */
+    encodeMessage: function (ndefRecords) {
+
+        var encoded = [],
+            tnf_byte,
+            record_type,
+            payload_length,
+            id_length,
+            i,
+            mb, me, // messageBegin, messageEnd
+            cf = false, // chunkFlag TODO implement
+            sr, // boolean shortRecord
+            il; // boolean idLengthFieldIsPresent
+
+        for(i = 0; i < ndefRecords.length; i++) {
+
+            mb = (i === 0);
+            me = (i === (ndefRecords.length - 1));
+            sr = (ndefRecords[i].payload.length < 0xFF);
+            il = (ndefRecords[i].id.length > 0);
+            tnf_byte = ndef.encodeTnf(mb, me, cf, sr, il, ndefRecords[i].tnf);
+            encoded.push(tnf_byte);
+
+            // type is stored as String, converting to bytes for storage
+            record_type = util.stringToBytes(ndefRecords[i].type);
+            encoded.push(record_type.length);
+
+            if (sr) {
+                payload_length = ndefRecords[i].payload.length;
+                encoded.push(payload_length);
+            } else {
+                payload_length = ndefRecords[i].payload.length;
+                // 4 bytes
+                encoded.push((payload_length >> 24));
+                encoded.push((payload_length >> 16));
+                encoded.push((payload_length >> 8));
+                encoded.push((payload_length & 0xFF));
+            }
+
+            if (il) {
+                id_length = ndefRecords[i].id.length;
+                encoded.push(id_length);
+            }
+
+            encoded = encoded.concat(record_type);
+
+            if (il) {
+                encoded = encoded.concat(ndefRecords[i].id);
+            }
+
+            encoded = encoded.concat(ndefRecords[i].payload);
+        }
+
+        return encoded;
+    },
+
+    /**
+     * Decodes an array bytes into an NDEF Message
+     *
+     * @bytes an array bytes read from a NFC tag
+     *
+     * @returns array of NDEF Records
+     *
+     * @see NFC Data Exchange Format (NDEF) http://www.nfc-forum.org/specs/spec_list/
+     */
+    decodeMessage: function (bytes) {
+
+        var bytes = bytes.slice(0), // clone since parsing is destructive
+            ndef_message = [],
+            tnf_byte,
+            header,
+            type_length = 0,
+            payload_length = 0,
+            id_length = 0,
+            record_type = [],
+            id = [],
+            payload = [];
+
+        while(bytes.length) {
+
+            tnf_byte = bytes.shift();
+            header = ndef.decodeTnf(tnf_byte);
+
+            type_length = bytes.shift();
+
+            if (header.sr) {
+                payload_length = bytes.shift();
+            } else {
+                // next 4 bytes are length
+                payload_length = ((0xFF & bytes.shift()) << 24) |
+                    ((0xFF & bytes.shift()) << 16) |
+                    ((0xFF & bytes.shift()) << 8) |
+                    (0xFF & bytes.shift());
+            }
+
+            if (header.il) {
+                id_length = bytes.shift();
+            }
+
+            record_type = bytes.splice(0, type_length);
+            id = bytes.splice(0, id_length);
+            payload = bytes.splice(0, payload_length);
+
+            ndef_message.push(
+                ndef.record(header.tnf, record_type, id, payload)
+            );
+
+            if (header.me) break; // last message
+        }
+
+        return ndef_message;
+    },
+
+    /**
+     * Decode the bit flags from a TNF Byte.
+     *
+     * @returns object with decoded data
+     *
+     *  See NFC Data Exchange Format (NDEF) Specification Section 3.2 RecordLayout
+     */
+    decodeTnf: function (tnf_byte) {
+        return {
+            mb: (tnf_byte & 0x80) !== 0,
+            me: (tnf_byte & 0x40) !== 0,
+            cf: (tnf_byte & 0x20) !== 0,
+            sr: (tnf_byte & 0x10) !== 0,
+            il: (tnf_byte & 0x8) !== 0,
+            tnf: (tnf_byte & 0x7)
+        };
+    },
+
+    /**
+     * Encode NDEF bit flags into a TNF Byte.
+     *
+     * @returns tnf byte
+     *
+     *  See NFC Data Exchange Format (NDEF) Specification Section 3.2 RecordLayout
+     */
+    encodeTnf: function (mb, me, cf, sr, il, tnf) {
+
+        var value = tnf;
+
+        if (mb) {
+            value = value | 0x80;
+        }
+
+        if (me) {
+            value = value | 0x40;
+        }
+
+        // note if cf: me, mb, li must be false and tnf must be 0x6
+        if (cf) {
+            value = value | 0x20;
+        }
+
+        if (sr) {
+            value = value | 0x10;
+        }
+
+        if (il) {
+            value = value | 0x8;
+        }
+
+        return value;
+    },
+
+    // TODO test with byte[] and string
+    isType: function(record, tnf, type) {
+
+        if (record.tnf === tnf) {
+            return (s(record) === s(type));
+        }
+        return false;
+
+    }
+
+};
+
+function tnfToString(tnf) {
+    var value = tnf;
+
+    switch (tnf) {
+        case ndef.TNF_EMPTY:
+            value = "Empty";
+            break;
+        case ndef.TNF_WELL_KNOWN:
+            value = "Well Known";
+            break;
+        case ndef.TNF_MIME_MEDIA:
+            value = "Mime Media";
+            break;
+        case ndef.TNF_ABSOLUTE_URI:
+            value = "Absolute URI";
+            break;
+        case ndef.TNF_EXTERNAL_TYPE:
+            value = "External";
+            break;
+        case ndef.TNF_UNKNOWN:
+            value = "Unknown";
+            break;
+        case ndef.TNF_UNCHANGED:
+            value = "Unchanged";
+            break;
+        case ndef.TNF_RESERVED:
+            value = "Reserved";
+            break;
+    }
+    return value;
+}
+
+// Convert NDEF records and messages to strings
+// This works OK for demos, but real code proably needs
+// a custom implementation. It would be nice to make
+// smarter record objects that can print themselves
+var stringifier = {
+
+    stringify: function (data, separator) {
+
+        if (Array.isArray(data)) {
+
+            if (typeof data[0] === 'number') {
+                // guessing this message bytes
+                data = ndef.decodeMessage(data);
+            }
+
+            return stringifier.printRecords(data, separator);
+        } else {
+            return stringifier.printRecord(data, separator);
+        }
+    },
+
+    // @message - NDEF Message (array of NDEF Records)
+    // @separator - line separator, optional, defaults to \n
+    // @returns string with NDEF Message
+    printRecords: function (message, separator) {
+
+        if(!separator) { separator = "\n"; }
+        result = "";
+
+        // Print out the payload for each record
+        message.forEach(function(record) {
+            result += stringifier.printRecord(record, separator);
+            result += separator;
+        });
+
+        return result.slice(0, (-1 * separator.length));
+    },
+
+    // @record - NDEF Record
+    // @separator - line separator, optional, defaults to \n
+    // @returns string with NDEF Record
+    printRecord: function (record, separator) {
+
+        var result = "";
+
+        if(!separator) { separator = "\n"; }
+
+        switch(record.tnf) {
+            case ndef.TNF_EMPTY:
+                result += "Empty Record";
+                result += separator;
+                break;
+            case ndef.TNF_WELL_KNOWN:
+                result += stringifier.printWellKnown(record, separator);
+                break;
+            case ndef.TNF_MIME_MEDIA:
+                result += "MIME Media";
+                result += separator;
+                result += s(record.type);
+                result += separator;
+                result += s(record.payload); // might be binary
+                break;
+            case ndef.TNF_ABSOLUTE_URI:
+                result += "Absolute URI";
+                result += separator;
+                result += s(record.type);    // the URI is the type
+                result += separator;
+                result += s(record.payload); // might be binary
+                break;;
+            case ndef.TNF_EXTERNAL_TYPE:
+                // AAR contains strings, other types could
+                // contain binary data
+                result += "External";
+                result += separator;
+                result += s(record.type);
+                result += separator;
+                result += s(record.payload);
+                break;
+            default:
+                result += s("Can't process TNF " + record.tnf);
+        }
+
+        result += separator;
+        return result;
+    },
+
+    printWellKnown: function (record, separator) {
+
+        var result = "";
+
+        if (record.tnf !== ndef.TNF_WELL_KNOWN) {
+            return "ERROR expecting TNF Well Known";
+        }
+
+        switch(record.type) {
+            case ndef.RTD_TEXT:
+                result += "Text Record";
+                result += separator;
+                result += (ndef.text.decodePayload(record.payload));
+                break;
+            case ndef.RTD_URI:
+                result += "URI Record";
+                result += separator;
+                result += (ndef.uri.decodePayload(record.payload));
+                break;
+            case ndef.RTD_SMART_POSTER:
+                result += "Smart Poster";
+                result += separator;
+                // the payload of a smartposter is a NDEF message
+                result += stringifier.printRecords(ndef.decodeMessage(record.payload));
+                break;
+            default:
+                // attempt to display other types
+                result += record.type + " Record";
+                result += separator;
+                result += s(record.payload);
+        }
+
+        return result;
+    }
+};
+
+// convert bytes to a String
+function s(bytes) {
+    return new Buffer(bytes).toString();
+}
+
+// expose helper objects
+ndef.text = textHelper;
+ndef.uri = uriHelper;
+ndef.tnfToString = tnfToString;
+ndef.util = util;
+ndef.stringify = stringifier.stringify;
+
+module.exports = ndef;
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var util = __webpack_require__(3);
+
+// decode text bytes from ndef record payload
+// @returns a string
+function decode(data) {
+
+    var languageCodeLength = (data[0] & 0x3F), // 6 LSBs
+        languageCode = data.slice(1, 1 + languageCodeLength),
+        utf16 = (data[0] & 0x80) !== 0; // assuming UTF-16BE
+
+    // TODO need to deal with UTF in the future
+    // console.log("lang " + languageCode + (utf16 ? " utf16" : " utf8"));
+
+    return util.bytesToString(data.slice(languageCodeLength + 1));
+}
+
+// encode text payload
+// @returns an array of bytes
+function encode(text, lang, encoding) {
+
+    // ISO/IANA language code, but we're not enforcing
+    if (!lang) { lang = 'en'; }
+
+    var encoded = util.stringToBytes(lang + text);
+    encoded.unshift(lang.length);
+
+    return encoded;
+}
+
+module.exports = {
+    encodePayload: encode,
+    decodePayload: decode
+}
+
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var util = __webpack_require__(3);
+
+// URI identifier codes from URI Record Type Definition NFCForum-TS-RTD_URI_1.0 2006-07-24
+// index in array matches code in the spec
+var protocols = [ "", "http://www.", "https://www.", "http://", "https://", "tel:", "mailto:", "ftp://anonymous:anonymous@", "ftp://ftp.", "ftps://", "sftp://", "smb://", "nfs://", "ftp://", "dav://", "news:", "telnet://", "imap:", "rtsp://", "urn:", "pop:", "sip:", "sips:", "tftp:", "btspp://", "btl2cap://", "btgoep://", "tcpobex://", "irdaobex://", "file://", "urn:epc:id:", "urn:epc:tag:", "urn:epc:pat:", "urn:epc:raw:", "urn:epc:", "urn:nfc:" ]
+
+// decode a URI payload bytes
+// @returns a string
+function decode(data) {
+    var prefix = protocols[data[0]];
+    if (!prefix) { // 36 to 255 should be ""
+        prefix = "";
+    }    
+    return prefix + util.bytesToString(data.slice(1));      
+} 
+
+// shorten a URI with standard prefix
+// @returns an array of bytes
+function encode(uri) {
+    
+    var prefix,
+        protocolCode,
+        encoded;
+
+    // check each protocol, unless we've found a match
+    // "urn:" is the one exception where we need to keep checking
+    // slice so we don't check ""
+    protocols.slice(1).forEach(function(protocol) {                        
+        if ((!prefix || prefix === "urn:") && uri.indexOf(protocol) === 0) { 
+            prefix = protocol;
+        }
+    });
+
+    if (!prefix) {
+        prefix = "";
+    }
+    
+    encoded = util.stringToBytes(uri.slice(prefix.length));
+    protocolCode = protocols.indexOf(prefix);    
+    // prepend protocol code
+    encoded.unshift(protocolCode);
+    
+    return encoded; 
+}
+
+module.exports = {
+    encodePayload: encode,
+    decodePayload: decode
+}
+
+
+/***/ }),
+/* 17 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process, Buffer) {
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+Object.defineProperty(exports, "__esModule", { value: true });
+if (process.version.indexOf('v0.8') === 0) {
+    // Monkey Patch Buffer for Node 0.8 support
+    Buffer.prototype.toJSON = function () {
+        var j = [];
+        for (var i = 0; i < this.length; i++) {
+            j[i] = this[i];
+        }
+        return j;
+    };
+}
+__export(__webpack_require__(6));
+__export(__webpack_require__(5));
+__export(__webpack_require__(20));
+var push_parser_1 = __webpack_require__(24);
+exports.PushParser = push_parser_1.PushParser;
+//# sourceMappingURL=index.js.map
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(0).Buffer))
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var util = __webpack_require__(4);
+// decode text bytes from ndef record payload
+// @returns a string
+function decodePayload(data) {
+    var // 6 LSBs
+    languageCodeLength = (data[0] & 0x3F); // assuming UTF-16BE
+    // TODO need to deal with UTF in the future
+    // console.log("lang " + languageCode + (utf16 ? " utf16" : " utf8"));
+    var languageCode = data.slice(1, 1 + languageCodeLength);
+    var utf16 = (data[0] & 0x80) !== 0;
+    return util.bytesToString(data.slice(languageCodeLength + 1));
+}
+exports.decodePayload = decodePayload;
+// encode text payload
+// @returns an array of bytes
+function encodePayload(text, lang, encoding) {
+    // ISO/IANA language code, but we're not enforcing
+    if (!lang) {
+        lang = 'en';
+    }
+    var encoded = util.stringToBytes(lang + text);
+    encoded.unshift(lang.length);
+    return encoded;
+}
+exports.encodePayload = encodePayload;
+//# sourceMappingURL=ndef-text.js.map
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var util = __webpack_require__(4);
+// URI identifier codes from URI Record Type Definition NFCForum-TS-RTD_URI_1.0 2006-07-24
+// index in array matches code in the spec
+var protocols = ['', 'http://www.', 'https://www.', 'http://', 'https://', 'tel:', 'mailto:', 'ftp://anonymous:anonymous@', 'ftp://ftp.', 'ftps://', 'sftp://', 'smb://', 'nfs://', 'ftp://', 'dav://', 'news:', 'telnet://', 'imap:', 'rtsp://', 'urn:', 'pop:', 'sip:', 'sips:', 'tftp:', 'btspp://', 'btl2cap://', 'btgoep://', 'tcpobex://', 'irdaobex://', 'file://', 'urn:epc:id:', 'urn:epc:tag:', 'urn:epc:pat:', 'urn:epc:raw:', 'urn:epc:', 'urn:nfc:'];
+// decode a URI payload bytes
+// @returns a string
+function decodePayload(data) {
+    var prefix = protocols[data[0]];
+    if (!prefix) {
+        prefix = '';
+    }
+    return prefix + util.bytesToString(data.slice(1));
+}
+exports.decodePayload = decodePayload;
+// shorten a URI with standard prefix
+// @returns an array of bytes
+function encodePayload(uri) {
+    var prefix;
+    // check each protocol, unless we've found a match
+    // "urn:" is the one exception where we need to keep checking
+    // slice so we don't check ""
+    var protocolCode;
+    var encoded;
+    protocols.slice(1).forEach(function (protocol) {
+        if ((!prefix || prefix === 'urn:') && uri.indexOf(protocol) === 0) {
+            prefix = protocol;
+        }
+    });
+    if (!prefix) {
+        prefix = '';
+    }
+    encoded = util.stringToBytes(uri.slice(prefix.length));
+    protocolCode = protocols.indexOf(prefix);
+    // prepend protocol code
+    encoded.unshift(protocolCode);
+    return encoded;
+}
+exports.encodePayload = encodePayload;
+//# sourceMappingURL=ndef-uri.js.map
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(Buffer) {
+Object.defineProperty(exports, "__esModule", { value: true });
+var assert = __webpack_require__(7);
+var consts_1 = __webpack_require__(5);
+function makeSlices(data, pageSize) {
+    if (pageSize === void 0) { pageSize = 4; }
+    var result = [];
+    for (var i = 0; i < data.length; i += pageSize) {
+        result.push(data.slice(i, i + pageSize));
+    }
+    return result;
+}
+exports.makeSlices = makeSlices;
+function tlvDecodeNdef(userData) {
+    var t = userData.readUInt8(0);
+    assert.equal(t, 0x03);
+    var length = userData.readUInt8(1);
+    var starts = 2;
+    if (length === 0xFF) {
+        length = userData.readUInt16BE(2);
+        starts = 4;
+    }
+    return userData.slice(starts, starts + length);
+}
+exports.tlvDecodeNdef = tlvDecodeNdef;
+function tlvEncodeNdef(message) {
+    // Add the ndef message type
+    var buffers = [new Buffer([consts_1.MESSAGE_START_TAG])];
+    var length = message.length;
+    if (length <= 0xFE) {
+        buffers.push(Buffer.from([length]));
+    }
+    else {
+        var length_1 = Buffer.alloc(3);
+        length_1.writeUInt8(0xff, 0);
+        length_1.writeUInt16BE(message.length, 1);
+        buffers.push(length_1);
+    }
+    buffers.push(message);
+    // Add the terminator
+    buffers.push(Buffer.from([consts_1.MESSAGE_STOP_BYTE]));
+    return Buffer.concat(buffers);
+}
+exports.tlvEncodeNdef = tlvEncodeNdef;
+function createWriteApdus(tagType, data) {
+    assert.equal(tagType, 'mifareUltralight');
+    var slices = makeSlices(data, 4);
+    var userDataPageStarts = 4; //
+    return slices.map(function (slice, ix) {
+        if (slice.length < 4) {
+            slice = Buffer.concat([slice, Buffer.alloc(4 - slice.length)]);
+        }
+        return Buffer.concat([
+            new Buffer([0xFF, 0xD6, 0x00, userDataPageStarts + ix, 4]),
+            slice
+        ]);
+    });
+}
+exports.createWriteApdus = createWriteApdus;
+//# sourceMappingURL=apdu-helpers.js.map
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
+
+/***/ }),
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -6201,7 +5597,7 @@ function isPrimitive(arg) {
 }
 exports.isPrimitive = isPrimitive;
 
-exports.isBuffer = __webpack_require__(24);
+exports.isBuffer = __webpack_require__(22);
 
 function objectToString(o) {
   return Object.prototype.toString.call(o);
@@ -6263,7 +5659,608 @@ function hasOwnProperty(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5), __webpack_require__(4)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(2)))
+
+/***/ }),
+/* 22 */
+/***/ (function(module, exports) {
+
+module.exports = function isBuffer(arg) {
+  return arg && typeof arg === 'object'
+    && typeof arg.copy === 'function'
+    && typeof arg.fill === 'function'
+    && typeof arg.readUInt8 === 'function';
+}
+
+/***/ }),
+/* 23 */
+/***/ (function(module, exports) {
+
+if (typeof Object.create === 'function') {
+  // implementation from standard node.js 'util' module
+  module.exports = function inherits(ctor, superCtor) {
+    ctor.super_ = superCtor
+    ctor.prototype = Object.create(superCtor.prototype, {
+      constructor: {
+        value: ctor,
+        enumerable: false,
+        writable: true,
+        configurable: true
+      }
+    });
+  };
+} else {
+  // old school shim for old browsers
+  module.exports = function inherits(ctor, superCtor) {
+    ctor.super_ = superCtor
+    var TempCtor = function () {}
+    TempCtor.prototype = superCtor.prototype
+    ctor.prototype = new TempCtor()
+    ctor.prototype.constructor = ctor
+  }
+}
+
+
+/***/ }),
+/* 24 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(Buffer) {
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+var events = __webpack_require__(25);
+var assert = __webpack_require__(7);
+var ndef_1 = __webpack_require__(6);
+var ParseState;
+(function (ParseState) {
+    ParseState[ParseState["expectingStopByte"] = 0] = "expectingStopByte";
+    ParseState[ParseState["expectingPayload"] = 1] = "expectingPayload";
+    ParseState[ParseState["expectingId"] = 2] = "expectingId";
+    ParseState[ParseState["expectingType"] = 3] = "expectingType";
+    ParseState[ParseState["expectingIdLength"] = 4] = "expectingIdLength";
+    ParseState[ParseState["expectingPayloadLengthFourByte"] = 5] = "expectingPayloadLengthFourByte";
+    ParseState[ParseState["expectingPayloadLengthOneByte"] = 6] = "expectingPayloadLengthOneByte";
+    ParseState[ParseState["expectingTypeLength"] = 7] = "expectingTypeLength";
+    ParseState[ParseState["expectingTag"] = 8] = "expectingTag";
+    ParseState[ParseState["expectingLength"] = 9] = "expectingLength";
+    ParseState[ParseState["expectingValue"] = 10] = "expectingValue";
+})(ParseState = exports.ParseState || (exports.ParseState = {}));
+function decodeTnf(tnf_byte) {
+    return {
+        mb: (tnf_byte & 0x80) !== 0,
+        me: (tnf_byte & 0x40) !== 0,
+        cf: (tnf_byte & 0x20) !== 0,
+        sr: (tnf_byte & 0x10) !== 0,
+        il: (tnf_byte & 0x8) !== 0,
+        tnf: (tnf_byte & 0x7)
+    };
+}
+var PushParser = (function (_super) {
+    __extends(PushParser, _super);
+    function PushParser(initialState) {
+        if (initialState === void 0) { initialState = ParseState.expectingTag; }
+        var _this = _super.call(this) || this;
+        _this.buffers = [];
+        _this.cursor = 0;
+        _this.currentCursor = 0;
+        _this.totalLength = 0;
+        _this.currentBuffer = 0;
+        _this.state = initialState;
+        return _this;
+    }
+    Object.defineProperty(PushParser.prototype, "state", {
+        get: function () {
+            return this._state;
+        },
+        set: function (v) {
+            // console.log('setting state', v, {
+            //   payloadLength: this.payloadLength,
+            //   typeLength: this.typeLength,
+            //   idLength: this.idLength
+            // })
+            this._state = v;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    PushParser.prototype.push = function (buffer) {
+        this.pushBuffer(buffer);
+        this.process();
+    };
+    PushParser.prototype.getState = function () {
+        return this.state;
+    };
+    PushParser.prototype.process = function () {
+        var self = this;
+        // noinspection FallThroughInSwitchStatementJS
+        if (self.state === ParseState.expectingTag) {
+            if (self.canRead(1)) {
+                var tag = self.readUint8();
+                if (tag === 0x03) {
+                    self.state = ParseState.expectingLength;
+                    self.emit('foundNdefTag');
+                }
+                else {
+                    self.emit('skipping');
+                    // self.process()
+                }
+            }
+        }
+        if (self.state === ParseState.expectingLength) {
+            if (self.canRead(3)) {
+                var length_1 = self.readUint8();
+                if (length_1 === 0xFF) {
+                    length_1 = self.readUint16BE();
+                    self.expectedLength = length_1;
+                }
+                self.state = ParseState.expectingValue;
+            }
+            else {
+                return;
+            }
+        }
+        if (self.state === ParseState.expectingValue) {
+            if (self.canRead(1)) {
+                var tnf_byte = self.readUint8();
+                var header = decodeTnf(tnf_byte);
+                self.header = header;
+                self.state = ParseState.expectingTypeLength;
+                if (header.mb) {
+                    self.emit('messageBegin');
+                }
+            }
+        }
+        if (self.state === ParseState.expectingTypeLength) {
+            if (self.canRead(1)) {
+                self.typeLength = self.readUint8();
+                if (self.header.sr) {
+                    self.state = ParseState.expectingPayloadLengthOneByte;
+                }
+                else {
+                    self.state = ParseState.expectingPayloadLengthFourByte;
+                }
+            }
+        }
+        if (self.state === ParseState.expectingPayloadLengthOneByte) {
+            if (self.canRead(1)) {
+                self.payloadLength = self.readUint8();
+                self.state = ParseState.expectingIdLength;
+            }
+        }
+        if (self.state === ParseState.expectingPayloadLengthFourByte) {
+            if (self.canRead(4)) {
+                self.payloadLength = self.readUint32BE();
+                self.state = ParseState.expectingIdLength;
+            }
+        }
+        if (self.state === ParseState.expectingIdLength) {
+            if (self.header.il) {
+                if (self.canRead(1)) {
+                    self.idLength = self.readUint8();
+                    self.state = ParseState.expectingType;
+                }
+            }
+            else {
+                self.idLength = 0;
+                self.state = ParseState.expectingType;
+            }
+        }
+        if (self.state === ParseState.expectingType) {
+            if (self.canRead(self.typeLength)) {
+                self.typeBytes = self.read(self.typeLength);
+                self.state = ParseState.expectingId;
+            }
+        }
+        if (self.state === ParseState.expectingId) {
+            if (self.canRead(self.idLength)) {
+                self.idBytes = self.read(self.idLength);
+                self.state = ParseState.expectingPayload;
+            }
+        }
+        if (self.state === ParseState.expectingPayload) {
+            if (self.canRead(self.payloadLength)) {
+                self.payloadBytes = self.read(self.payloadLength);
+                self.emit('record', self.getRecord());
+                if (!self.header.me) {
+                    self.state = ParseState.expectingValue;
+                    self.process();
+                }
+                else {
+                    self.emit('messageEnd');
+                    self.state = ParseState.expectingStopByte;
+                }
+            }
+        }
+        if (self.state == ParseState.expectingStopByte) {
+            if (this.canRead(1)) {
+            }
+            // go to next ...
+        }
+        // noinspection FallThroughInSwitchStatementJS
+    };
+    PushParser.prototype.getRecord = function () {
+        // TODO: use bytes
+        var getBytes = function (buf) { return buf.toJSON().data; };
+        return ndef_1.record(this.header.tnf, getBytes(this.typeBytes), getBytes(this.idBytes), getBytes(this.payloadBytes));
+    };
+    PushParser.prototype.pushBuffer = function (buffer) {
+        this.buffers.push(buffer);
+        this.totalLength += buffer.length;
+    };
+    PushParser.prototype.canRead = function (n) {
+        return (this.cursor + n) <= this.totalLength;
+    };
+    PushParser.prototype.read = function (n) {
+        // cursor is zero based indexing, so cursor + n should be less than total
+        assert(this.canRead(n));
+        if (n === 0) {
+            return Buffer.alloc(0);
+        }
+        this.cursor += n;
+        var buffers = [];
+        while (n > this.availableInTopBuffer()) {
+            var current = this.current();
+            var buf = this.currentCursor !== 0 ?
+                // take what's left of the current buffer
+                current.slice(this.currentCursor) :
+                // take the whole buffer
+                current;
+            buffers.push(buf);
+            n -= buf.length;
+            this.currentBuffer++;
+            this.currentCursor = 0;
+        }
+        if (n) {
+            // Take part
+            buffers.push(this.current().slice(this.currentCursor, this.currentCursor + n));
+            this.currentCursor += n;
+        }
+        return Buffer.concat(buffers);
+    };
+    PushParser.prototype.readUint32BE = function () {
+        var buf = this.read(4);
+        return buf.readUInt32BE(0);
+    };
+    PushParser.prototype.readUint8 = function () {
+        var buf = this.read(1);
+        return buf.readUInt8(0);
+    };
+    PushParser.prototype.availableInTopBuffer = function () {
+        return this.current().length - this.currentCursor;
+    };
+    PushParser.prototype.current = function () {
+        return this.buffers[this.currentBuffer];
+    };
+    PushParser.prototype.readUint16BE = function () {
+        var buf = this.read(2);
+        return buf.readUInt16BE(0);
+    };
+    PushParser.prototype.finishedMessage = function () {
+        return this.state === ParseState.expectingStopByte;
+    };
+    return PushParser;
+}(events.EventEmitter));
+exports.PushParser = PushParser;
+//# sourceMappingURL=push-parser.js.map
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
+
+/***/ }),
+/* 25 */
+/***/ (function(module, exports) {
+
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+function EventEmitter() {
+  this._events = this._events || {};
+  this._maxListeners = this._maxListeners || undefined;
+}
+module.exports = EventEmitter;
+
+// Backwards-compat with node 0.10.x
+EventEmitter.EventEmitter = EventEmitter;
+
+EventEmitter.prototype._events = undefined;
+EventEmitter.prototype._maxListeners = undefined;
+
+// By default EventEmitters will print a warning if more than 10 listeners are
+// added to it. This is a useful default which helps finding memory leaks.
+EventEmitter.defaultMaxListeners = 10;
+
+// Obviously not all Emitters should be limited to 10. This function allows
+// that to be increased. Set to zero for unlimited.
+EventEmitter.prototype.setMaxListeners = function(n) {
+  if (!isNumber(n) || n < 0 || isNaN(n))
+    throw TypeError('n must be a positive number');
+  this._maxListeners = n;
+  return this;
+};
+
+EventEmitter.prototype.emit = function(type) {
+  var er, handler, len, args, i, listeners;
+
+  if (!this._events)
+    this._events = {};
+
+  // If there is no 'error' event listener then throw.
+  if (type === 'error') {
+    if (!this._events.error ||
+        (isObject(this._events.error) && !this._events.error.length)) {
+      er = arguments[1];
+      if (er instanceof Error) {
+        throw er; // Unhandled 'error' event
+      } else {
+        // At least give some kind of context to the user
+        var err = new Error('Uncaught, unspecified "error" event. (' + er + ')');
+        err.context = er;
+        throw err;
+      }
+    }
+  }
+
+  handler = this._events[type];
+
+  if (isUndefined(handler))
+    return false;
+
+  if (isFunction(handler)) {
+    switch (arguments.length) {
+      // fast cases
+      case 1:
+        handler.call(this);
+        break;
+      case 2:
+        handler.call(this, arguments[1]);
+        break;
+      case 3:
+        handler.call(this, arguments[1], arguments[2]);
+        break;
+      // slower
+      default:
+        args = Array.prototype.slice.call(arguments, 1);
+        handler.apply(this, args);
+    }
+  } else if (isObject(handler)) {
+    args = Array.prototype.slice.call(arguments, 1);
+    listeners = handler.slice();
+    len = listeners.length;
+    for (i = 0; i < len; i++)
+      listeners[i].apply(this, args);
+  }
+
+  return true;
+};
+
+EventEmitter.prototype.addListener = function(type, listener) {
+  var m;
+
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  if (!this._events)
+    this._events = {};
+
+  // To avoid recursion in the case that type === "newListener"! Before
+  // adding it to the listeners, first emit "newListener".
+  if (this._events.newListener)
+    this.emit('newListener', type,
+              isFunction(listener.listener) ?
+              listener.listener : listener);
+
+  if (!this._events[type])
+    // Optimize the case of one listener. Don't need the extra array object.
+    this._events[type] = listener;
+  else if (isObject(this._events[type]))
+    // If we've already got an array, just append.
+    this._events[type].push(listener);
+  else
+    // Adding the second element, need to change to array.
+    this._events[type] = [this._events[type], listener];
+
+  // Check for listener leak
+  if (isObject(this._events[type]) && !this._events[type].warned) {
+    if (!isUndefined(this._maxListeners)) {
+      m = this._maxListeners;
+    } else {
+      m = EventEmitter.defaultMaxListeners;
+    }
+
+    if (m && m > 0 && this._events[type].length > m) {
+      this._events[type].warned = true;
+      console.error('(node) warning: possible EventEmitter memory ' +
+                    'leak detected. %d listeners added. ' +
+                    'Use emitter.setMaxListeners() to increase limit.',
+                    this._events[type].length);
+      if (typeof console.trace === 'function') {
+        // not supported in IE 10
+        console.trace();
+      }
+    }
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.on = EventEmitter.prototype.addListener;
+
+EventEmitter.prototype.once = function(type, listener) {
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  var fired = false;
+
+  function g() {
+    this.removeListener(type, g);
+
+    if (!fired) {
+      fired = true;
+      listener.apply(this, arguments);
+    }
+  }
+
+  g.listener = listener;
+  this.on(type, g);
+
+  return this;
+};
+
+// emits a 'removeListener' event iff the listener was removed
+EventEmitter.prototype.removeListener = function(type, listener) {
+  var list, position, length, i;
+
+  if (!isFunction(listener))
+    throw TypeError('listener must be a function');
+
+  if (!this._events || !this._events[type])
+    return this;
+
+  list = this._events[type];
+  length = list.length;
+  position = -1;
+
+  if (list === listener ||
+      (isFunction(list.listener) && list.listener === listener)) {
+    delete this._events[type];
+    if (this._events.removeListener)
+      this.emit('removeListener', type, listener);
+
+  } else if (isObject(list)) {
+    for (i = length; i-- > 0;) {
+      if (list[i] === listener ||
+          (list[i].listener && list[i].listener === listener)) {
+        position = i;
+        break;
+      }
+    }
+
+    if (position < 0)
+      return this;
+
+    if (list.length === 1) {
+      list.length = 0;
+      delete this._events[type];
+    } else {
+      list.splice(position, 1);
+    }
+
+    if (this._events.removeListener)
+      this.emit('removeListener', type, listener);
+  }
+
+  return this;
+};
+
+EventEmitter.prototype.removeAllListeners = function(type) {
+  var key, listeners;
+
+  if (!this._events)
+    return this;
+
+  // not listening for removeListener, no need to emit
+  if (!this._events.removeListener) {
+    if (arguments.length === 0)
+      this._events = {};
+    else if (this._events[type])
+      delete this._events[type];
+    return this;
+  }
+
+  // emit removeListener for all listeners on all events
+  if (arguments.length === 0) {
+    for (key in this._events) {
+      if (key === 'removeListener') continue;
+      this.removeAllListeners(key);
+    }
+    this.removeAllListeners('removeListener');
+    this._events = {};
+    return this;
+  }
+
+  listeners = this._events[type];
+
+  if (isFunction(listeners)) {
+    this.removeListener(type, listeners);
+  } else if (listeners) {
+    // LIFO order
+    while (listeners.length)
+      this.removeListener(type, listeners[listeners.length - 1]);
+  }
+  delete this._events[type];
+
+  return this;
+};
+
+EventEmitter.prototype.listeners = function(type) {
+  var ret;
+  if (!this._events || !this._events[type])
+    ret = [];
+  else if (isFunction(this._events[type]))
+    ret = [this._events[type]];
+  else
+    ret = this._events[type].slice();
+  return ret;
+};
+
+EventEmitter.prototype.listenerCount = function(type) {
+  if (this._events) {
+    var evlistener = this._events[type];
+
+    if (isFunction(evlistener))
+      return 1;
+    else if (evlistener)
+      return evlistener.length;
+  }
+  return 0;
+};
+
+EventEmitter.listenerCount = function(emitter, type) {
+  return emitter.listenerCount(type);
+};
+
+function isFunction(arg) {
+  return typeof arg === 'function';
+}
+
+function isNumber(arg) {
+  return typeof arg === 'number';
+}
+
+function isObject(arg) {
+  return typeof arg === 'object' && arg !== null;
+}
+
+function isUndefined(arg) {
+  return arg === void 0;
+}
+
 
 /***/ })
 /******/ ])));
