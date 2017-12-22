@@ -23,7 +23,7 @@ module.exports = {
   module: {
       loaders: [{
           test: /\.ts$/,
-          exclude: /node_modules/,
+          exclude: /node_modules\/(?!(ndef-lib)\/).*/,
           use: [
               {
                   loader: 'ts-loader'

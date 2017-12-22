@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 19);
+/******/ 	return __webpack_require__(__webpack_require__.s = 22);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -81,9 +81,9 @@
 
 
 
-var base64 = __webpack_require__(12)
-var ieee754 = __webpack_require__(14)
-var isArray = __webpack_require__(15)
+var base64 = __webpack_require__(11)
+var ieee754 = __webpack_require__(13)
+var isArray = __webpack_require__(14)
 
 exports.Buffer = Buffer
 exports.SlowBuffer = SlowBuffer
@@ -1861,10 +1861,112 @@ function isnan (val) {
   return val !== val // eslint-disable-line no-self-compare
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ }),
 /* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TNF_EMPTY = 0x0;
+exports.TNF_WELL_KNOWN = 0x01;
+exports.TNF_MIME_MEDIA = 0x02;
+exports.TNF_ABSOLUTE_URI = 0x03;
+exports.TNF_EXTERNAL_TYPE = 0x04;
+exports.TNF_UNKNOWN = 0x05;
+exports.TNF_UNCHANGED = 0x06;
+exports.TNF_RESERVED = 0x07;
+exports.RTD_TEXT = 'T'; // [0x54]
+exports.RTD_URI = 'U'; // [0x55]
+exports.RTD_SMART_POSTER = 'Sp'; // [0x53, 0x70]
+exports.RTD_ALTERNATIVE_CARRIER = 'ac'; // [0x61, 0x63]
+exports.RTD_HANDOVER_CARRIER = 'Hc'; // [0x48, 0x63]
+exports.RTD_HANDOVER_REQUEST = 'Hr'; // [0x48, 0x72]
+exports.RTD_HANDOVER_SELECT = 'Hs'; // [0x48, 0x73]
+exports.MESSAGE_STOP_BYTE = 0xfe;
+exports.MESSAGE_START_TAG = 0x03;
+//# sourceMappingURL=consts.js.map
+
+/***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(Buffer) {
+// ndef-util.js
+// Copyright 2013 Don Coleman
+//
+Object.defineProperty(exports, "__esModule", { value: true });
+// This is from phonegap-nfc.js and is a combination of helpers in nfc and util
+// https://github.com/chariotsolutions/phonegap-nfc/blob/master/www/phonegap-nfc.js
+function stringToBytes(string) {
+    var bytes = Buffer.from(string).toJSON();
+    if (bytes.hasOwnProperty('data')) {
+        // Node 0.12.x
+        return bytes.data;
+    }
+    else {
+        // Node 0.10.x
+        return bytes;
+    }
+}
+exports.stringToBytes = stringToBytes;
+function bytesToString(bytes) {
+    return Buffer.from(bytes).toString();
+}
+exports.bytesToString = bytesToString;
+// useful for readable version of Tag UID
+function bytesToHexString(bytes) {
+    var dec;
+    var hexstring;
+    var bytesAsHexString = '';
+    for (var i = 0; i < bytes.length; i++) {
+        if (bytes[i] >= 0) {
+            dec = bytes[i];
+        }
+        else {
+            dec = 256 + bytes[i];
+        }
+        hexstring = dec.toString(16);
+        // zero padding
+        if (hexstring.length == 1) {
+            hexstring = '0' + hexstring;
+        }
+        bytesAsHexString += hexstring;
+    }
+    return bytesAsHexString;
+}
+exports.bytesToHexString = bytesToHexString;
+// i must be <= 256
+function toHex(i) {
+    var hex;
+    if (i < 0) {
+        i += 256;
+    }
+    hex = i.toString(16);
+    // zero padding
+    if (hex.length == 1) {
+        hex = '0' + hex;
+    }
+    return hex;
+}
+exports.toHex = toHex;
+function toPrintable(i) {
+    if (i >= 0x20 && i <= 0x7F) {
+        return String.fromCharCode(i);
+    }
+    else {
+        return '.';
+    }
+}
+exports.toPrintable = toPrintable;
+//# sourceMappingURL=ndef-util.js.map
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
+
+/***/ }),
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {// ndef-util.js
@@ -1943,7 +2045,7 @@ module.exports = {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 2 */
+/* 4 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -2133,7 +2235,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 3 */
+/* 5 */
 /***/ (function(module, exports) {
 
 var g;
@@ -2158,108 +2260,6 @@ try {
 
 module.exports = g;
 
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.TNF_EMPTY = 0x0;
-exports.TNF_WELL_KNOWN = 0x01;
-exports.TNF_MIME_MEDIA = 0x02;
-exports.TNF_ABSOLUTE_URI = 0x03;
-exports.TNF_EXTERNAL_TYPE = 0x04;
-exports.TNF_UNKNOWN = 0x05;
-exports.TNF_UNCHANGED = 0x06;
-exports.TNF_RESERVED = 0x07;
-exports.RTD_TEXT = 'T'; // [0x54]
-exports.RTD_URI = 'U'; // [0x55]
-exports.RTD_SMART_POSTER = 'Sp'; // [0x53, 0x70]
-exports.RTD_ALTERNATIVE_CARRIER = 'ac'; // [0x61, 0x63]
-exports.RTD_HANDOVER_CARRIER = 'Hc'; // [0x48, 0x63]
-exports.RTD_HANDOVER_REQUEST = 'Hr'; // [0x48, 0x72]
-exports.RTD_HANDOVER_SELECT = 'Hs'; // [0x48, 0x73]
-exports.MESSAGE_STOP_BYTE = 0xfe;
-exports.MESSAGE_START_TAG = 0x03;
-//# sourceMappingURL=consts.js.map
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(Buffer) {
-// ndef-util.js
-// Copyright 2013 Don Coleman
-//
-Object.defineProperty(exports, "__esModule", { value: true });
-// This is from phonegap-nfc.js and is a combination of helpers in nfc and util
-// https://github.com/chariotsolutions/phonegap-nfc/blob/master/www/phonegap-nfc.js
-function toBuffer(arg) {
-    return Buffer.from(arg, 'utf8');
-    // const bytes = Buffer.from(string).toJSON()
-    // if (bytes.hasOwnProperty('data')) {
-    //       // Node 0.12.x
-    //   return bytes.data
-    // } else {
-    //       // Node 0.10.x
-    //   return (bytes as any as number[])
-    // }
-}
-exports.toBuffer = toBuffer;
-function bytesToString(bytes) {
-    return Buffer.from(bytes, 'utf8').toString();
-}
-exports.bytesToString = bytesToString;
-// useful for readable version of Tag UID
-function bytesToHexString(bytes) {
-    var dec;
-    var hexstring;
-    var bytesAsHexString = '';
-    for (var i = 0; i < bytes.length; i++) {
-        if (bytes[i] >= 0) {
-            dec = bytes[i];
-        }
-        else {
-            dec = 256 + bytes[i];
-        }
-        hexstring = dec.toString(16);
-        // zero padding
-        if (hexstring.length == 1) {
-            hexstring = '0' + hexstring;
-        }
-        bytesAsHexString += hexstring;
-    }
-    return bytesAsHexString;
-}
-exports.bytesToHexString = bytesToHexString;
-// i must be <= 256
-function toHex(i) {
-    var hex;
-    if (i < 0) {
-        i += 256;
-    }
-    hex = i.toString(16);
-    // zero padding
-    if (hex.length == 1) {
-        hex = '0' + hex;
-    }
-    return hex;
-}
-exports.toHex = toHex;
-function toPrintable(i) {
-    if (i >= 0x20 && i <= 0x7F) {
-        return String.fromCharCode(i);
-    }
-    else {
-        return '.';
-    }
-}
-exports.toPrintable = toPrintable;
-//# sourceMappingURL=ndef-util.js.map
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
 /* 6 */
@@ -2334,7 +2334,7 @@ function isBuffer(b) {
 // ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-var util = __webpack_require__(22);
+var util = __webpack_require__(25);
 var hasOwn = Object.prototype.hasOwnProperty;
 var pSlice = Array.prototype.slice;
 var functionsHaveNames = (function () {
@@ -2757,7 +2757,7 @@ var objectKeys = Object.keys || function (obj) {
   return keys;
 };
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)))
 
 /***/ }),
 /* 7 */
@@ -2770,12 +2770,10 @@ var objectKeys = Object.keys || function (obj) {
 //
 // This code is from phonegap-nfc.js https://github.com/don/phonegap-nfc
 Object.defineProperty(exports, "__esModule", { value: true });
-var utils = __webpack_require__(5);
-var consts = __webpack_require__(4);
-var textHelper = __webpack_require__(25);
-var uriHelper = __webpack_require__(26);
-var push_parser_1 = __webpack_require__(8);
-var buffer_list_1 = __webpack_require__(24);
+var utils = __webpack_require__(2);
+var consts = __webpack_require__(1);
+var textHelper = __webpack_require__(16);
+var uriHelper = __webpack_require__(17);
 // import {
 //   RTD_SMART_POSTER, RTD_TEXT, RTD_URI, TNF_ABSOLUTE_URI, TNF_EMPTY,
 //   TNF_EXTERNAL_TYPE, TNF_MIME_MEDIA, TNF_RESERVED, TNF_UNCHANGED, TNF_UNKNOWN,
@@ -2808,16 +2806,16 @@ function record(tnf, type, id, payload) {
         payload = [];
     }
     // store type as String so it's easier to compare
-    if (Buffer.isBuffer(type) || Array.isArray(type)) {
+    if (type instanceof Array) {
         type = utils.bytesToString(type);
     }
     // in the future, id could be a String
-    if (!(Buffer.isBuffer(id))) {
-        id = utils.toBuffer(id);
+    if (!(id instanceof Array)) {
+        id = utils.stringToBytes(id);
     }
     // Payload must be binary
-    if (!(Buffer.isBuffer(payload))) {
-        payload = utils.toBuffer(payload);
+    if (!(payload instanceof Array)) {
+        payload = utils.stringToBytes(payload);
     }
     // TODO: typescript
     var record = {
@@ -2838,10 +2836,6 @@ function record(tnf, type, id, payload) {
                 record.value = exports.uri.decodePayload(record.payload);
                 break;
         }
-    }
-    else {
-        // Assume utf-8
-        record.value = record.payload.toString('utf8');
     }
     return record;
 }
@@ -2931,7 +2925,7 @@ exports.mimeMediaRecord = mimeMediaRecord;
  * @id byte[] (optional)
  */
 function smartPoster(ndefRecords, id) {
-    var payload = Buffer.alloc(0);
+    var payload = [];
     if (!id) {
         id = [];
     }
@@ -2980,7 +2974,7 @@ exports.androidApplicationRecord = androidApplicationRecord;
  *     http://www.nfc-forum.org/specs/spec_list/
  */
 function encodeMessage(ndefRecords) {
-    var encoded = new buffer_list_1.BufferList();
+    var encoded = [];
     var tnf_byte;
     var record_type;
     var payload_length;
@@ -3001,7 +2995,7 @@ function encodeMessage(ndefRecords) {
         tnf_byte = encodeTnf(mb, me, cf, sr, il, ndefRecords[i].tnf);
         encoded.push(tnf_byte);
         // type is stored as String, converting to bytes for storage
-        record_type = utils.toBuffer(ndefRecords[i].type);
+        record_type = utils.stringToBytes(ndefRecords[i].type);
         encoded.push(record_type.length);
         if (sr) {
             payload_length = ndefRecords[i].payload.length;
@@ -3019,13 +3013,13 @@ function encodeMessage(ndefRecords) {
             id_length = ndefRecords[i].id.length;
             encoded.push(id_length);
         }
-        encoded.push(record_type);
+        encoded = encoded.concat(record_type);
         if (il) {
-            encoded.push(ndefRecords[i].id);
+            encoded = encoded.concat(ndefRecords[i].id);
         }
-        encoded.push(ndefRecords[i].payload);
+        encoded = encoded.concat(ndefRecords[i].payload);
     }
-    return encoded.joined();
+    return encoded;
 }
 exports.encodeMessage = encodeMessage;
 /**
@@ -3039,72 +3033,61 @@ exports.encodeMessage = encodeMessage;
  *     http://www.nfc-forum.org/specs/spec_list/
  */
 function decodeMessage(bytes) {
-    var parser = new push_parser_1.PushParser(push_parser_1.ParseState.expectingValue);
-    parser.push(Buffer.from(bytes));
-    return parser.getMessage();
-    // bytes = bytes.slice(0)
-    //
-    // const ndef_message = []
-    // let tnf_byte
-    // let header
-    // let type_length = 0
-    // let payload_length = 0
-    // let id_length = 0
-    // let record_type = []
-    // let id = []
-    // let payload = []
-    //
-    // while (bytes.length) {
-    //   tnf_byte = bytes.shift()
-    //   header = decodeTnf(tnf_byte)
-    //
-    //   type_length = bytes.shift()
-    //
-    //   if (header.sr) {
-    //     payload_length = bytes.shift()
-    //   } else {
-    //     // next 4 bytes are length
-    //     payload_length = ((0xFF & bytes.shift()) << 24) |
-    //       ((0xFF & bytes.shift()) << 16) |
-    //       ((0xFF & bytes.shift()) << 8) |
-    //       (0xFF & bytes.shift())
-    //   }
-    //
-    //   if (header.il) {
-    //     id_length = bytes.shift()
-    //   }
-    //
-    //   record_type = bytes.splice(0, type_length)
-    //   id = bytes.splice(0, id_length)
-    //   payload = bytes.splice(0, payload_length)
-    //
-    //   ndef_message.push(
-    //     record(header.tnf, record_type, id, payload)
-    //   )
-    //
-    //   if (header.me) break // last message
-    // }
-    //
-    // return ndef_message
+    bytes = bytes.slice(0);
+    var ndef_message = [];
+    var tnf_byte;
+    var header;
+    var type_length = 0;
+    var payload_length = 0;
+    var id_length = 0;
+    var record_type = [];
+    var id = [];
+    var payload = [];
+    while (bytes.length) {
+        tnf_byte = bytes.shift();
+        header = decodeTnf(tnf_byte);
+        type_length = bytes.shift();
+        if (header.sr) {
+            payload_length = bytes.shift();
+        }
+        else {
+            // next 4 bytes are length
+            payload_length = ((0xFF & bytes.shift()) << 24) |
+                ((0xFF & bytes.shift()) << 16) |
+                ((0xFF & bytes.shift()) << 8) |
+                (0xFF & bytes.shift());
+        }
+        if (header.il) {
+            id_length = bytes.shift();
+        }
+        record_type = bytes.splice(0, type_length);
+        id = bytes.splice(0, id_length);
+        payload = bytes.splice(0, payload_length);
+        ndef_message.push(record(header.tnf, record_type, id, payload));
+        if (header.me)
+            break; // last message
+    }
+    return ndef_message;
 }
 exports.decodeMessage = decodeMessage;
-// /**
-//  * Decode the bit flags from a TNF Byte.
-//  *
-//  * @returns object with decoded data
-//  *
-//  *  See NFC Data Exchange Format (NDEF) Specification Section 3.2 RecordLayout
-//  */
-// export function decodeTnf (tnf_byte) {
-//   return {
-//     mb: (tnf_byte & 0x80) !== 0,
-//     me: (tnf_byte & 0x40) !== 0,
-//     cf: (tnf_byte & 0x20) !== 0,
-//     sr: (tnf_byte & 0x10) !== 0,
-//     il: (tnf_byte & 0x8) !== 0,
-//     tnf: (tnf_byte & 0x7)
-//   }
-// }
+/**
+ * Decode the bit flags from a TNF Byte.
+ *
+ * @returns object with decoded data
+ *
+ *  See NFC Data Exchange Format (NDEF) Specification Section 3.2 RecordLayout
+ */
+function decodeTnf(tnf_byte) {
+    return {
+        mb: (tnf_byte & 0x80) !== 0,
+        me: (tnf_byte & 0x40) !== 0,
+        cf: (tnf_byte & 0x20) !== 0,
+        sr: (tnf_byte & 0x10) !== 0,
+        il: (tnf_byte & 0x8) !== 0,
+        tnf: (tnf_byte & 0x7)
+    };
+}
+exports.decodeTnf = decodeTnf;
 /**
  * Encode NDEF bit flags into a TNF Byte.
  *
@@ -3179,7 +3162,7 @@ exports.tnfToString = tnfToString;
 // smarter record objects that can print themselves
 var stringifier = {
     stringify: function (data, separator) {
-        if (Array.isArray(data) || Buffer.isBuffer(data)) {
+        if (Array.isArray(data)) {
             if (typeof data[0] === 'number') {
                 // guessing this message bytes
                 data = decodeMessage(data);
@@ -3302,286 +3285,6 @@ exports.stringify = stringifier.stringify;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(Buffer) {
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-Object.defineProperty(exports, "__esModule", { value: true });
-var events = __webpack_require__(13);
-var assert = __webpack_require__(6);
-var ndef_1 = __webpack_require__(7);
-var ParseState;
-(function (ParseState) {
-    ParseState[ParseState["expectingStopByte"] = 0] = "expectingStopByte";
-    ParseState[ParseState["expectingPayload"] = 1] = "expectingPayload";
-    ParseState[ParseState["expectingId"] = 2] = "expectingId";
-    ParseState[ParseState["expectingType"] = 3] = "expectingType";
-    ParseState[ParseState["expectingIdLength"] = 4] = "expectingIdLength";
-    ParseState[ParseState["expectingPayloadLengthFourByte"] = 5] = "expectingPayloadLengthFourByte";
-    ParseState[ParseState["expectingPayloadLengthOneByte"] = 6] = "expectingPayloadLengthOneByte";
-    ParseState[ParseState["expectingTypeLength"] = 7] = "expectingTypeLength";
-    ParseState[ParseState["expectingTag"] = 8] = "expectingTag";
-    ParseState[ParseState["expectingLength"] = 9] = "expectingLength";
-    ParseState[ParseState["expectingValue"] = 10] = "expectingValue";
-})(ParseState = exports.ParseState || (exports.ParseState = {}));
-function decodeTnf(tnf_byte) {
-    return {
-        mb: (tnf_byte & 0x80) !== 0,
-        me: (tnf_byte & 0x40) !== 0,
-        cf: (tnf_byte & 0x20) !== 0,
-        sr: (tnf_byte & 0x10) !== 0,
-        il: (tnf_byte & 0x8) !== 0,
-        tnf: (tnf_byte & 0x7)
-    };
-}
-var PushParser = /** @class */ (function (_super) {
-    __extends(PushParser, _super);
-    function PushParser(initialState) {
-        if (initialState === void 0) { initialState = ParseState.expectingTag; }
-        var _this = _super.call(this) || this;
-        _this.buffers = [];
-        _this.messages = [];
-        _this.cursor = 0;
-        _this.currentCursor = 0;
-        _this.totalLength = 0;
-        _this.currentBuffer = 0;
-        _this.state = initialState;
-        return _this;
-    }
-    Object.defineProperty(PushParser.prototype, "state", {
-        get: function () {
-            return this._state;
-        },
-        set: function (v) {
-            // console.log('setting state', v, {
-            //   payloadLength: this.payloadLength,
-            //   typeLength: this.typeLength,
-            //   idLength: this.idLength
-            // })
-            this._state = v;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    PushParser.prototype.push = function (buffer) {
-        this.pushBuffer(buffer);
-        this.process();
-    };
-    PushParser.prototype.getState = function () {
-        return this.state;
-    };
-    PushParser.prototype.getMessage = function () {
-        return this.messages[0];
-    };
-    PushParser.prototype.process = function () {
-        var self = this;
-        // noinspection FallThroughInSwitchStatementJS
-        if (self.state === ParseState.expectingTag) {
-            if (self.canRead(1)) {
-                var tag = self.readUint8();
-                if (tag === 0x03) {
-                    self.state = ParseState.expectingLength;
-                    self.emit('foundNdefTag');
-                }
-                else {
-                    self.emit('skipping');
-                    // self.process()
-                }
-            }
-        }
-        if (self.state === ParseState.expectingLength) {
-            if (self.canRead(3)) {
-                var length_1 = self.readUint8();
-                if (length_1 === 0xFF) {
-                    length_1 = self.readUint16BE();
-                    self.expectedLength = length_1;
-                }
-                self.state = ParseState.expectingValue;
-            }
-            else {
-                return;
-            }
-        }
-        if (self.state === ParseState.expectingValue) {
-            if (self.canRead(1)) {
-                var tnf_byte = self.readUint8();
-                var header = decodeTnf(tnf_byte);
-                self.header = header;
-                self.state = ParseState.expectingTypeLength;
-                if (header.mb) {
-                    self.emit('messageBegin');
-                    this.messages.push([]);
-                }
-            }
-        }
-        if (self.state === ParseState.expectingTypeLength) {
-            if (self.canRead(1)) {
-                self.typeLength = self.readUint8();
-                if (self.header.sr) {
-                    self.state = ParseState.expectingPayloadLengthOneByte;
-                }
-                else {
-                    self.state = ParseState.expectingPayloadLengthFourByte;
-                }
-            }
-        }
-        if (self.state === ParseState.expectingPayloadLengthOneByte) {
-            if (self.canRead(1)) {
-                self.payloadLength = self.readUint8();
-                self.state = ParseState.expectingIdLength;
-            }
-        }
-        if (self.state === ParseState.expectingPayloadLengthFourByte) {
-            if (self.canRead(4)) {
-                self.payloadLength = self.readUint32BE();
-                self.state = ParseState.expectingIdLength;
-            }
-        }
-        if (self.state === ParseState.expectingIdLength) {
-            if (self.header.il) {
-                if (self.canRead(1)) {
-                    self.idLength = self.readUint8();
-                    self.state = ParseState.expectingType;
-                }
-            }
-            else {
-                self.idLength = 0;
-                self.state = ParseState.expectingType;
-            }
-        }
-        if (self.state === ParseState.expectingType) {
-            if (self.canRead(self.typeLength)) {
-                self.typeBytes = self.read(self.typeLength);
-                self.state = ParseState.expectingId;
-            }
-        }
-        if (self.state === ParseState.expectingId) {
-            if (self.canRead(self.idLength)) {
-                self.idBytes = self.read(self.idLength);
-                self.state = ParseState.expectingPayload;
-            }
-        }
-        if (self.state === ParseState.expectingPayload) {
-            if (self.canRead(self.payloadLength)) {
-                self.payloadBytes = self.read(self.payloadLength);
-                var record_1 = self.getRecord();
-                this.messages[this.messages.length - 1].push(record_1);
-                self.emit('record', record_1);
-                if (!self.header.me) {
-                    self.state = ParseState.expectingValue;
-                    self.process();
-                }
-                else {
-                    self.emit('messageEnd');
-                    self.state = ParseState.expectingStopByte;
-                }
-            }
-        }
-        if (self.state == ParseState.expectingStopByte) {
-            if (this.canRead(1)) {
-            }
-            // go to next ...
-        }
-        // noinspection FallThroughInSwitchStatementJS
-    };
-    PushParser.prototype.getRecord = function () {
-        // TODO: use bytes
-        var getBytes = function (buf) { return buf.toJSON().data; };
-        return ndef_1.record(this.header.tnf, getBytes(this.typeBytes), getBytes(this.idBytes), getBytes(this.payloadBytes));
-    };
-    PushParser.prototype.pushBuffer = function (buffer) {
-        this.buffers.push(buffer);
-        this.totalLength += buffer.length;
-    };
-    PushParser.prototype.canRead = function (n) {
-        return (this.cursor + n) <= this.totalLength;
-    };
-    PushParser.prototype.read = function (n) {
-        // cursor is zero based indexing, so cursor + n should be less than total
-        assert(this.canRead(n));
-        if (n === 0) {
-            return Buffer.alloc(0);
-        }
-        this.cursor += n;
-        var buffers = [];
-        while (n > this.availableInTopBuffer()) {
-            var current = this.current();
-            var buf = this.currentCursor !== 0 ?
-                // take what's left of the current buffer
-                current.slice(this.currentCursor) :
-                // take the whole buffer
-                current;
-            buffers.push(buf);
-            n -= buf.length;
-            this.currentBuffer++;
-            this.currentCursor = 0;
-        }
-        if (n) {
-            // Take part
-            buffers.push(this.current().slice(this.currentCursor, this.currentCursor + n));
-            this.currentCursor += n;
-        }
-        return Buffer.concat(buffers);
-    };
-    PushParser.prototype.readUint32BE = function () {
-        var buf = this.read(4);
-        return buf.readUInt32BE(0);
-    };
-    PushParser.prototype.readUint8 = function () {
-        var buf = this.read(1);
-        return buf.readUInt8(0);
-    };
-    PushParser.prototype.availableInTopBuffer = function () {
-        return this.current().length - this.currentCursor;
-    };
-    PushParser.prototype.current = function () {
-        return this.buffers[this.currentBuffer];
-    };
-    PushParser.prototype.readUint16BE = function () {
-        var buf = this.read(2);
-        return buf.readUInt16BE(0);
-    };
-    PushParser.prototype.finishedMessage = function () {
-        return this.state === ParseState.expectingStopByte;
-    };
-    return PushParser;
-}(events.EventEmitter));
-exports.PushParser = PushParser;
-//# sourceMappingURL=push-parser.js.map
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
-
-/***/ }),
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(process, Buffer) {var ndef = __webpack_require__(18);
-module.exports = ndef;
-
-if (process.version.indexOf('v0.8') === 0) {
-    // Monkey Patch Buffer for Node 0.8 support
-    Buffer.prototype.toJSON = function() {
-        j = [];
-        for (var i = 0; i < this.length; i++) {
-            j[i] = this[i];
-        }    
-        return j;
-    }
-}
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(0).Buffer))
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
 /* WEBPACK VAR INJECTION */(function(process, Buffer) {
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -3598,21 +3301,41 @@ if (process.version.indexOf('v0.8') === 0) {
     };
 }
 __export(__webpack_require__(7));
-__export(__webpack_require__(4));
-__export(__webpack_require__(23));
-var push_parser_1 = __webpack_require__(8);
+__export(__webpack_require__(1));
+__export(__webpack_require__(15));
+var push_parser_1 = __webpack_require__(18);
 exports.PushParser = push_parser_1.PushParser;
 //# sourceMappingURL=index.js.map
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(0).Buffer))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4), __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 11 */
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(process, Buffer) {var ndef = __webpack_require__(21);
+module.exports = ndef;
+
+if (process.version.indexOf('v0.8') === 0) {
+    // Monkey Patch Buffer for Node 0.8 support
+    Buffer.prototype.toJSON = function() {
+        j = [];
+        for (var i = 0; i < this.length; i++) {
+            j[i] = this[i];
+        }    
+        return j;
+    }
+}
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4), __webpack_require__(0).Buffer))
+
+/***/ }),
+/* 10 */
 /***/ (function(module, exports) {
 
 module.exports = require("cordova/exec");
 
 /***/ }),
-/* 12 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3733,7 +3456,7 @@ function fromByteArray (uint8) {
 
 
 /***/ }),
-/* 13 */
+/* 12 */
 /***/ (function(module, exports) {
 
 // Copyright Joyent, Inc. and other Node contributors.
@@ -4041,7 +3764,7 @@ function isUndefined(arg) {
 
 
 /***/ }),
-/* 14 */
+/* 13 */
 /***/ (function(module, exports) {
 
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
@@ -4131,7 +3854,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 
 
 /***/ }),
-/* 15 */
+/* 14 */
 /***/ (function(module, exports) {
 
 var toString = {}.toString;
@@ -4142,10 +3865,411 @@ module.exports = Array.isArray || function (arr) {
 
 
 /***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(Buffer) {
+Object.defineProperty(exports, "__esModule", { value: true });
+var assert = __webpack_require__(6);
+var consts_1 = __webpack_require__(1);
+function makeSlices(data, pageSize) {
+    if (pageSize === void 0) { pageSize = 4; }
+    var result = [];
+    for (var i = 0; i < data.length; i += pageSize) {
+        result.push(data.slice(i, i + pageSize));
+    }
+    return result;
+}
+exports.makeSlices = makeSlices;
+function tlvDecodeNdef(userData) {
+    var t = userData.readUInt8(0);
+    assert.equal(t, 0x03);
+    var length = userData.readUInt8(1);
+    var starts = 2;
+    if (length === 0xFF) {
+        length = userData.readUInt16BE(2);
+        starts = 4;
+    }
+    return userData.slice(starts, starts + length);
+}
+exports.tlvDecodeNdef = tlvDecodeNdef;
+function tlvEncodeNdef(message) {
+    // Add the ndef message type
+    var buffers = [new Buffer([consts_1.MESSAGE_START_TAG])];
+    var length = message.length;
+    if (length <= 0xFE) {
+        buffers.push(Buffer.from([length]));
+    }
+    else {
+        var length_1 = Buffer.alloc(3);
+        length_1.writeUInt8(0xff, 0);
+        length_1.writeUInt16BE(message.length, 1);
+        buffers.push(length_1);
+    }
+    buffers.push(message);
+    // Add the terminator
+    buffers.push(Buffer.from([consts_1.MESSAGE_STOP_BYTE]));
+    return Buffer.concat(buffers);
+}
+exports.tlvEncodeNdef = tlvEncodeNdef;
+function createWriteApdus(tagType, data) {
+    assert.equal(tagType, 'mifareUltralight');
+    var slices = makeSlices(data, 4);
+    var userDataPageStarts = 4; //
+    return slices.map(function (slice, ix) {
+        if (slice.length < 4) {
+            slice = Buffer.concat([slice, Buffer.alloc(4 - slice.length)]);
+        }
+        return Buffer.concat([
+            new Buffer([0xFF, 0xD6, 0x00, userDataPageStarts + ix, 4]),
+            slice
+        ]);
+    });
+}
+exports.createWriteApdus = createWriteApdus;
+//# sourceMappingURL=apdu-helpers.js.map
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
+
+/***/ }),
 /* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var util = __webpack_require__(1);
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var util = __webpack_require__(2);
+// decode text bytes from ndef record payload
+// @returns a string
+function decodePayload(data) {
+    var // 6 LSBs
+    languageCodeLength = (data[0] & 0x3F); // assuming UTF-16BE
+    // TODO need to deal with UTF in the future
+    // console.log("lang " + languageCode + (utf16 ? " utf16" : " utf8"));
+    var languageCode = data.slice(1, 1 + languageCodeLength);
+    var utf16 = (data[0] & 0x80) !== 0;
+    return util.bytesToString(data.slice(languageCodeLength + 1));
+}
+exports.decodePayload = decodePayload;
+// encode text payload
+// @returns an array of bytes
+function encodePayload(text, lang, encoding) {
+    // ISO/IANA language code, but we're not enforcing
+    if (!lang) {
+        lang = 'en';
+    }
+    var encoded = util.stringToBytes(lang + text);
+    encoded.unshift(lang.length);
+    return encoded;
+}
+exports.encodePayload = encodePayload;
+//# sourceMappingURL=ndef-text.js.map
+
+/***/ }),
+/* 17 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var util = __webpack_require__(2);
+// URI identifier codes from URI Record Type Definition NFCForum-TS-RTD_URI_1.0 2006-07-24
+// index in array matches code in the spec
+var protocols = ['', 'http://www.', 'https://www.', 'http://', 'https://', 'tel:', 'mailto:', 'ftp://anonymous:anonymous@', 'ftp://ftp.', 'ftps://', 'sftp://', 'smb://', 'nfs://', 'ftp://', 'dav://', 'news:', 'telnet://', 'imap:', 'rtsp://', 'urn:', 'pop:', 'sip:', 'sips:', 'tftp:', 'btspp://', 'btl2cap://', 'btgoep://', 'tcpobex://', 'irdaobex://', 'file://', 'urn:epc:id:', 'urn:epc:tag:', 'urn:epc:pat:', 'urn:epc:raw:', 'urn:epc:', 'urn:nfc:'];
+// decode a URI payload bytes
+// @returns a string
+function decodePayload(data) {
+    var prefix = protocols[data[0]];
+    if (!prefix) {
+        prefix = '';
+    }
+    return prefix + util.bytesToString(data.slice(1));
+}
+exports.decodePayload = decodePayload;
+// shorten a URI with standard prefix
+// @returns an array of bytes
+function encodePayload(uri) {
+    var prefix;
+    // check each protocol, unless we've found a match
+    // "urn:" is the one exception where we need to keep checking
+    // slice so we don't check ""
+    var protocolCode;
+    var encoded;
+    protocols.slice(1).forEach(function (protocol) {
+        if ((!prefix || prefix === 'urn:') && uri.indexOf(protocol) === 0) {
+            prefix = protocol;
+        }
+    });
+    if (!prefix) {
+        prefix = '';
+    }
+    encoded = util.stringToBytes(uri.slice(prefix.length));
+    protocolCode = protocols.indexOf(prefix);
+    // prepend protocol code
+    encoded.unshift(protocolCode);
+    return encoded;
+}
+exports.encodePayload = encodePayload;
+//# sourceMappingURL=ndef-uri.js.map
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(Buffer) {
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+var events = __webpack_require__(12);
+var assert = __webpack_require__(6);
+var ndef_1 = __webpack_require__(7);
+var ParseState;
+(function (ParseState) {
+    ParseState[ParseState["expectingStopByte"] = 0] = "expectingStopByte";
+    ParseState[ParseState["expectingPayload"] = 1] = "expectingPayload";
+    ParseState[ParseState["expectingId"] = 2] = "expectingId";
+    ParseState[ParseState["expectingType"] = 3] = "expectingType";
+    ParseState[ParseState["expectingIdLength"] = 4] = "expectingIdLength";
+    ParseState[ParseState["expectingPayloadLengthFourByte"] = 5] = "expectingPayloadLengthFourByte";
+    ParseState[ParseState["expectingPayloadLengthOneByte"] = 6] = "expectingPayloadLengthOneByte";
+    ParseState[ParseState["expectingTypeLength"] = 7] = "expectingTypeLength";
+    ParseState[ParseState["expectingTag"] = 8] = "expectingTag";
+    ParseState[ParseState["expectingLength"] = 9] = "expectingLength";
+    ParseState[ParseState["expectingValue"] = 10] = "expectingValue";
+})(ParseState = exports.ParseState || (exports.ParseState = {}));
+function decodeTnf(tnf_byte) {
+    return {
+        mb: (tnf_byte & 0x80) !== 0,
+        me: (tnf_byte & 0x40) !== 0,
+        cf: (tnf_byte & 0x20) !== 0,
+        sr: (tnf_byte & 0x10) !== 0,
+        il: (tnf_byte & 0x8) !== 0,
+        tnf: (tnf_byte & 0x7)
+    };
+}
+var PushParser = (function (_super) {
+    __extends(PushParser, _super);
+    function PushParser(initialState) {
+        if (initialState === void 0) { initialState = ParseState.expectingTag; }
+        var _this = _super.call(this) || this;
+        _this.buffers = [];
+        _this.cursor = 0;
+        _this.currentCursor = 0;
+        _this.totalLength = 0;
+        _this.currentBuffer = 0;
+        _this.state = initialState;
+        return _this;
+    }
+    Object.defineProperty(PushParser.prototype, "state", {
+        get: function () {
+            return this._state;
+        },
+        set: function (v) {
+            // console.log('setting state', v, {
+            //   payloadLength: this.payloadLength,
+            //   typeLength: this.typeLength,
+            //   idLength: this.idLength
+            // })
+            this._state = v;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    PushParser.prototype.push = function (buffer) {
+        this.pushBuffer(buffer);
+        this.process();
+    };
+    PushParser.prototype.getState = function () {
+        return this.state;
+    };
+    PushParser.prototype.process = function () {
+        var self = this;
+        // noinspection FallThroughInSwitchStatementJS
+        if (self.state === ParseState.expectingTag) {
+            if (self.canRead(1)) {
+                var tag = self.readUint8();
+                if (tag === 0x03) {
+                    self.state = ParseState.expectingLength;
+                    self.emit('foundNdefTag');
+                }
+                else {
+                    self.emit('skipping');
+                    // self.process()
+                }
+            }
+        }
+        if (self.state === ParseState.expectingLength) {
+            if (self.canRead(3)) {
+                var length_1 = self.readUint8();
+                if (length_1 === 0xFF) {
+                    length_1 = self.readUint16BE();
+                    self.expectedLength = length_1;
+                }
+                self.state = ParseState.expectingValue;
+            }
+            else {
+                return;
+            }
+        }
+        if (self.state === ParseState.expectingValue) {
+            if (self.canRead(1)) {
+                var tnf_byte = self.readUint8();
+                var header = decodeTnf(tnf_byte);
+                self.header = header;
+                self.state = ParseState.expectingTypeLength;
+                if (header.mb) {
+                    self.emit('messageBegin');
+                }
+            }
+        }
+        if (self.state === ParseState.expectingTypeLength) {
+            if (self.canRead(1)) {
+                self.typeLength = self.readUint8();
+                if (self.header.sr) {
+                    self.state = ParseState.expectingPayloadLengthOneByte;
+                }
+                else {
+                    self.state = ParseState.expectingPayloadLengthFourByte;
+                }
+            }
+        }
+        if (self.state === ParseState.expectingPayloadLengthOneByte) {
+            if (self.canRead(1)) {
+                self.payloadLength = self.readUint8();
+                self.state = ParseState.expectingIdLength;
+            }
+        }
+        if (self.state === ParseState.expectingPayloadLengthFourByte) {
+            if (self.canRead(4)) {
+                self.payloadLength = self.readUint32BE();
+                self.state = ParseState.expectingIdLength;
+            }
+        }
+        if (self.state === ParseState.expectingIdLength) {
+            if (self.header.il) {
+                if (self.canRead(1)) {
+                    self.idLength = self.readUint8();
+                    self.state = ParseState.expectingType;
+                }
+            }
+            else {
+                self.idLength = 0;
+                self.state = ParseState.expectingType;
+            }
+        }
+        if (self.state === ParseState.expectingType) {
+            if (self.canRead(self.typeLength)) {
+                self.typeBytes = self.read(self.typeLength);
+                self.state = ParseState.expectingId;
+            }
+        }
+        if (self.state === ParseState.expectingId) {
+            if (self.canRead(self.idLength)) {
+                self.idBytes = self.read(self.idLength);
+                self.state = ParseState.expectingPayload;
+            }
+        }
+        if (self.state === ParseState.expectingPayload) {
+            if (self.canRead(self.payloadLength)) {
+                self.payloadBytes = self.read(self.payloadLength);
+                self.emit('record', self.getRecord());
+                if (!self.header.me) {
+                    self.state = ParseState.expectingValue;
+                    self.process();
+                }
+                else {
+                    self.emit('messageEnd');
+                    self.state = ParseState.expectingStopByte;
+                }
+            }
+        }
+        if (self.state == ParseState.expectingStopByte) {
+            if (this.canRead(1)) {
+            }
+            // go to next ...
+        }
+        // noinspection FallThroughInSwitchStatementJS
+    };
+    PushParser.prototype.getRecord = function () {
+        // TODO: use bytes
+        var getBytes = function (buf) { return buf.toJSON().data; };
+        return ndef_1.record(this.header.tnf, getBytes(this.typeBytes), getBytes(this.idBytes), getBytes(this.payloadBytes));
+    };
+    PushParser.prototype.pushBuffer = function (buffer) {
+        this.buffers.push(buffer);
+        this.totalLength += buffer.length;
+    };
+    PushParser.prototype.canRead = function (n) {
+        return (this.cursor + n) <= this.totalLength;
+    };
+    PushParser.prototype.read = function (n) {
+        // cursor is zero based indexing, so cursor + n should be less than total
+        assert(this.canRead(n));
+        if (n === 0) {
+            return Buffer.alloc(0);
+        }
+        this.cursor += n;
+        var buffers = [];
+        while (n > this.availableInTopBuffer()) {
+            var current = this.current();
+            var buf = this.currentCursor !== 0 ?
+                // take what's left of the current buffer
+                current.slice(this.currentCursor) :
+                // take the whole buffer
+                current;
+            buffers.push(buf);
+            n -= buf.length;
+            this.currentBuffer++;
+            this.currentCursor = 0;
+        }
+        if (n) {
+            // Take part
+            buffers.push(this.current().slice(this.currentCursor, this.currentCursor + n));
+            this.currentCursor += n;
+        }
+        return Buffer.concat(buffers);
+    };
+    PushParser.prototype.readUint32BE = function () {
+        var buf = this.read(4);
+        return buf.readUInt32BE(0);
+    };
+    PushParser.prototype.readUint8 = function () {
+        var buf = this.read(1);
+        return buf.readUInt8(0);
+    };
+    PushParser.prototype.availableInTopBuffer = function () {
+        return this.current().length - this.currentCursor;
+    };
+    PushParser.prototype.current = function () {
+        return this.buffers[this.currentBuffer];
+    };
+    PushParser.prototype.readUint16BE = function () {
+        var buf = this.read(2);
+        return buf.readUInt16BE(0);
+    };
+    PushParser.prototype.finishedMessage = function () {
+        return this.state === ParseState.expectingStopByte;
+    };
+    return PushParser;
+}(events.EventEmitter));
+exports.PushParser = PushParser;
+//# sourceMappingURL=push-parser.js.map
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var util = __webpack_require__(3);
 
 // decode text bytes from ndef record payload
 // @returns a string
@@ -4181,10 +4305,10 @@ module.exports = {
 
 
 /***/ }),
-/* 17 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var util = __webpack_require__(1);
+var util = __webpack_require__(3);
 
 // URI identifier codes from URI Record Type Definition NFCForum-TS-RTD_URI_1.0 2006-07-24
 // index in array matches code in the spec
@@ -4236,7 +4360,7 @@ module.exports = {
 
 
 /***/ }),
-/* 18 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(Buffer) {// ndef.js
@@ -4244,9 +4368,9 @@ module.exports = {
 //
 // This code is from phonegap-nfc.js https://github.com/don/phonegap-nfc
 
-var util = __webpack_require__(1),
-    textHelper = __webpack_require__(16),
-    uriHelper = __webpack_require__(17);
+var util = __webpack_require__(3),
+    textHelper = __webpack_require__(19),
+    uriHelper = __webpack_require__(20);
 
 var ndef = {
 
@@ -4796,7 +4920,7 @@ module.exports = ndef;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 19 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4837,9 +4961,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var exec = __webpack_require__(11);
+var exec = __webpack_require__(10);
 var ndef = __webpack_require__(9);
-var ndef_lib_1 = __webpack_require__(10);
+var ndef_lib_1 = __webpack_require__(8);
 function noop() {
     // empty
 }
@@ -5509,7 +5633,7 @@ function execPromise(success, error, pluginName, method, args) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
 /***/ }),
-/* 20 */
+/* 23 */
 /***/ (function(module, exports) {
 
 if (typeof Object.create === 'function') {
@@ -5538,7 +5662,7 @@ if (typeof Object.create === 'function') {
 
 
 /***/ }),
-/* 21 */
+/* 24 */
 /***/ (function(module, exports) {
 
 module.exports = function isBuffer(arg) {
@@ -5549,7 +5673,7 @@ module.exports = function isBuffer(arg) {
 }
 
 /***/ }),
-/* 22 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {// Copyright Joyent, Inc. and other Node contributors.
@@ -6077,7 +6201,7 @@ function isPrimitive(arg) {
 }
 exports.isPrimitive = isPrimitive;
 
-exports.isBuffer = __webpack_require__(21);
+exports.isBuffer = __webpack_require__(24);
 
 function objectToString(o) {
   return Object.prototype.toString.call(o);
@@ -6121,7 +6245,7 @@ exports.log = function() {
  *     prototype.
  * @param {function} superCtor Constructor function to inherit prototype from.
  */
-exports.inherits = __webpack_require__(20);
+exports.inherits = __webpack_require__(23);
 
 exports._extend = function(origin, add) {
   // Don't do anything if add isn't an object
@@ -6139,223 +6263,7 @@ function hasOwnProperty(obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(2)))
-
-/***/ }),
-/* 23 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(Buffer) {
-Object.defineProperty(exports, "__esModule", { value: true });
-var assert = __webpack_require__(6);
-var consts_1 = __webpack_require__(4);
-function makeSlices(data, pageSize) {
-    if (pageSize === void 0) { pageSize = 4; }
-    var result = [];
-    for (var i = 0; i < data.length; i += pageSize) {
-        result.push(data.slice(i, i + pageSize));
-    }
-    return result;
-}
-exports.makeSlices = makeSlices;
-function tlvDecodeNdef(userData) {
-    var t = userData.readUInt8(0);
-    assert.equal(t, 0x03);
-    var length = userData.readUInt8(1);
-    var starts = 2;
-    if (length === 0xFF) {
-        length = userData.readUInt16BE(2);
-        starts = 4;
-    }
-    return userData.slice(starts, starts + length);
-}
-exports.tlvDecodeNdef = tlvDecodeNdef;
-function tlvEncodeNdef(message) {
-    // Add the ndef message type
-    var buffers = [new Buffer([consts_1.MESSAGE_START_TAG])];
-    var length = message.length;
-    if (length <= 0xFE) {
-        buffers.push(Buffer.from([length]));
-    }
-    else {
-        var length_1 = Buffer.alloc(3);
-        length_1.writeUInt8(0xff, 0);
-        length_1.writeUInt16BE(message.length, 1);
-        buffers.push(length_1);
-    }
-    buffers.push(message);
-    // Add the terminator
-    buffers.push(Buffer.from([consts_1.MESSAGE_STOP_BYTE]));
-    return Buffer.concat(buffers);
-}
-exports.tlvEncodeNdef = tlvEncodeNdef;
-function createWriteApdus(tagType, data) {
-    assert.equal(tagType, 'mifareUltralight');
-    var slices = makeSlices(data, 4);
-    var userDataPageStarts = 4; //
-    return slices.map(function (slice, ix) {
-        if (slice.length < 4) {
-            slice = Buffer.concat([slice, Buffer.alloc(4 - slice.length)]);
-        }
-        return Buffer.concat([
-            new Buffer([0xFF, 0xD6, 0x00, userDataPageStarts + ix, 4]),
-            slice
-        ]);
-    });
-}
-exports.createWriteApdus = createWriteApdus;
-//# sourceMappingURL=apdu-helpers.js.map
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
-
-/***/ }),
-/* 24 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(Buffer) {
-Object.defineProperty(exports, "__esModule", { value: true });
-var BufferList = /** @class */ (function () {
-    function BufferList() {
-        this.buffers = [];
-    }
-    BufferList.prototype.push = function (val) {
-        if (!Buffer.isBuffer(val)) {
-            val = Buffer.from([val]);
-        }
-        this.buffers.push(val);
-    };
-    BufferList.prototype.joined = function () {
-        return Buffer.concat(this.buffers);
-    };
-    return BufferList;
-}());
-exports.BufferList = BufferList;
-//# sourceMappingURL=buffer-list.js.map
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
-
-/***/ }),
-/* 25 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(Buffer) {
-Object.defineProperty(exports, "__esModule", { value: true });
-var util = __webpack_require__(5);
-// decode text bytes from ndef record payload
-// @returns a string
-function decodePayload(data) {
-    var // 6 LSBs
-    languageCodeLength = (data[0] & 0x3F); // assuming UTF-16BE
-    // TODO need to deal with UTF in the future
-    // console.log("lang " + languageCode + (utf16 ? " utf16" : " utf8"));
-    var languageCode = data.slice(1, 1 + languageCodeLength);
-    var utf16 = (data[0] & 0x80) !== 0;
-    return util.bytesToString(data.slice(languageCodeLength + 1));
-}
-exports.decodePayload = decodePayload;
-// encode text payload
-// @returns an array of bytes
-function encodePayload(text, lang, encoding) {
-    // ISO/IANA language code, but we're not enforcing
-    if (!lang) {
-        lang = 'en';
-    }
-    // const encoded: any[] =
-    // encoded.unshift(lang.length)
-    return Buffer.concat([Buffer.from([lang.length]), util.toBuffer(lang + text)]);
-    // return encoded
-}
-exports.encodePayload = encodePayload;
-//# sourceMappingURL=ndef-text.js.map
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
-
-/***/ }),
-/* 26 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(Buffer) {
-Object.defineProperty(exports, "__esModule", { value: true });
-var util = __webpack_require__(5);
-// URI identifier codes from URI Record Type Definition NFCForum-TS-RTD_URI_1.0
-// 2006-07-24 index in array matches code in the spec
-var protocols = [
-    '',
-    'http://www.',
-    'https://www.',
-    'http://',
-    'https://',
-    'tel:',
-    'mailto:',
-    'ftp://anonymous:anonymous@',
-    'ftp://ftp.',
-    'ftps://',
-    'sftp://',
-    'smb://',
-    'nfs://',
-    'ftp://',
-    'dav://',
-    'news:',
-    'telnet://',
-    'imap:',
-    'rtsp://',
-    'urn:',
-    'pop:',
-    'sip:',
-    'sips:',
-    'tftp:',
-    'btspp://',
-    'btl2cap://',
-    'btgoep://',
-    'tcpobex://',
-    'irdaobex://',
-    'file://',
-    'urn:epc:id:',
-    'urn:epc:tag:',
-    'urn:epc:pat:',
-    'urn:epc:raw:',
-    'urn:epc:',
-    'urn:nfc:'
-];
-// decode a URI payload bytes
-// @returns a string
-function decodePayload(data) {
-    var prefix = protocols[data[0]];
-    // console.log('prefix', prefix)
-    if (!prefix) {
-        prefix = '';
-    }
-    return prefix + util.bytesToString(data.slice(1));
-}
-exports.decodePayload = decodePayload;
-// shorten a URI with standard prefix
-// @returns an array of bytes
-function encodePayload(uri) {
-    var prefix;
-    // check each protocol, unless we've found a match
-    // "urn:" is the one exception where we need to keep checking
-    // slice so we don't check ""
-    var protocolCode;
-    var encoded;
-    protocols.slice(1).forEach(function (protocol) {
-        if ((!prefix || prefix === 'urn:') && uri.indexOf(protocol) === 0) {
-            prefix = protocol;
-        }
-    });
-    if (!prefix) {
-        prefix = '';
-    }
-    encoded = util.toBuffer(uri.slice(prefix.length));
-    protocolCode = protocols.indexOf(prefix);
-    // console.log('protocol Code', protocolCode)
-    // prepend protocol code
-    //encoded.unshift(protocolCode)
-    return Buffer.concat([Buffer.from([protocolCode]), encoded]);
-}
-exports.encodePayload = encodePayload;
-//# sourceMappingURL=ndef-uri.js.map
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5), __webpack_require__(4)))
 
 /***/ })
 /******/ ])));

@@ -26,7 +26,7 @@
     "homepage": "https://github.com/flomio/flomio_cordova_plugin#readme",
     "dependencies": {
         "ndef": "^0.1.3",
-        "ndef-lib": "file:../ndef-lib"
+        "ndef-lib": "git+https://github.com/flomio/ndef-lib.git"
     },
     "devDependencies": {
         "@types/node": "^7.0.12",
