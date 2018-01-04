@@ -12,7 +12,7 @@
                 <param name="android-package" value="com.flomio.plugin.FlomioPlugin"/>
             </feature>
         </config-file>
-        <js-module src="www/flomioPlugin.js" name="FlomioPlugin">
+        <js-module src="www/build/flomioPlugin.js" name="FlomioPlugin">
             <clobbers target="flomioPlugin" />
         </js-module>
         <source-file src="src/android/FlomioPlugin.java" target-dir="src/com/flomio/plugin/"/>
@@ -25,7 +25,7 @@
                 <param name="ios-package" value="FlomioPlugin" />
             </feature>
         </config-file>
-        <js-module src="www/flomioPlugin.js" name="FlomioPlugin">
+        <js-module src="www/build/flomioPlugin.js" name="FlomioPlugin">
             <clobbers target="flomioPlugin" />
         </js-module>
 

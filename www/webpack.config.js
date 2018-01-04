@@ -1,18 +1,15 @@
 var path = require('path');
-var webpack = require('webpack')
-
-console.log(process.argv);
 
 module.exports = {
-  entry: './www/flomioPlugin.ts',
+  entry: './flomioPlugin.ts',
   output: {
     libraryTarget: 'commonjs',
-    path: path.resolve(__dirname, 'www'),
+    path: path.resolve(__dirname, 'build'),
     filename: 'flomioPlugin.js'
   },
-  // devtool: 'inline-source-map',
   externals: [
-    'aws-sdk', 'bufferutil', 'utf-8-validate', 'cordova/exec'
+      "cordova",
+      "cordova/exec"
   ],
   target: 'web',
   resolve: {
