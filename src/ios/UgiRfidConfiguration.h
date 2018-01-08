@@ -14,26 +14,34 @@
 // Doxygen (the documentation generator)
 ///////////////////////////////////////////////////////////////////////////////////////
 
-typedef NS_ENUM(NSInteger, UgiMemoryBank) {
+typedef NS_ENUM(int, UgiMemoryBank) {
   UGI_MEMORY_BANK_RESERVED = 0,
   UGI_MEMORY_BANK_EPC = 1,
   UGI_MEMORY_BANK_TID = 2,
   UGI_MEMORY_BANK_USER = 3
 };
 
-typedef NS_ENUM(NSInteger, UgiSoundTypes) {
+typedef NS_ENUM(int, UgiSoundTypes) {
   UGI_INVENTORY_SOUNDS_NONE = 0,
   UGI_INVENTORY_SOUNDS_GEIGER_COUNTER = 1,
   UGI_INVENTORY_SOUNDS_FIRST_FIND = 2,
   UGI_INVENTORY_SOUNDS_FIRST_FIND_AND_LAST = 6
 };
 
-typedef NS_ENUM(NSInteger, UgiInventoryTypes) {
+typedef NS_ENUM(int, UgiInventoryTypes) {
   UGI_INVENTORY_TYPE_LOCATE_DISTANCE = 1,
   UGI_INVENTORY_TYPE_INVENTORY_SHORT_RANGE = 2,
   UGI_INVENTORY_TYPE_INVENTORY_DISTANCE = 3,
   UGI_INVENTORY_TYPE_LOCATE_SHORT_RANGE = 4,
-  UGI_INVENTORY_TYPE_LOCATE_VERY_SHORT_RANGE = 5
+  UGI_INVENTORY_TYPE_LOCATE_VERY_SHORT_RANGE = 5,
+  UGI_INVENTORY_TYPE_SINGLE_FIND = 6,
+};
+
+typedef NS_ENUM(int, UgiSingleFindRampPowerModes) {
+  UGI_SINGLE_FIND_RAMP_POWER_NO_RAMP = 0,
+  UGI_SINGLE_FIND_RAMP_POWER_SLOW = 1,
+  UGI_SINGLE_FIND_RAMP_POWER_MEDIUM = 2,
+  UGI_SINGLE_FIND_RAMP_POWER_FAST = 3
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -46,7 +54,7 @@ typedef NS_ENUM(NSInteger, UgiInventoryTypes) {
  */
 @interface UgiRfidConfiguration : NSObject<NSCopying>
 
-#define MAX_RFID_CONFIGURATION_MASK_LENGTH_BYTES 32
+#define MAX_RFID_CONFIGURATION_MASK_LENGTH_BYTES 12
 
 #if DOXYGEN   // Defined before class for Swift compatibility, documented here for Doxygen compatibility
 
@@ -78,8 +86,20 @@ typedef enum {
   UGI_INVENTORY_TYPE_INVENTORY_SHORT_RANGE = 2,    //! Inventory (count) at short range, especially in dense environments
   UGI_INVENTORY_TYPE_INVENTORY_DISTANCE = 3,       //! Inventory (count) a at a distance
   UGI_INVENTORY_TYPE_LOCATE_SHORT_RANGE = 4,       //! Locate at short range
-  UGI_INVENTORY_TYPE_LOCATE_VERY_SHORT_RANGE = 5   //! Locate at very short range
+  UGI_INVENTORY_TYPE_LOCATE_VERY_SHORT_RANGE = 5,  //! Locate at very short range
+  UGI_INVENTORY_TYPE_SINGLE_FIND = 6,              //! Find a single tag
 } UgiInventoryTypes;
+
+/**
+ Values for singleFindRampPowerMode
+ */
+typedef enum {
+  UGI_SINGLE_FIND_RAMP_POWER_NO_RAMP = 0,   //! Do not ramp power (normal power setting)
+  UGI_SINGLE_FIND_RAMP_POWER_SLOW = 1,      //! Ramp power slowly (250 rounds from lowest to highest, about 4 seconds)
+  UGI_SINGLE_FIND_RAMP_POWER_MEDIUM = 2,    //! Ramp power medium (125 rounds from lowest to highest, about 2 seconds)
+  UGI_SINGLE_FIND_RAMP_POWER_FAST = 3       //! Ramp power quickly (50 rounds from lowest to highest, about 1 second)
+} UgiSingleFindRampPowerModes;
+
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -148,7 +168,7 @@ typedef enum {
 @property (nonatomic) int maxReservedBytes;
 
 //! Mask to use in SELECT before inventory round. If nil (the default) then no SELECT is done before each inventory
-@property (nonatomic, retain) NSData *selectMask;
+@property (nonatomic, retain) NSData * _Nullable selectMask;
 //! Length of the mask, in bits. If zero, then selectMask.length*8 is used
 @property (nonatomic) int selectMaskBitLength;
 //! Bit offset for SELECT
@@ -190,6 +210,15 @@ typedef enum {
 //! YES to delay for 3ms after SELECT (useful for some sensor tags) - requires firmware 1.10.4 or above
 @property (nonatomic) BOOL delayAfterSelect;
 
+//! YES to use single find mode (find one tag only) - requires firmware 1.12.5 or above
+@property (nonatomic) BOOL singleFindMode;
+
+//! YES to stop inventory in singleFindMode after tag is found - requires firmware 1.12.5 or above
+@property (nonatomic) BOOL singleFindContinueInventory;
+
+//! If and how to ramp power from min to max in singleFindMode - requires firmware 1.12.5 or above
+@property (nonatomic) UgiSingleFindRampPowerModes singleFindRampPowerMode;
+
 //! Type of sounds to make when tags are found
 @property (nonatomic) UgiSoundTypes soundType;
 
@@ -202,29 +231,30 @@ typedef enum {
 //! Number of history periods (default is 20)
 @property (nonatomic) int historyDepth;
 
+
 ///////////////////////////////////////////////////////////////////////////////////////
 #pragma mark - Methods
 ///////////////////////////////////////////////////////////////////////////////////////
 
 /**
-  Create a configuration object from a pre-defined inventory type.
- 
+ Create a configuration object from a pre-defined inventory type.
+
  @param inventoryType  One of UgiInventoryTypes
  @return                Configuration structure
  */
-+ (UgiRfidConfiguration *) configWithInventoryType:(UgiInventoryTypes)inventoryType;
++ (UgiRfidConfiguration * _Nonnull) configWithInventoryType:(UgiInventoryTypes)inventoryType;
 
 /**
  Get the name for an inventory type.
- 
+
  @param inventoryType  One of UgiInventoryTypes
  @return                Name
  */
-+ (NSString *) nameForInventoryType:(UgiInventoryTypes)inventoryType;
++ (NSString * _Nonnull) nameForInventoryType:(UgiInventoryTypes)inventoryType;
 
 /**
  Get the number of inventory types
- 
+
  @return          Number of inventory types
  */
 + (int) numInventoryTypes;
@@ -235,42 +265,42 @@ typedef enum {
 
 /**
  Get the minimum power value (dBm)
- 
+
  @return          Minimum power value (dBm)
  */
 + (double) getMinAllowablePowerLevel;
 
 /**
  Get the maximum power value (dBm)
- 
+
  @return          Maximum power value (dBm)
  */
 + (double) getMaxAllowablePowerLevel;
 
 /**
  Get the minimum Q value
- 
+
  @return          Minimum Q value
  */
 + (int) getMinAllowableQValue;
 
 /**
  Get the maximum Q value
- 
+
  @return          Maximum Q value
  */
 + (int) getMaxAllowableQValue;
 
 /**
  Get the maximum value for roundsWithNoFindsToToggleAB
- 
+
  @return          Maximum value for roundsWithNoFindsToToggleAB
  */
 + (int) getMaxAllowableRoundsWithNoFindsToToggleAB;
 
 /**
  Get the maximum value for maxTidBytes/maxReservedBytes/maxUserBytes
- 
+
  @return          Maximum value for maxTidBytes/maxReservedBytes/maxUserBytes
  */
 + (int) getMaxAllowableMemoryBankBytes;

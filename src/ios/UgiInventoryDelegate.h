@@ -15,14 +15,14 @@
 // Doxygen (the documentation generator)
 ///////////////////////////////////////////////////////////////////////////////////////
 
-typedef NS_ENUM(NSInteger, UgiInventoryCompletedReturnValues) {
+typedef NS_ENUM(int, UgiInventoryCompletedReturnValues) {
   UGI_INVENTORY_COMPLETED_OK=0,
   UGI_INVENTORY_COMPLETED_ERROR_SENDING=98,
   UGI_INVENTORY_COMPLETED_LOST_CONNECTION=99,
   UGI_INVENTORY_COMPLETED_SPI_NOT_WORKING=1,
   UGI_INVENTORY_COMPLETED_ENABLE_PIN_NOT_WORKING=2,
   UGI_INVENTORY_COMPLETED_INTERRUPT_PIN_NOT_WORKING=3,
-  UGI_INVENTORY_COMPLETED_WRONG_CHIP_VERSION=4,
+  UGI_INVENTORY_COMPLETED_HF_NOT_SUPPORTED=4,
   UGI_INVENTORY_COMPLETED_CRYSTAL_NOT_STABLE=5,
   UGI_INVENTORY_COMPLETED_PLL_NOT_LOCKED=6,
   UGI_INVENTORY_COMPLETED_BATTERY_TOO_LOW=7,
@@ -39,7 +39,7 @@ typedef NS_ENUM(NSInteger, UgiInventoryCompletedReturnValues) {
  A UgiInventoryDelegate object is passed to the startInventory method
  of the Ugi singleton. This object receives notification when inventory events
  happen.
- 
+
  All of the protocol methods are optional, the delegate only implements the
  methods it needs.
  */
@@ -70,7 +70,7 @@ typedef enum {
   UGI_INVENTORY_COMPLETED_SPI_NOT_WORKING=1,           //!< Reader error
   UGI_INVENTORY_COMPLETED_ENABLE_PIN_NOT_WORKING=2,    //!< Reader error
   UGI_INVENTORY_COMPLETED_INTERRUPT_PIN_NOT_WORKING=3, //!< Reader error
-  UGI_INVENTORY_COMPLETED_WRONG_CHIP_VERSION=4,        //!< Reader error
+  UGI_INVENTORY_COMPLETED_HF_NOT_SUPPORTED=4,          //!< Reader error
   UGI_INVENTORY_COMPLETED_CRYSTAL_NOT_STABLE=5,        //!< Reader error
   UGI_INVENTORY_COMPLETED_PLL_NOT_LOCKED=6,            //!< Reader error
   UGI_INVENTORY_COMPLETED_BATTERY_TOO_LOW=7,           //!< Reader error
@@ -84,7 +84,7 @@ typedef enum {
  The reader has stopped doing inventory. If result is UGI_INVENTORY_COMPLETED_LOST_CONNECTION
  then this is a temporary stop and the inventory will continue when connection is
  reestablished.
- 
+
  @param result      Result of inventory
  */
 - (void) inventoryDidStopWithResult:(UgiInventoryCompletedReturnValues)result;
@@ -100,20 +100,20 @@ typedef enum {
 /**
  Determine whether a newly found tag should be filtered out (not sent to inventoryTagFound
  or inventoryTagChanged, not put into the tags array).
- 
+
  @param epc    The EPC
  @return       YES to filter out the tag (the defualt is to not filter out any tags)
  */
-- (BOOL) inventoryFilter:(UgiEpc *)epc;
+- (BOOL) inventoryFilter:(UgiEpc * _Nonnull)epc;
 
 /**
  Filter out a tag at the raw EPC level -- this is called on an arbitrary thread and must
  work very quickly
- 
+
  @param epc    The EPC
  @return       YES to filter out the EPC (the defualt is to not filter out any EPCs)
  */
-- (BOOL) inventoryFilterLowLevel:(UgiEpc *)epc;
+- (BOOL) inventoryFilterLowLevel:(UgiEpc * _Nonnull)epc;
 
 ///@}
 
@@ -130,36 +130,36 @@ typedef enum {
 
 /**
  The visibility of a tag has changed.
- 
+
  - A tag has been found for the first time
  - A tag has not been seen for the history period (interval * depth)
  - A tag that had not been seen for the history period has reappeared
- 
+
  @param tag        The tag that has changed
  @param firstFind  YES if this is the first time this tag has been found
  */
-- (void) inventoryTagChanged:(UgiTag *)tag
+- (void) inventoryTagChanged:(UgiTag * _Nullable)tag
                  isFirstFind:(BOOL)firstFind;
 
 /**
  A new tag has been found
- 
+
  @param tag        The tag that has been found
  @param detailedPerReadData  Array of UgiDetailedPerReadData obejcts, if detailed per-read data was requested
  */
-- (void) inventoryTagFound:(UgiTag *)tag
-   withDetailedPerReadData:(NSArray<UgiDetailedPerReadData *> *)detailedPerReadData;
+- (void) inventoryTagFound:(UgiTag * _Nonnull)tag
+   withDetailedPerReadData:(NSArray<UgiDetailedPerReadData *> * _Nullable)detailedPerReadData;
 
 /**
  A previously found tag has been found again
- 
+
  @param tag        The tag
  @param num        The number of finds since inventoryTagSubsequentFinds was last called
  @param detailedPerReadData  Array of UgiDetailedPerReadData obejcts, if detailed per-read data was requested
  */
-- (void) inventoryTagSubsequentFinds:(UgiTag *)tag
+- (void) inventoryTagSubsequentFinds:(UgiTag * _Nonnull)tag
                             numFinds:(int)num
-             withDetailedPerReadData:(NSArray<UgiDetailedPerReadData *> *)detailedPerReadData;
+             withDetailedPerReadData:(NSArray<UgiDetailedPerReadData *> * _Nullable)detailedPerReadData;
 
 ///@}
 
@@ -167,7 +167,7 @@ typedef enum {
 
 /**
  A history interval has passed.
- 
+
  This method is called at the end of each history interval IF one or more
  tags are currently visible
  */

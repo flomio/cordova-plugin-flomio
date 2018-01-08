@@ -31,20 +31,20 @@ typedef void (^TuneAntennaCompletion)(BOOL success);
 
 /**
  Tune the antenna
- 
+
  @param oneFrequencyTunedCompletion  Code to run for each frequency tuned
  @param completion                   Code to run then tuning is completed
  */
-- (void) tuneAntennaWithOneFrequencyTunedCompletion:(TuneAntennaOneFrequencyTunedCompletion)oneFrequencyTunedCompletion
-                                     withCompletion:(TuneAntennaCompletion)completion;
+- (void) tuneAntennaWithOneFrequencyTunedCompletion:(nullable TuneAntennaOneFrequencyTunedCompletion)oneFrequencyTunedCompletion
+                                     withCompletion:(nonnull TuneAntennaCompletion)completion;
 
 /**
  Get antenna tuning information
- 
+
  @param staticAverage   Average tuning value from last saved tuning
  @param dynamicAverage  Average tuning value currently
  @return        YES if successful
  */
-- (BOOL) getAntennaTuning:(int*)staticAverage dynamicAverage:(int*)dynamicAverage;
+- (BOOL) getAntennaTuning:(int * _Nonnull)staticAverage dynamicAverage:(int * _Nonnull)dynamicAverage;
 
 @end

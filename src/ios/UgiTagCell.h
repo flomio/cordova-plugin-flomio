@@ -20,16 +20,16 @@
 @interface UgiTagCell : UITableViewCell
 
 //! UgiTag to display the read history for
-@property (retain, nonatomic) UgiTag *displayTag;
+@property (retain, nonatomic) UgiTag * _Nullable displayTag;
 
 //! Color to use for visual display of read history
-@property (retain, nonatomic) UIColor *themeColor;
+@property (retain, nonatomic, nullable) UIColor *themeColor;
 
 //! Title text
-@property (retain, nonatomic) NSString *title;
+@property (retain, nonatomic, nullable) NSString *title;
 
 //! Detail text (optional)
-@property (retain, nonatomic) NSString *detail;
+@property (retain, nonatomic, nullable) NSString *detail;
 
 //! Force the history view to update
 - (void) updateHistoryView;

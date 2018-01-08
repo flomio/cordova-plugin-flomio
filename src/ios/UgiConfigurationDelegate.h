@@ -50,29 +50,29 @@
  @param cancelCompletion    Block to execute if the user cancels
  @param postponeCompletion  Block to to postpone until later
  */
-- (void) promptForFirmwareUpdate:(UgiFirmwareUpdateInfo *)info
-            withUpdateCompletion:(void(^)(void))updateCompletion
-            withCancelCompletion:(void(^)(void))cancelCompletion
-          withPostponeCompletion:(void(^)(void))postponeCompletion;
+- (void) promptForFirmwareUpdate:(UgiFirmwareUpdateInfo * _Nonnull)info
+            withUpdateCompletion:(nonnull void(^)(void))updateCompletion
+            withCancelCompletion:(nonnull void(^)(void))cancelCompletion
+          withPostponeCompletion:(nonnull void(^)(void))postponeCompletion;
 
 /**
  Notify the user that there was an error loading the firmware update.
  @param completion    Block to execute after notification
  */
-- (void) notifyFirmwareUpdateErrorLoadingUpdateWithCompletion:(void(^)(void))completion;
+- (void) notifyFirmwareUpdateErrorLoadingUpdateWithCompletion:(nonnull void(^)(void))completion;
 
 /**
  Notify the user that there was an error starting the firmware update.
  @param completion    Block to execute after notification
  */
-- (void) notifyFirmwareUpdateErrorStartingUpdateWithCompletion:(void(^)(void))completion;
+- (void) notifyFirmwareUpdateErrorStartingUpdateWithCompletion:(nonnull void(^)(void))completion;
 
 /**
  Display progress notification about the firmware update
  
  @param cancelCompletion    Block to execute if the user cancels
  */
-- (void) displayFirmwareUpdateProgressWithCancelCompletion:(void(^)(void))cancelCompletion;
+- (void) displayFirmwareUpdateProgressWithCancelCompletion:(nonnull void(^)(void))cancelCompletion;
 
 /**
  Update the progress notification about the firmware update
@@ -92,7 +92,7 @@
  @param completion    Block to execute after notification
  */
 - (void) notifyFirmwareUpdateSuccess:(int)seconds
-                      withCompletion:(void(^)(void))completion;
+                      withCompletion:(nonnull void(^)(void))completion;
 
 /**
  Notify the user that the firmware update failed
@@ -104,8 +104,8 @@
  */
 - (void) notifyFirmwareUpdateFailure:(BOOL)mustRetry
                     withError:(NSUInteger)error
-                 withRetryCompletion:(void(^)(void))retryCompletion
-                withCancelCompletion:(void(^)(void))cancelCompletion;
+                 withRetryCompletion:(nonnull void(^)(void))retryCompletion
+                withCancelCompletion:(nonnull void(^)(void))cancelCompletion;
 
 /**
  Abort firmware update (Grokker has been disconnected)
@@ -116,67 +116,6 @@
  Firmware update sequence has finished
  */
 - (void) afterFirmwareUpdate:(BOOL)updated;
-
-///////////////////////////////////////////////////////////////////////////////////////
-#pragma mark - Region setting
-///////////////////////////////////////////////////////////////////////////////////////
-
-/**
- Specific region names to use for Grokker initialization. nil causes a call to the
- * U Grok It server to get the most recent list of approved regions (default = nil)
- */
-@property (retain, nonatomic) NSArray *specificRegionsForGrokkerInitialization;
-
-/**
- Notify the user that there was an error loading the regions.
-
- @param retryCompletion     Block to execute to retry
- */
-- (void) notifyLoadRegionFailureWithCompletion:(void(^)(void))retryCompletion;
-
-/**
- Choose a region from the list of regions
- 
- @param regionNames         List of regions
- @param selectedIndex       Index of currently selected region
- @param completion          Block to execute to set the region
- */
-- (void) chooseRegionFromRegions:(NSArray<NSString *> *)regionNames
-               withSelectedIndex:(int)selectedIndex
-                  withCompletion:(void(^)(NSString *regionName))completion;
-
-/**
- Abort set region (Grokker has been disconnected)
- */
-- (void) setRegionCancelled;
-
-/**
- Called after notifySetRegionSuccess has completed
- */
-- (void) afterSetRegionSuccess;
-
-/**
- Notify the user the region was set successfully.
-
- @param regionName          The region
- @param completion          Block to execute after notification is completed
- */
-- (void) notifySetRegionSuccess:(NSString *)regionName
-                 withCompletion:(void(^)(void))completion;
-
-/**
- Notify the user that there was an error setting the region.
-
- @param regionName          The region
- @param completion          Block to execute after notification is completed
- */
-- (void) notifySetRegionFailure:(NSString *)regionName
-                 withCompletion:(void(^)(void))completion;
-
-/**
- Notify the user that this firmware version does not support setting the region.
- */
-- (void) notifyFirmwareDoesNotSupportSetRegion;
 
 ///////////////////////////////////////////////////////////////////////////////////////
 #pragma mark - Waiting notification

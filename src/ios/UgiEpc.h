@@ -27,7 +27,7 @@
 @interface UgiEpc : NSObject<NSCopying,UgiJsonModel>
 
 //! EPCs data (the bytes)
-@property (nonatomic, retain) NSData *data;
+@property (nonatomic, retain, nonnull) NSData *data;
 
 // These are here so that automatic documentation generation catches them
 #if 0
@@ -41,19 +41,19 @@ static const int UGI_MAX_EPC_LENGTH = 27;
 
 /**
  Create a UgiEpc object from a NSData object
- 
+
  @param data     Raw bytes to create object from
  @return         New UgiEpc object
  */
-+ (UgiEpc *) epcFromBytes:(NSData *)data;
++ (UgiEpc * _Nonnull) epcFromBytes:(NSData * _Nonnull)data;
 
 /**
  Create a UgiEpc object from a string of hex digits (uppercase or lowercase)
- 
+
  @param s        String to create object from
  @return         New UgiEpc object
  */
-+ (UgiEpc *) epcFromString:(NSString *)s;
++ (UgiEpc * _Nonnull) epcFromString:(NSString * _Nonnull)s;
 
 ///////////////////////////////////////////////////////////////////////////////////////
 #pragma mark - Methods
@@ -62,7 +62,7 @@ static const int UGI_MAX_EPC_LENGTH = 27;
 /**
  Get a pointer to the EPC's bytes (convenience method for data.bytes)
  */
-- (const uint8_t *)bytes;
+- (const uint8_t * _Nonnull)bytes;
 
 /**
  Get the length of the EPC (convenience method for data.length)
@@ -71,40 +71,40 @@ static const int UGI_MAX_EPC_LENGTH = 27;
 
 /**
  Convert to a string of hex digits (uppercase)
- 
+
  @return String of hex digits representing the EPC code
  */
-- (NSString *) toString;
+- (NSString * _Nonnull) toString;
 
 /**
  Convert to a tag URI string (as defined by the EPC spec)
- 
+
  @return Tag URI string
  */
-- (NSString *) toTagURI;
+- (NSString * _Nonnull) toTagURI;
 
 /**
  Get the manufacturer name if a EPC is unprogrammed.
- 
+
  This is a hueristic function, based on a variety of tags tested
- 
+
  @return   Manufacturer name
  */
-- (NSString *) getManufacturerNameIfUnprogrammed;
+- (NSString * _Nonnull) getManufacturerNameIfUnprogrammed;
 
 /**
  Is this EPC unprogrammed?
- 
+
  @return   YES if unprogrammed
  */
 - (BOOL) isUnprogrammedEpc;
 
 /**
  Create a new EPC for use with a U Grok It tag
- 
+
  @return Created EPC
  */
-+ (UgiEpc *) epcFromUGrokItEpc;
++ (UgiEpc * _Nonnull) epcFromUGrokItEpc;
 
 @end
 

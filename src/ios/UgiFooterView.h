@@ -34,21 +34,23 @@
 @interface UgiFooterView : UIView
 
 //! Color to use for footer, if nil then use [UgiUiUtil uiThemeColor]
-@property (nonatomic, retain) UIColor *themeColor;
+@property (nonatomic, retain, nullable) UIColor *themeColor;
 
 /**
  Set the left button title and handler
  * @param text          Button title
  * @param completion    Click handler
  */
-- (void) setLeftText:(NSString *)text withCompletion:(VoidBlock)completion;
+- (void) setLeftText:(NSString * _Nullable)text
+      withCompletion:(nullable VoidBlock)completion;
 
 /**
  Set the center button title and handler
  * @param text          Button title
  * @param completion    Click handler
  */
-- (void) setCenterText:(NSString *)text withCompletion:(VoidBlock)completion;
+- (void) setCenterText:(NSString * _Nullable)text
+        withCompletion:(nullable VoidBlock)completion;
 
 /**
  Set the center button title, image and handler
@@ -56,14 +58,17 @@
  * @param image         Button image
  * @param completion    Click handler
  */
-- (void) setCenterText:(NSString *)text image:(UIImage *)image withCompletion:(VoidBlock)completion;
+- (void) setCenterText:(NSString * _Nullable)text
+                 image:(UIImage * _Nullable)image
+        withCompletion:(nullable VoidBlock)completion;
 
 /**
  Set the right button title and handler
  * @param text          Button title
  * @param completion    Click handler
  */
-- (void) setRightText:(NSString *)text withCompletion:(VoidBlock)completion;
+- (void) setRightText:(NSString * _Nullable)text
+       withCompletion:(nullable VoidBlock)completion;
 
 /**
  See if any of the buttons are displayed
@@ -76,12 +81,12 @@
 
 //! @cond
 // Old style
-- (void) setLeftText:(NSString *)text;
-- (void) setCenterText:(NSString *)text;
-- (void) setCenterText:(NSString *)text image:(UIImage *)image;
-- (void) setRightText:(NSString *)text;
+- (void) setLeftText:(NSString * _Nullable)text;
+- (void) setCenterText:(NSString * _Nullable)text;
+- (void) setCenterText:(NSString * _Nullable)text image:(UIImage * _Nullable)image;
+- (void) setRightText:(NSString * _Nullable)text;
 
-@property (assign, nonatomic) NSObject<UgiFooterViewDelegate> *delegate;
+@property (assign, nonatomic, nullable) NSObject<UgiFooterViewDelegate> *delegate;
 //! @endcond
 
 @end

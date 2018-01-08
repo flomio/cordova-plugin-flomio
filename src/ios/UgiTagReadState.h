@@ -20,10 +20,10 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 
 //! Tag this state is associated with
-@property (readonly, nonatomic) UgiTag *tag;
+@property (readonly, nonatomic, nonnull) UgiTag *tag;
 
 //! When this state was created
-@property (readonly, nonatomic) NSDate *timestamp;
+@property (readonly, nonatomic, nonnull) NSDate *timestamp;
 
 //! Is the tag currently visible (has it been seem in the last N seconds, where N is historyIntervalMSec*historyDepth
 @property (readonly, nonatomic) BOOL isVisible;
@@ -32,7 +32,7 @@
 @property (readonly, nonatomic) int totalReads;
 
 //! When this tag was most recently read
-@property (readonly, nonatomic) NSDate *mostRecentRead;
+@property (readonly, nonatomic, nonnull) NSDate *mostRecentRead;
 
 //! Most recent RSSI value, I channel
 @property (readonly, nonatomic) double mostRecentRssiI;
@@ -44,7 +44,7 @@
  Array of number of times the tag was found in each history period
  [0] is the most recent data
  */
-@property (readonly, nonatomic) NSArray *readHistory;
+@property (readonly, nonatomic, nullable) NSArray *readHistory;
 
 ///////////////////////////////////////////////////////////////////////////////////////
 #pragma mark - Methods
@@ -52,15 +52,15 @@
 
 /**
  Get a string representing the read history of the tag, generally for debugging
- 
+
  @return Read history of the tag
  */
-- (NSString *)readHistoryString;
+- (NSString * _Nullable)readHistoryString;
 /**
  Get a description of the tag state, generally for debugging
- 
+
  @return Description of the tag
  */
-- (NSString *)description;
+- (NSString * _Nonnull)description;
 
 @end

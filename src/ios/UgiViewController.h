@@ -36,16 +36,16 @@
 @property (nonatomic) BOOL allowRotationIfTablet;
 
 //! Non-nil to use this as the UI Color. If so, this is
-@property (retain, nonatomic) UIColor *themeColor;
+@property (retain, nonatomic, nullable) UIColor *themeColor;
 
 //! Non-nil to use this as the ext color to use when the background is the theme color
-@property (retain, nonatomic) UIColor *textColorOnThemeColor;
+@property (retain, nonatomic, nullable) UIColor *textColorOnThemeColor;
 
 //! Non-nil to use this as the UI Font
-@property (retain, nonatomic) NSString *themeFontName;
+@property (retain, nonatomic, nullable) NSString *themeFontName;
 
 //! Title view
-@property (retain, nonatomic, readonly) UgiTitleView *titleView;
+@property (retain, nonatomic, readonly, nullable) UgiTitleView *titleView;
 
 ///////////////////////////////////////////////////////////////////////////////////////
 #pragma mark - Methods
@@ -75,14 +75,14 @@
 
 /**
  Go back a screen
-*/
+ */
 - (void) goBack;
 
 /**
  Go back a screen
  @param completion  Code to run after animation is complete
  */
-- (void) goBackWithCompletion:(VoidBlock)completion;
+- (void) goBackWithCompletion:(nullable VoidBlock)completion;
 
 /**
  Notification that the app has become active
@@ -93,5 +93,26 @@
  Notification that the app has become not active
  */
 - (void) appWillResignActive;
+
+/**
+ Called when the title view is tapped
+ */
+- (void) titleViewTapped;
+
+/**
+ Prototype for completion method for performSegueWithIdentifier:withConfigCallback
+
+ @param tag     The tag accessed (possibly not valid if the access failed)
+ @param result  Result of the operation
+ */
+typedef void (^PerformSegueWithIdentifierCompletion)(UIViewController * _Nonnull vc);
+
+/**
+ Perform a segue with code to initialize the new view controller
+ @param identifier        Segue to invoke
+ @param configCompletion  Code to run after animation is complete
+ */
+- (void)performSegueWithIdentifier:(NSString * _Nonnull)identifier
+                withConfigCallback:(nonnull PerformSegueWithIdentifierCompletion)configCompletion;
 
 @end

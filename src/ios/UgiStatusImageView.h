@@ -18,6 +18,9 @@
 @interface UgiStatusImageView : UIImageView
 
 //! nil if on a light background, or a color if on a dark background
-@property (retain, nonatomic) UIColor *color;
+@property (retain, nonatomic, nullable) UIColor *color;
+
+//! show version information alert when touched
+@property (nonatomic) BOOL displayVersionInfoOnTouch;
 
 @end

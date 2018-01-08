@@ -22,40 +22,40 @@
 
 /**
  Utility to convert NSData to a string of hex digits (uppercase)
- 
+
  @param data    NSData object to convert to a string
  @return        String of hex digits
  */
-+ (NSString *)dataToString:(NSData *)data;
++ (NSString * _Nullable)dataToString:(NSData * _Nullable)data;
 
 /**
  Utility to convert bytes to a string of hex digits (uppercase)
- 
+
  @param ba      Byte array to convert
  @param len     Length of byte array
  @return String of hex digits
  */
-+ (NSString *)bytesToString:(const uint8_t *)ba
-                     length:(int)len;
++ (NSString * _Nullable)bytesToString:(const uint8_t * _Nullable)ba
+                               length:(int)len;
 
 /**
  Utility to convert a hex string to NSData
- 
+
  @param s           String to convert
  @return            NSData
  */
-+ (NSData *)stringToData:(NSString *)s;
++ (NSData * _Nullable)stringToData:(NSString * _Nullable)s;
 
 /**
  Utility to convert string to bytes
- 
+
  @param s           String to convert
  @param ba          Buffer to put result in
  @param bufferSize  Size of the buffer in bytes
  @return            Number of bytes
  */
-+ (int)stringToBytes:(NSString *)s
-            toBuffer:(uint8_t *)ba
++ (int)stringToBytes:(NSString * _Nullable)s
+            toBuffer:(uint8_t * _Nonnull)ba
           bufferSize:(int)bufferSize;
 
 @end

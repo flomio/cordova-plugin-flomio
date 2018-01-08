@@ -13,7 +13,7 @@
 // Doxygen (the documentation generator)
 ///////////////////////////////////////////////////////////////////////////////////////
 
-typedef NS_ENUM(NSInteger, UgiShowModalAnimationTypes) {
+typedef NS_ENUM(int, UgiShowModalAnimationTypes) {
   UgiModalBottom, UgiModalCenter, UgiModalCenterWithKeyboard
 };
 
@@ -31,10 +31,10 @@ typedef NS_ENUM(NSInteger, UgiShowModalAnimationTypes) {
 @interface UgiMenuItem : NSObject
 
 //! Title for the menu item
-@property (retain, nonatomic) NSString *title;
+@property (retain, nonatomic, nonnull) NSString *title;
 
 //! Handler for the menu item
-@property (strong, nonatomic) VoidBlock handler;
+@property (strong, nonatomic, nonnull) VoidBlock handler;
 
 /**
  Create a menu item
@@ -42,7 +42,8 @@ typedef NS_ENUM(NSInteger, UgiShowModalAnimationTypes) {
  @param handler    Handler for the menu item
  @return       Menu item
  */
-+ (UgiMenuItem *) itemWithTitle:(NSString *)title withHandler:(VoidBlock)handler;
++ (UgiMenuItem * _Nonnull) itemWithTitle:(NSString * _Nonnull)title
+                             withHandler:(nonnull VoidBlock)handler;
 
 @end
 
@@ -62,28 +63,28 @@ typedef NS_ENUM(NSInteger, UgiShowModalAnimationTypes) {
  Get the view to show UI on (such as alerts)
  @return       UIView to show UI on
  */
-- (UIView *) getViewControllerToShowUiOn;
+- (UIView * _Nullable) getViewControllerToShowUiOn;
 
 /**
  Show a view controller
  @param viewController    View controller to show
  */
-- (void) showViewController:(UIViewController *)viewController;
+- (void) showViewController:(UIViewController * _Nonnull)viewController;
 
 /**
  Hide a view controller
  @param viewController    View controller to hide
  */
-- (void) hideViewController:(UIViewController *)viewController;
+- (void) hideViewController:(UIViewController * _Nonnull)viewController;
 
 //! Get the color to use for buttons and styling
-@property (readonly) UIColor *uiThemeColor;
+@property (readonly, nonatomic, nullable) UIColor *uiThemeColor;
 
 //! Get the color to use when on top of the theme color
-@property (readonly) UIColor *uiTextColorOnThemeColor;
+@property (readonly, nonatomic, nullable) UIColor *uiTextColorOnThemeColor;
 
 //! Get the font name to use for buttons
-@property (readonly) NSString *uiFontName;
+@property (readonly, nonatomic, nullable) NSString *uiFontName;
 
 @end
 
@@ -97,8 +98,8 @@ typedef NS_ENUM(NSInteger, UgiShowModalAnimationTypes) {
 
 //! @cond
 // Xamarin helpers
-+ (void) internalShowViewController:(UIViewController *)viewController;
-+ (void) internalHideViewController:(UIViewController *)viewController;
++ (void) internalShowViewController:(UIViewController * _Nonnull)viewController;
++ (void) internalHideViewController:(UIViewController * _Nonnull)viewController;
 //! @endcond
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -109,31 +110,31 @@ typedef NS_ENUM(NSInteger, UgiShowModalAnimationTypes) {
  Get the UI Delegate
  @return UgiUiDelegate object, or nil if none
  */
-+ (NSObject<UgiUiDelegate> *) uiDelegate;
++ (NSObject<UgiUiDelegate> * _Nonnull) uiDelegate;
 
 /**
  Set the UI Delegate
  @param delegate   UgiUiDelegate object to set
  */
-+ (void) setUiDelegate:(NSObject<UgiUiDelegate> *)delegate;
++ (void) setUiDelegate:(NSObject<UgiUiDelegate> * _Nullable)delegate;
 
 /**
  Get the color to use for UI stuff (from the delegate, otherwise the default)
  @return color
  */
-+ (UIColor *)uiThemeColor;
++ (UIColor * _Nonnull)uiThemeColor;
 
 /**
  Get the textColorOnThemeColor to use for UI stuff (from the delegate, otherwise the default)
  @return color
  */
-+ (UIColor *)uiTextColorOnThemeColor;
++ (UIColor * _Nonnull)uiTextColorOnThemeColor;
 
 /**
  Get the font name to use for UI stuff (from the delegate, otherwise the default)
  @return font name
  */
-+ (NSString *)uiFontName;
++ (NSString * _Nonnull)uiFontName;
 
 ///////////////////////////////////////////////////////////////////////////////////////
 #pragma mark - Top level
@@ -149,13 +150,13 @@ typedef NS_ENUM(NSInteger, UgiShowModalAnimationTypes) {
  Show a view controller
  @param viewController       View controller to show
  */
-+ (void) showViewController:(UIViewController *)viewController;
++ (void) showViewController:(UIViewController * _Nonnull)viewController;
 
 /**
  Hide a view controller
  @param viewController       View controller to hide
  */
-+ (void) hideViewController:(UIViewController *)viewController;
++ (void) hideViewController:(UIViewController * _Nonnull)viewController;
 
 ////////////
 
@@ -165,14 +166,14 @@ typedef NS_ENUM(NSInteger, UgiShowModalAnimationTypes) {
  @param block      Code to run
  @return           id to use to cancel the block
  */
-+ (id) performCancellableBlockAfterSeconds:(double)seconds
-                                     block:(VoidBlock)block;
++ (nonnull id) performCancellableBlockAfterSeconds:(double)seconds
+                                             block:(nonnull VoidBlock)block;
 
 /**
  Cancel a block scheduled with performCancellableBlockAfterSeconds:block:
  @param blockId    id returned from performCancellableBlockAfterSeconds:
  */
-+ (void) cancelBlock:(id)blockId;
++ (void) cancelBlock:(nonnull id)blockId;
 
 ///////////////////////////////////////////////////////////////////////////////////////
 #pragma mark - Alerts
@@ -182,85 +183,85 @@ typedef NS_ENUM(NSInteger, UgiShowModalAnimationTypes) {
  * Hide UI shown with any of the showXXX methods
  * @param o   Object returned by the showXXX method
  */
-+ (void) hideUI:(NSObject *)o;
++ (void) hideUI:(NSObject * _Nonnull)o;
 
 /**
  * Update an alert's title
  * @param alert   Object returned by the showXXX method
  * @param title   New title
  */
-+ (void) updateAlert:(NSObject *)alert withTitle:(NSString *)title;
++ (void) updateAlert:(NSObject * _Nonnull)alert withTitle:(NSString * _Nullable)title;
 
 /**
  * Update an alert's message
  * @param alert   Object returned by the showXXX method
  * @param message New message
  */
-+ (void) updateAlert:(NSObject *)alert withMessage:(NSString *)message;
++ (void) updateAlert:(NSObject * _Nonnull)alert withMessage:(NSString * _Nullable)message;
 
 /**
  Show an alert with a cancel button
- 
+
  @param title               Title for the alert
  @param message             Text for the body of the alert
  @param completion          Block to execute for "ok"
  @return                    Object to pass to hideAlert:
  */
-+ (NSObject *)showCancel:(NSString *)title
-                 message:(NSString *)message
-          withCompletion:(VoidBlock)completion;
++ (NSObject * _Nonnull)showCancel:(NSString * _Nullable)title
+                          message:(NSString * _Nullable)message
+                   withCompletion:(nullable VoidBlock)completion;
 
 /**
  Show an alert with an ok button
- 
+
  @param title               Title for the alert
  @param message             Text for the body of the alert
  @return                    The alert
  */
-+ (NSObject *)showOk:(NSString *)title
-             message:(NSString *)message;
++ (NSObject * _Nonnull)showOk:(NSString * _Nullable)title
+                      message:(NSString * _Nullable)message;
 
 /**
  Show an alert with an ok button
- 
+
  @param title               Title for the alert
  @param message             Text for the body of the alert
  @param completion          Block to execute for "ok"
  @return                    The alert
  */
-+ (NSObject *)showOk:(NSString *)title
-             message:(NSString *)message
-      withCompletion:(VoidBlock)completion;
++ (NSObject * _Nonnull)showOk:(NSString * _Nullable)title
+                      message:(NSString * _Nullable)message
+               withCompletion:(nullable VoidBlock)completion;
 
 /**
  Show an alert with an ok button
- 
+
  @param title               Title for the alert
  @param message             Text for the body of the alert
  @param okButtonTitle       Text for the "ok" button, or "" for the default, or nil for no ok button
  @param completion          Block to execute for "ok"
  @return                    The alert
  */
-+ (NSObject *)showOk:(NSString *)title
-             message:(NSString *)message
-       okButtonTitle:(NSString *)okButtonTitle
-      withCompletion:(VoidBlock)completion;
++ (NSObject * _Nonnull)showOk:(NSString * _Nullable)title
+                      message:(NSString * _Nullable)message
+                okButtonTitle:(NSString * _Nullable)okButtonTitle
+               withCompletion:(nullable VoidBlock)completion;
 
 /**
  Show an alert with ok and cancel buttons
- 
+
  @param title               Title for the alert
  @param message             Text for the body of the alert
  @param completion          Block to execute for "ok"
  @return                    The alert
  */
-+ (NSObject *)showOkCancel:(NSString *)title
-                   message:(NSString *)message
-            withCompletion:(VoidBlock)completion;
++ (NSObject * _Nonnull)showOkCancel:(NSString * _Nullable)title
+                            message:(NSString * _Nullable)message
+                     withCompletion:(nullable VoidBlock)completion;
 
 /**
  Show an alert with ok and cancel buttons
- 
+
  @param title               Title for the alert
  @param message             Text for the body of the alert
  @param okButtonTitle       Text for the "ok" button, or "" for the default, or nil for no ok button
@@ -268,15 +269,15 @@ typedef NS_ENUM(NSInteger, UgiShowModalAnimationTypes) {
  @param completion          Block to execute for "ok"
  @return                    The alert
  */
-+ (NSObject *)showOkCancel:(NSString *)title
-                   message:(NSString *)message
-             okButtonTitle:(NSString *)okButtonTitle
-         cancelButtonTitle:(NSString *)cancelButtonTitle
-            withCompletion:(VoidBlock)completion;
++ (NSObject * _Nonnull)showOkCancel:(NSString * _Nullable)title
+                            message:(NSString * _Nullable)message
+                      okButtonTitle:(NSString * _Nullable)okButtonTitle
+                  cancelButtonTitle:(NSString * _Nullable)cancelButtonTitle
+                     withCompletion:(nullable VoidBlock)completion;
 
 /**
  Show an alert with ok and cancel buttons
- 
+
  @param title               Title for the alert
  @param message             Text for the body of the alert
  @param okButtonTitle       Text for the "ok" button, or "" for the default, or nil for no ok button
@@ -285,20 +286,20 @@ typedef NS_ENUM(NSInteger, UgiShowModalAnimationTypes) {
  @param cancelCompletion    Block to execute for "cancel"
  @return                    The alert
  */
-+ (NSObject *)showOkCancel:(NSString *)title
-                   message:(NSString *)message
-             okButtonTitle:(NSString *)okButtonTitle
-         cancelButtonTitle:(NSString *)cancelButtonTitle
-            withCompletion:(VoidBlock)completion
-      withCancelCompletion:(VoidBlock)cancelCompletion;
++ (NSObject * _Nonnull)showOkCancel:(NSString * _Nullable)title
+                            message:(NSString * _Nullable)message
+                      okButtonTitle:(NSString * _Nullable)okButtonTitle
+                  cancelButtonTitle:(NSString * _Nullable)cancelButtonTitle
+                     withCompletion:(nullable VoidBlock)completion
+               withCancelCompletion:(nullable VoidBlock)cancelCompletion;
 
 ///////////////
 
 //! completion for showTextInput, return YES to enable the action button
-typedef BOOL (^UgiShowTextInputShouldEnableForTextCompletion)(NSString *text);
+typedef BOOL (^UgiShowTextInputShouldEnableForTextCompletion)(NSString * _Nonnull text);
 
 //! completion for showTextInput
-typedef void (^UgiShowTextInputCompletionWithText)(NSString *text, BOOL switchValue);
+typedef void (^UgiShowTextInputCompletionWithText)(NSString * _Nonnull text, BOOL switchValue);
 
 /**
  Input a text string from the user
@@ -315,17 +316,17 @@ typedef void (^UgiShowTextInputCompletionWithText)(NSString *text, BOOL switchVa
  @param shouldEnableForTextCompletion   Code to determine whether the action button should be enabled
  @return                    The alert
  */
-+ (NSObject *)showTextInput:(NSString *)title
-                    message:(NSString *)message
-          actionButtonTitle:(NSString *)actionButtonTitle
-                initialText:(NSString *)initialText
-        allowAutoCorrection:(BOOL)allowAutoCorrection
-               keyboardType:(UIKeyboardType)keyboardType
-                 switchText:(NSString *)switchText
-         switchInitialValue:(BOOL)switchInitialValue
-             withCompletion:(UgiShowTextInputCompletionWithText)completion
-       withCancelCompletion:(VoidBlock)cancelCompletion
-withShouldEnableForTextCompletion:(UgiShowTextInputShouldEnableForTextCompletion)shouldEnableForTextCompletion;
++ (NSObject * _Nonnull)showTextInput:(NSString * _Nullable)title
+                             message:(NSString * _Nullable)message
+                   actionButtonTitle:(NSString * _Nullable)actionButtonTitle
+                         initialText:(NSString * _Nullable)initialText
+                 allowAutoCorrection:(BOOL)allowAutoCorrection
+                        keyboardType:(UIKeyboardType)keyboardType
+                          switchText:(NSString * _Nullable)switchText
+                  switchInitialValue:(BOOL)switchInitialValue
+                      withCompletion:(nonnull UgiShowTextInputCompletionWithText)completion
+                withCancelCompletion:(nullable VoidBlock)cancelCompletion
+   withShouldEnableForTextCompletion:(nullable UgiShowTextInputShouldEnableForTextCompletion)shouldEnableForTextCompletion;
 
 ///////////////
 
@@ -343,14 +344,14 @@ withShouldEnableForTextCompletion:(UgiShowTextInputShouldEnableForTextCompletion
  @param cancelCompletion    Block to execute for "cancel"
  @return                    The alert
  */
-+ (NSObject *)show3ButtonAlert:(NSString *)title
-                       message:(NSString *)message
-                  button1Title:(NSString *)button1Title
-                  button2Title:(NSString *)button2Title
-             cancelButtonTitle:(NSString *)cancelButtonTitle
-             button1Completion:(VoidBlock)button1Completion
-             button2Completion:(VoidBlock)button2Completion
-          withCancelCompletion:(VoidBlock)cancelCompletion;
++ (NSObject * _Nonnull)show3ButtonAlert:(NSString * _Nullable)title
+                                message:(NSString * _Nullable)message
+                           button1Title:(NSString * _Nullable)button1Title
+                           button2Title:(NSString * _Nullable)button2Title
+                      cancelButtonTitle:(NSString * _Nullable)cancelButtonTitle
+                      button1Completion:(nullable VoidBlock)button1Completion
+                      button2Completion:(nullable VoidBlock)button2Completion
+                   withCancelCompletion:(nullable VoidBlock)cancelCompletion;
 
 ///////////////
 
@@ -366,23 +367,25 @@ typedef void (^UgiAlertCompletionWithIndex)(NSInteger buttonIndex);
  @param completion          Block to execute for when a button is selected
  @return                    The alert
  */
-+ (NSObject *)showManyButtonAlert:(NSString *)title
-                          message:(NSString *)message
-                     buttonTitles:(NSArray<NSString *> *)buttonTitles
-                cancelButtonTitle:(NSString *)cancelButtonTitle
-                   withCompletion:(UgiAlertCompletionWithIndex)completion;
++ (NSObject * _Nonnull)showManyButtonAlert:(NSString * _Nullable)title
+                                   message:(NSString * _Nullable)message
+                              buttonTitles:(NSArray<NSString *> * _Nonnull)buttonTitles
+                         cancelButtonTitle:(NSString * _Nullable)cancelButtonTitle
+                            withCompletion:(nonnull UgiAlertCompletionWithIndex)completion;
 
 ///////////////
 
 //! Completion for showChoices:
-typedef void (^UgiShowChoicesAlertCompletion)(int index, NSString *name);
+typedef void (^UgiShowChoicesAlertCompletion)(int index, NSString * _Nonnull name);
 
 //! Completion for showChoices:
-typedef void (^UgiShowChoicesAlertConfirmationCompletion)(int index, NSString *name, VoidBlock completion);
+typedef void (^UgiShowChoicesAlertConfirmationCompletion)(int index,
+                                                          NSString * _Nonnull name,
+                                                          VoidBlock _Nonnull completion);
 
 /**
  Show UI to choose from a list of choices
- 
+
  @param choices               Choices to choose from
  @param initialSelectedIndex  Choice to select initially
  @param title                 Title for the alert
@@ -394,20 +397,20 @@ typedef void (^UgiShowChoicesAlertConfirmationCompletion)(int index, NSString *n
  @param cancelCompletion      Block to execute for "cancel"
  @return                      The alert
  */
-+ (NSObject *) showChoices:(NSArray<NSString *> *)choices
-  withInitialSelectedIndex:(int)initialSelectedIndex
-                 withTitle:(NSString *)title
-               withMessage:(NSString *)message
-     withActionButtonTitle:(NSString *)actionButtonTitle
-             withCanCancel:(BOOL)canCancel
-            withCompletion:(UgiShowChoicesAlertCompletion)completion
-withConfirmationCompletion:(UgiShowChoicesAlertConfirmationCompletion)confirmationCompletion
-      withCancelCompletion:(VoidBlock) cancelCompletion;
++ (NSObject * _Nonnull) showChoices:(NSArray<NSString *> * _Nonnull)choices
+           withInitialSelectedIndex:(int)initialSelectedIndex
+                          withTitle:(NSString * _Nullable)title
+                        withMessage:(NSString * _Nullable)message
+              withActionButtonTitle:(NSString * _Nullable)actionButtonTitle
+                      withCanCancel:(BOOL)canCancel
+                     withCompletion:(nonnull UgiShowChoicesAlertCompletion)completion
+         withConfirmationCompletion:(nullable UgiShowChoicesAlertConfirmationCompletion)confirmationCompletion
+               withCancelCompletion:(nullable VoidBlock) cancelCompletion;
 
 //! @cond
-+ (NSObject *) showMenuWithTitle:(NSString *)title
-            withCancelCompletion:(VoidBlock)cancelCompletion
-           withTitlesAndHandlers:(id)firstTitle, ... NS_REQUIRES_NIL_TERMINATION __attribute__((deprecated));
++ (NSObject * _Nonnull) showMenuWithTitle:(NSString * _Nullable)title
+                     withCancelCompletion:(nullable VoidBlock)cancelCompletion
+                    withTitlesAndHandlers:(nonnull id)firstTitle, ... NS_REQUIRES_NIL_TERMINATION __attribute__((deprecated));
 //! @endcond
 
 /**
@@ -417,9 +420,9 @@ withConfirmationCompletion:(UgiShowChoicesAlertConfirmationCompletion)confirmati
  @param items                 Array of menu items
  @return                      The alert
  */
-+ (NSObject *) showMenuWithTitle:(NSString *)title
-            withCancelCompletion:(VoidBlock)cancelCompletion
-                       withItems:(NSArray<UgiMenuItem*> *)items;
++ (NSObject * _Nonnull) showMenuWithTitle:(NSString * _Nullable)title
+                     withCancelCompletion:(nullable VoidBlock)cancelCompletion
+                                withItems:(NSArray<UgiMenuItem*> * _Nonnull)items;
 
 /////////////
 
@@ -428,28 +431,28 @@ withConfirmationCompletion:(UgiShowChoicesAlertConfirmationCompletion)confirmati
 //
 //! @cond
 typedef void (^UgiShowMenuLowCompletion)(int choice);
-+ (NSObject *) showMenuWithTitle:(NSString *)title
-            withCancelCompletion:(VoidBlock)cancelCompletion
-                      withTitles:(NSArray<NSString *> *)titles
-                     withHandler:(UgiShowMenuLowCompletion)handler;
++ (NSObject * _Nonnull) showMenuWithTitle:(NSString * _Nullable)title
+                     withCancelCompletion:(nullable VoidBlock)cancelCompletion
+                               withTitles:(NSArray<NSString *> * _Nonnull)titles
+                              withHandler:(nonnull UgiShowMenuLowCompletion)handler;
 //! @endcond
 
 ///////////////
 
 /**
  Show "waiting" alert, call completion if cancelled
- 
+
  @param message             Text for the body of the alert
  @param completion          Block to execute for "cancel" (or nil if cancel is not an option)
  */
-+ (void)showWaiting:(NSString *)message withCancelCompletion:(VoidBlock)completion;
++ (void)showWaiting:(NSString * _Nonnull)message withCancelCompletion:(nullable VoidBlock)completion;
 
 /**
  Show "waiting" alert without cancel
- 
+
  @param message             Text for the body of the alert
  */
-+ (void)showWaiting:(NSString *)message;
++ (void)showWaiting:(NSString * _Nonnull)message;
 
 /**
  Hide "waiting" alert
@@ -460,7 +463,7 @@ typedef void (^UgiShowMenuLowCompletion)(int choice);
  Update the "waiting" alert
  @param message   New message
  */
-+ (void) updateWaiting:(NSString *)message;
++ (void) updateWaiting:(NSString * _Nonnull)message;
 
 //! See if the waiting alert is shown
 + (BOOL)isWaitingShown;
@@ -470,8 +473,8 @@ typedef void (^UgiShowMenuLowCompletion)(int choice);
  @param title               Title for the toast
  @param message             Text for the body of the toast
  */
-+ (void)showToast:(NSString *)title
-          message:(NSString *)message;
++ (void)showToast:(NSString * _Nullable)title
+          message:(NSString * _Nullable)message;
 
 /**
  Show a "toast" (a temporary message)
@@ -479,8 +482,8 @@ typedef void (^UgiShowMenuLowCompletion)(int choice);
  @param message             Text for the body of the toast
  @param interval            Duration to display the toast
  */
-+ (void)showToast:(NSString *)title
-          message:(NSString *)message
++ (void)showToast:(NSString * _Nullable)title
+          message:(NSString * _Nullable)message
   forTimeInterval:(NSTimeInterval)interval;
 
 /**
@@ -489,8 +492,8 @@ typedef void (^UgiShowMenuLowCompletion)(int choice);
  @param showExtraInfo      YES to display additional (debugging) info
  @return                      The alert
  */
-+ (NSObject *)showVersionAlertWithTitle:(NSString *)title
-                      withShowExtraInfo:(BOOL)showExtraInfo;
++ (NSObject * _Nonnull)showVersionAlertWithTitle:(NSString * _Nullable)title
+                               withShowExtraInfo:(BOOL)showExtraInfo;
 
 ///////////////
 
@@ -498,7 +501,7 @@ typedef void (^UgiShowMenuLowCompletion)(int choice);
  Call stop inventory while displaying a waiting dialog
  @param completion      Code to run after inventory is stopped
  */
-+ (void) stopInventoryWithCompletionShowWaiting:(StopInventoryCompletion)completion;
++ (void) stopInventoryWithCompletionShowWaiting:(nullable StopInventoryCompletion)completion;
 
 /**
  * Stop running inventory, showing a waiting dialog if the given dialog is dismissed before
@@ -506,22 +509,28 @@ typedef void (^UgiShowMenuLowCompletion)(int choice);
  * @param alert         Alert being shown
  * @param completion    Completion to run after inventory stops and the alert is dismissed
  */
-+ (void) stopInventoryWithShownAlert:(NSObject *)alert
-                      withCompletion:(StopInventoryCompletion)completion;
++ (void) stopInventoryWithShownAlert:(NSObject * _Nonnull)alert
+                      withCompletion:(nullable StopInventoryCompletion)completion;
 
 ///////////////
 
 /**
  Show an alert if the Grokker is not connected
- 
+
  @param cancelCompletion    Block to execute if the user cancels
  */
-+ (void) startDisconnectedAlert:(VoidBlock)cancelCompletion;
++ (void) startDisconnectedAlert:(nullable VoidBlock)cancelCompletion;
 
 /**
  Stop showing the disconnected alert
  */
 + (void) stopDisconnectedAlert;
+
+/**
+ * See if the disconnected alert is active
+ * @return true if disconnected alert is active
+ */
++ (BOOL) isDisconnectedAlertActive;
 
 ///////////////
 
@@ -530,21 +539,21 @@ typedef void (^UgiShowMenuLowCompletion)(int choice);
  @param result     The error
  @return           Description
  */
-+ (NSString *) inventoryErrorMessageForResult:(UgiInventoryCompletedReturnValues)result;
++ (NSString * _Nullable) inventoryErrorMessageForResult:(UgiInventoryCompletedReturnValues)result;
 
 /**
  Get the description of a tag access error
  @param result     The error
  @return           Description
  */
-+ (NSString *) tagAccessErrorMessageForTagAccessReturnValue:(UgiTagAccessReturnValues) result;
++ (NSString * _Nullable) tagAccessErrorMessageForTagAccessReturnValue:(UgiTagAccessReturnValues) result;
 
 /**
  Show an alert with a message about an inventory error
  @param result     The error
  @return           The alert
  */
-+ (NSObject *) showInventoryError:(UgiInventoryCompletedReturnValues)result;
++ (NSObject * _Nonnull) showInventoryError:(UgiInventoryCompletedReturnValues)result;
 
 /**
  Show an alert with a message about an inventory error
@@ -552,8 +561,8 @@ typedef void (^UgiShowMenuLowCompletion)(int choice);
  @param completion    Block to execute when the alert is completed
  @return              The alert
  */
-+ (NSObject *) showInventoryError:(UgiInventoryCompletedReturnValues)result
-                   withCompletion:(VoidBlock)completion;
++ (NSObject * _Nonnull) showInventoryError:(UgiInventoryCompletedReturnValues)result
+                            withCompletion:(nullable VoidBlock)completion;
 
 @end
 
@@ -565,7 +574,7 @@ typedef void (^UgiShowMenuLowCompletion)(int choice);
 @interface UIView (UgiUiUtil)
 
 #if DOXYGEN   // Defined before class for Swift compatibility, documented here for Doxygen compatibility
-//! Type passed to showModal for the type of transition and the placement
+              //! Type passed to showModal for the type of transition and the placement
 typedef enum {
   UgiModalBottom,             //! Show at bottom
   UgiModalCenter,             //! Show in center
@@ -578,45 +587,46 @@ typedef enum {
  @param animationType  Type of animation
  @return               id to pass to hideModal:
  */
-- (id) showModal:(UgiShowModalAnimationTypes)animationType;
+- (nonnull id) showModal:(UgiShowModalAnimationTypes)animationType;
 
 /**
  Show this view after it has been shown with showModal:
  @param idFromShowModal  ID returned by showModal
  */
-- (void) hideModal:(id)idFromShowModal;
+- (void) hideModal:(nonnull id)idFromShowModal;
 
 /**
  Show this view after it has been shown with showModal:
  @param idFromShowModal  ID returned by showModal
  @param completion       Block to run when completed
  */
-- (void) hideModal:(id)idFromShowModal withCompletion:(void(^)(void))completion;
+- (void) hideModal:(nonnull id)idFromShowModal
+    withCompletion:(nullable void(^)(void))completion;
 
 /**
  Find the view's first responder
  @return    First responder
  */
-- (id)findFirstResponder;
+- (nullable id)findFirstResponder;
 
 /**
  Find the first superview view of a specific class
  @param viewClass    View class to look for
  @return             The view
  */
-- (id) superviewOfClass:(Class)viewClass;
+- (nullable id) superviewOfClass:(nonnull Class)viewClass;
 
 /**
  Find the first subview view of a specific class
  @param viewClass    View class to look for
  @return             The view
  */
-- (id) subviewOfClass:(Class)viewClass;
+- (nullable id) subviewOfClass:(nonnull Class)viewClass;
 
 //------------------------------
 
 //! Completion for traverseSubviews:
-typedef id (^UgiTraverseSubviewsCompletion)(id subview, int depth);
+typedef _Nullable id (^UgiTraverseSubviewsCompletion)(id _Nonnull subview, int depth);
 
 /**
  Enumerate all subviews
@@ -624,22 +634,22 @@ typedef id (^UgiTraverseSubviewsCompletion)(id subview, int depth);
  @param completion Block to run for each subview, if the return is not nil, enumeration is aborted and this value is returned
  @return Value returned by completion or nil
  */
-- (id) traverseSubviews:(BOOL)recursive
-         withCompletion:(UgiTraverseSubviewsCompletion)completion;
+- (nullable id) traverseSubviews:(BOOL)recursive
+                  withCompletion:(nonnull UgiTraverseSubviewsCompletion)completion;
 
 /**
  Log the tree of subviews, for debugging
  @param logConstraints  YES log all the constraints
  @param firstArg        List of names of parameters to log for each view
  */
-- (void) logViewTree:(BOOL)logConstraints firstArg:(NSString *)firstArg, ...;
+- (void) logViewTree:(BOOL)logConstraints firstArg:(NSString * _Nullable)firstArg, ...;
 
 /**
  Log the chain of superviews, for debugging
  @param logConstraints  YES log all the constraints
  @param firstArg        List of names of parameters to log for each view
  */
-- (void) logViewParents:(BOOL)logConstraints firstArg:(NSString *)firstArg, ...;
+- (void) logViewParents:(BOOL)logConstraints firstArg:(NSString * _Nullable)firstArg, ...;
 
 @end
 
@@ -655,7 +665,7 @@ typedef id (^UgiTraverseSubviewsCompletion)(id subview, int depth);
  @param hexString  The string
  @return           New color
  */
-+ (UIColor *) colorFromHexString:(NSString *)hexString;
++ (UIColor * _Nonnull) colorFromHexString:(NSString * _Nonnull)hexString;
 
 /**
  Make a color from a hex string, with transparency
@@ -663,28 +673,28 @@ typedef id (^UgiTraverseSubviewsCompletion)(id subview, int depth);
  @param alpha      Transparency
  @return           New color
  */
-+ (UIColor *) colorFromHexString:(NSString *)hexString withAlpha:(float)alpha;
++ (UIColor * _Nonnull) colorFromHexString:(NSString * _Nonnull)hexString withAlpha:(float)alpha;
 
 /**
  Make a color more transparent
  @param degree  Degree to make the color more transparent
  @return        New color
  */
-- (UIColor *) moreTransparent:(float)degree;
+- (UIColor * _Nonnull) moreTransparent:(float)degree;
 
 /**
  Make a color lighter
  @param degree  Degree to lighten: 0 = white, 1 = no change
  @return        New color
  */
-- (UIColor *) lighten:(float)degree;
+- (UIColor * _Nonnull) lighten:(float)degree;
 
 /**
  Make a color darker
  @param degree  Degree to darken: 0 = black, 1 = no change
  @return        New color
  */
-- (UIColor *) darken:(float)degree;
+- (UIColor * _Nonnull) darken:(float)degree;
 
 /**
  Get the perceived luminance of a color
@@ -707,14 +717,14 @@ typedef id (^UgiTraverseSubviewsCompletion)(id subview, int depth);
  @param color  Color to fill with
  @return       New image
  */
-- (UIImage *) colorImageWithColor:(UIColor *)color;
+- (UIImage * _Nonnull) colorImageWithColor:(UIColor * _Nonnull)color;
 
 /**
  Scale an image
  @param size   New image size
  @return       New image
  */
-- (UIImage *) scaleImageToSize:(CGSize)size;
+- (UIImage * _Nonnull) scaleImageToSize:(CGSize)size;
 
 @end
 
@@ -740,7 +750,7 @@ typedef id (^UgiTraverseSubviewsCompletion)(id subview, int depth);
  @param scrollToBottom  YES to scroll to the bottom of the list (to display the appended row)
  @return                UITableViewCell appended
  */
-- (UITableViewCell *) appendRow:(BOOL)scrollToBottom;
+- (UITableViewCell * _Nonnull) appendRow:(BOOL)scrollToBottom;
 
 /**
  Delete a row from a table
@@ -762,7 +772,7 @@ typedef id (^UgiTraverseSubviewsCompletion)(id subview, int depth);
  @param viewControllerClass    View controller class to look for
  @return                       The view controller
  */
-- (id) parentViewControllerOfClass:(Class)viewControllerClass;
+- (nullable id) parentViewControllerOfClass:(nonnull Class)viewControllerClass;
 
 @end
 
@@ -779,14 +789,15 @@ typedef id (^UgiTraverseSubviewsCompletion)(id subview, int depth);
  @param animated               YES to animate
  @return                       View controllers popped
  */
-- (NSArray<UIViewController *> *)popToViewControllerOfClass:(Class)viewControllerClass animated:(BOOL)animated;
+- (NSArray<UIViewController *> * _Nullable)popToViewControllerOfClass:(nonnull Class)viewControllerClass
+                                                             animated:(BOOL)animated;
 
 /**
  See if there is a view controller of a specific class on the stack
  @param viewControllerClass    View controller class to look for
  @return                       YES if there is a view controller of the specific class
  */
-- (BOOL)canPopToViewControllerOfClass:(Class)viewControllerClass;
+- (BOOL)canPopToViewControllerOfClass:(nonnull Class)viewControllerClass;
 
 @end
 
@@ -801,14 +812,23 @@ typedef id (^UgiTraverseSubviewsCompletion)(id subview, int depth);
  Trim whitespace from the string
  @return   Trimmed string
  */
-- (NSString *) trimWhitespace;
+- (NSString * _Nonnull) trimWhitespace;
 
 /**
  Do a case insensitive compare
  @param s   String to compare to
  @return    YES if equal
  */
-- (BOOL) isEqualToStringCaseInsensitive:(NSString *)s;
+- (BOOL) isEqualToStringCaseInsensitive:(NSString * _Nullable)s;
+
+/**
+ Find the size of the string
+ @param font    Font to use
+ @param size    Size to constrin to
+ @return        Text size
+ */
+- (CGSize) sizeWithFont:(UIFont * _Nonnull)font
+      constrainedToSize:(CGSize)size;
 
 @end
 
@@ -826,8 +846,8 @@ typedef id (^UgiTraverseSubviewsCompletion)(id subview, int depth);
  @param block      Block to run
  @return           The timer
  */
-+ (NSTimer *)scheduledTimerWithTimeIntervalUgi:(NSTimeInterval)seconds
-                                       repeats:(BOOL)repeats
-                                         block:(void (^)(void))block;
++ (NSTimer * _Nonnull)scheduledTimerWithTimeIntervalUgi:(NSTimeInterval)seconds
+                                                repeats:(BOOL)repeats
+                                                  block:( nonnull void (^)(void))block;
 
 @end

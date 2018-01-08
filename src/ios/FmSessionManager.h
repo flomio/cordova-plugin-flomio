@@ -56,6 +56,7 @@
 - (void)setConfiguration:(FmConfiguration *)configuration ofDevice:(NSString *)deviceUuid;
 - (FmConfiguration *)getConfiguration:(NSString *)deviceUuid;
 - (void)sendApdu:(NSString *)apdu toDevice:(NSString *)deviceUuid success:(void (^)(NSString *))completionBlock;
+- (void)readNdef:(NSString *)deviceUuid success:(void (^)(NdefMessage *))completionBlock;
 
 @property (nonatomic, strong) id<FmSessionManagerDelegate> delegate;
 @property (nonatomic, strong) FmConnectionsManager *connectionsManager;

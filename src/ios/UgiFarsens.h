@@ -20,10 +20,10 @@
 ///////////////////////////////////////////////////////////////////////////////////////
 
 /**
-Completion for readFenixVortexTemperature
-@param status  Description of current state
-*/
-typedef void (^UgiFarsensStatusCallback)(NSString *status);
+ Completion for readFenixVortexTemperature
+ @param status  Description of current state
+ */
+typedef void (^UgiFarsensStatusCallback)(NSString * _Nonnull status);
 
 ///////////////////////////////////////////////////////////////////////////////////////
 #pragma mark - Fenix Vortex
@@ -42,9 +42,9 @@ typedef void (^UgiFarsensReadFenixVortexTemperatureCompletion)(UgiTagAccessRetur
  @param statusCallback  Callback for each step of the process (intended for use with showWaiting)
  @param completion      Completion when finished
  */
-+ (void) readFenixVortexTemperature:(UgiTag *)tag
-                 withStatusCallback:(UgiFarsensStatusCallback)statusCallback
-                     withCompletion:(UgiFarsensReadFenixVortexTemperatureCompletion)completion;
++ (void) readFenixVortexTemperature:(UgiTag * _Nonnull)tag
+                 withStatusCallback:(nullable UgiFarsensStatusCallback)statusCallback
+                     withCompletion:(nonnull UgiFarsensReadFenixVortexTemperatureCompletion)completion;
 
 /////
 
@@ -61,9 +61,9 @@ typedef void (^UgiFarsensReadFenixVortexPressureCompletion)(UgiTagAccessReturnVa
  @param statusCallback  Callback for each step of the process (intended for use with showWaiting)
  @param completion      Completion when finished
  */
-+ (void) readFenixVortexPressure:(UgiTag *)tag
-              withStatusCallback:(UgiFarsensStatusCallback)statusCallback
-                  withCompletion:(UgiFarsensReadFenixVortexPressureCompletion)completion;
++ (void) readFenixVortexPressure:(UgiTag * _Nonnull)tag
+              withStatusCallback:(nullable UgiFarsensStatusCallback)statusCallback
+                  withCompletion:(nonnull UgiFarsensReadFenixVortexPressureCompletion)completion;
 
 ///////////////////////////////////////////////////////////////////////////////////////
 #pragma mark - Kineo
@@ -84,9 +84,9 @@ typedef void (^UgiFarsensReadKineoCompletion)(UgiTagAccessReturnValues result, f
  @param statusCallback  Callback for each step of the process (intended for use with showWaiting)
  @param completion      Completion when finished
  */
-+ (void) readKineo:(UgiTag *)tag
-withStatusCallback:(UgiFarsensStatusCallback)statusCallback
-    withCompletion:(UgiFarsensReadKineoCompletion)completion;
++ (void) readKineo:(UgiTag * _Nonnull)tag
+withStatusCallback:(nullable UgiFarsensStatusCallback)statusCallback
+    withCompletion:(nonnull UgiFarsensReadKineoCompletion)completion;
 
 ///////////////////////////////////////////////////////////////////////////////////////
 #pragma mark - Titan
@@ -107,9 +107,9 @@ typedef void (^UgiFarsensReadTitanCompletion)(UgiTagAccessReturnValues result,
  @param statusCallback  Callback for each step of the process (intended for use with showWaiting)
  @param completion      Completion when finished
  */
-+ (void) readTitan:(UgiTag *)tag
-withStatusCallback:(UgiFarsensStatusCallback)statusCallback
-    withCompletion:(UgiFarsensReadTitanCompletion)completion;
++ (void) readTitan:(UgiTag * _Nonnull)tag
+withStatusCallback:(nullable UgiFarsensStatusCallback)statusCallback
+    withCompletion:(nonnull UgiFarsensReadTitanCompletion)completion;
 
 
 /**
@@ -125,9 +125,9 @@ typedef void (^UgiFarsensWriteTitanCompletion)(UgiTagAccessReturnValues result);
  @param statusCallback  Callback for each step of the process (intended for use with showWaiting)
  @param completion      Completion when finished
  */
-+ (void) writeTitan:(UgiTag *)tag
++ (void) writeTitan:(UgiTag * _Nonnull)tag
    withSetPosition1:(BOOL)setPosition1
-withStatusCallback:(UgiFarsensStatusCallback)statusCallback
-    withCompletion:(UgiFarsensWriteTitanCompletion)completion;
+ withStatusCallback:(nullable UgiFarsensStatusCallback)statusCallback
+     withCompletion:(nonnull UgiFarsensWriteTitanCompletion)completion;
 
 @end

@@ -15,7 +15,7 @@
 // Doxygen (the documentation generator)
 ///////////////////////////////////////////////////////////////////////////////////////
 
-typedef NS_ENUM(NSInteger, UgiFirmwareUpdateCompatibilityValues) {
+typedef NS_ENUM(int, UgiFirmwareUpdateCompatibilityValues) {
   FIRMWARE_COMPATIBILITY_INVALID = 0,
   FIRMWARE_COMPATIBILITY_INCOMPATIBLE = 1,
   FIRMWARE_COMPATIBILITY_DOWNGRADE = 2,
@@ -51,7 +51,7 @@ typedef NS_ENUM(NSUInteger, UgiFirmwareUpdateReturnValues) {
 @interface UgiFirmwareUpdateInfo : NSObject
 
 #if DOXYGEN   // Defined before class for Swift compatibility, documented here for Doxygen compatibility
-//! Values returned from firmwareCheckCompatibility
+              //! Values returned from firmwareCheckCompatibility
 typedef enum {
   FIRMWARE_COMPATIBILITY_INVALID = 0,        //!< File is invalid
   FIRMWARE_COMPATIBILITY_INCOMPATIBLE = 1,   //!< File is incompatible with this Grokker
@@ -61,15 +61,15 @@ typedef enum {
 } UgiFirmwareUpdateCompatibilityValues;
 #endif
 
-@property (readonly, retain, nonatomic) NSString *name;            //!< Name of update file
+@property (readonly, retain, nonatomic, nonnull) NSString *name;            //!< Name of update file
 @property (readonly) int protocol;                                 //!< Reader protocol
-@property (readonly, retain, nonatomic) NSString *notes;           //!< Notes
+@property (readonly, retain, nonatomic, nonnull) NSString *notes;           //!< Notes
 
 @property (readonly, nonatomic) UgiFirmwareUpdateCompatibilityValues compatibilityValue;   //!< Compatibility
 @property (readonly, nonatomic) int softwareVersionMajor;        //!< Version major
 @property (readonly, nonatomic) int softwareVersionMinor;        //!< Version minor
 @property (readonly, nonatomic) int softwareVersionBuild;        //!< Version build
-@property (readonly, retain, nonatomic) NSDate *sofwareVersionDate;    //!< Date the firmware ware built
+@property (readonly, nonatomic, retain, nonnull) NSDate *sofwareVersionDate;    //!< Date the firmware ware built
 
 @end
 
@@ -80,7 +80,7 @@ typedef enum {
 /**
  A UgiFirmwareUpdateDelegate object is passed to the firmwareUpdate method
  of the Ugi singleton.
- 
+
  All of the protocol methods are optional, the delegate only implements the
  methods it needs.
  */
@@ -136,12 +136,17 @@ typedef enum {
 /**
  * Name of release channel
  */
-@property (readonly, nonatomic) NSString *FIRMWARE_CHANNEL_RELEASE;
+@property (readonly, nonatomic, nonnull) NSString *FIRMWARE_CHANNEL_RELEASE;
 
 /**
  * Name of development channel
  */
-@property (readonly, nonatomic) NSString *FIRMWARE_CHANNEL_DEVELOPMENT;
+@property (readonly, nonatomic, nonnull) NSString *FIRMWARE_CHANNEL_DEVELOPMENT;
+
+/**
+ * Name of channel for automatic updates (normally FIRMWARE_CHANNEL_RELEASE)
+ */
+@property (nonatomic, nonnull) NSString *automaticFirmwareUpdateChannel;
 
 ///////////////////////////////////////////////////////////////////////////////////////
 #pragma mark - Automatic update
@@ -157,7 +162,8 @@ typedef enum {
  @param info         Info for update that is ready (or nil if update cannot be loaded)
  @param required     YES if update is required
  */
-typedef void (^AutomaticCheckForFirmwareUpdateCompletion)(UgiFirmwareUpdateInfo *info, BOOL required);
+typedef void (^AutomaticCheckForFirmwareUpdateCompletion)(UgiFirmwareUpdateInfo * _Nullable info,
+                                                          BOOL required);
 
 /**
  Check for firmware update automatically.
@@ -170,12 +176,12 @@ typedef void (^AutomaticCheckForFirmwareUpdateCompletion)(UgiFirmwareUpdateInfo 
  - whenever new channel data is loaded (and a Grokker is connected and not running inventory)
  - when forceFirmwareGrokkerCheck: is called
  It is possible that a firmware update is available at a time that is inconveient for an update.
- 
+
  @param channel   Channel to connect on, normally FIRMWARE_CHANNEL_RELEASE
  @param completion  Completion code when an update is ready
  */
-- (void) automaticCheckForFirmwareUpdate:(NSString *)channel
-                          withCompletion:(AutomaticCheckForFirmwareUpdateCompletion)completion;
+- (void) automaticCheckForFirmwareUpdate:(NSString * _Nonnull)channel
+                          withCompletion:(nonnull AutomaticCheckForFirmwareUpdateCompletion)completion;
 
 /**
  Update the firmware update status (reload the control file).
@@ -195,16 +201,16 @@ typedef void (^AutomaticCheckForFirmwareUpdateCompletion)(UgiFirmwareUpdateInfo 
  @param name Update to load
  @param completion  Completion called after the update has been loaded
  */
-- (void)loadUpdateWithName:(NSString *)name
-            withCompletion:(void(^)(NSError *error))completion;
+- (void)loadUpdateWithName:(NSString * _Nonnull)name
+            withCompletion:(nonnull void(^)(NSError * _Nullable error))completion;
 
 /**
  Update firmware that has been previously loaded with loadUpdateWithName:
- 
+
  @param delegate    Object to send notifications to
  @return Result of starting the firmware update
  */
-- (UgiFirmwareUpdateReturnValues) firmwareUpdate:(id<UgiFirmwareUpdateDelegate>)delegate;
+- (UgiFirmwareUpdateReturnValues) firmwareUpdate:(nonnull id<UgiFirmwareUpdateDelegate>)delegate;
 
 /**
  Cancel an update in progress
@@ -218,26 +224,28 @@ typedef void (^AutomaticCheckForFirmwareUpdateCompletion)(UgiFirmwareUpdateInfo 
 /**
  Load updates (metadata)
  @param channel   Channel to load from, normally FIRMWARE_CHANNEL_RELEASE
+ @param checkCompatibilityWithConnectedGrokker  YES to check compatibility
  @param completion  Completion code when updates are loaded
  */
-- (void) loadUpdatesFromChannel:(NSString *)channel
-                 withCompletion:(void(^)(NSMutableArray *updates))completion;
+- (void) loadUpdatesFromChannel:(NSString * _Nonnull)channel
+         withCheckCompatibility:(BOOL)checkCompatibilityWithConnectedGrokker
+                 withCompletion:(nonnull void(^)(NSMutableArray<UgiFirmwareUpdateInfo *> * _Nullable updates))completion;
 
 /**
  After firmware has been updated, update an array of UgiFirmwareUpdateInfo objects
  @param updates   Updates to update
  */
-- (void) updateFirmwareInfoCompatibility:(NSMutableArray *)updates;
+- (void) updateFirmwareInfoCompatibility:(NSMutableArray * _Nonnull)updates;
 
 /**
  Check compatibility of a given update file
- 
+
  @param filePath    File name (or path) to check
  @param compatibility Version of firmware filePath is compatible with
  @return   Compatibility
  */
-- (UgiFirmwareUpdateCompatibilityValues) firmwareCheckCompatibility:(NSString *)filePath
-                                                  withCompatibility:(NSString *)compatibility;
+- (UgiFirmwareUpdateCompatibilityValues) firmwareCheckCompatibility:(NSString * _Nonnull)filePath
+                                                  withCompatibility:(NSString * _Nonnull)compatibility;
 
 /**
  See if an update is in progress
@@ -255,17 +263,17 @@ typedef void (^AutomaticCheckForFirmwareUpdateCompletion)(UgiFirmwareUpdateInfo 
  Set that this app requires a minimum firmware version on the Grokker
  @param firmwareVersion    The minimum firmware version
  */
-- (void)requiresFirmwareVersion:(NSString *)firmwareVersion;
+- (void)requiresFirmwareVersion:(NSString * _Nullable)firmwareVersion;
 
 /**
  Update firmware that has been previously loaded with loadUpdateWithName:
- 
+
  @param delegate    Object to send notifications to
  @param downgrade   YES to allow downgrading
  @param sameVersion YES to allow sending the same version the reader has now
  @return Result of starting the firmware update
  */
-- (UgiFirmwareUpdateReturnValues) firmwareUpdate:(id<UgiFirmwareUpdateDelegate>)delegate
+- (UgiFirmwareUpdateReturnValues) firmwareUpdate:(nonnull id<UgiFirmwareUpdateDelegate>)delegate
                                   allowDowngrade:(BOOL)downgrade
                                 allowSameVersion:(BOOL)sameVersion;
 

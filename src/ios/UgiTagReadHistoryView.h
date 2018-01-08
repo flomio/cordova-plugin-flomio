@@ -19,10 +19,10 @@
 @interface UgiTagReadHistoryView : UIView
 
 //! UgiTag to display the read history for
-@property (retain, nonatomic) UgiTag *displayTag;
+@property (retain, nonatomic) UgiTag * _Nonnull displayTag;
 
 //! Color to use for visual display of read history
-@property (retain, nonatomic) UIColor *themeColor;
+@property (retain, nonatomic) UIColor * _Nullable themeColor;
 
 //! The preferred size for this view
 - (CGSize) preferredSize;
