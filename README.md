@@ -1,252 +1,377 @@
 # Flomio Cordova Plugin for SDK v2.3
 
-Flomio's plugin for Cordova / Meteor, for use with the v2.2 of the Flomio SDK. [Get yours here.]
-(http://flomio.com/shop/apps/flomio-sdk-basic-turnkey-oem-support/)
-This plugin is only supported for FloBLE Plus
+Flomio's plugin for Cordova / Meteor, for use with v2.3 of the Flomio SDK.
+This plugin is only supported for the FloBLE Plus or FloBLE Micro
 
-## Installation
+## Contents
 
-- Download and install [Node](http://nodejs.org/) plus the [Cordova CLI](http://cordova.apache.org/docs/en/4.0.0/guide_cli_index.md.html) or [Meteor CLI](https://www.meteor.com/install).
+* [Installation](#installation)
+* [Example](#example)
+* [API](#api)
+  - [init](##init)
+  - [setConfiguration](##setconfiguration)
+  - [getConfiguration](##getConfiguration)
+  - [startReaders](##startreaders)
+  - [stopReaders](##stopreaders)
+  - [sleepReaders](##sleepreaders)
+  - [selectSpecificDeviceId](##selectspecificdeviceid)
+  - [sendApdu](##sendapdu)
+  - [getBatteryLevel](##getbatterylevel)
+  - [getCommunicationStatus](##getcommunicationstatus)
+  - [writeNdef](##writendef)
+  - [write](##write)
+  - [launchNativeNfc](##launchnativenfc)
+  - [readNdef](##readndef)
+  - [addConnectedDevicesListener](##addconnecteddeviceslistener)
+  - [addTagDiscoveredListener](##addtagdiscoveredlistener)
+  - [addTagStatusChangeListener](##addtagstatuschangelistener)
 
-- Create your Cordova or Meteor example app.
+* [Tag](#tag)
+* [TagStatus](#tagstatus)
+* [DeviceInfo](#deviceinfo)
+* [DeviceConfiguration](#deviceconfiguration)
+* [PowerOperation](#poweroperation)
+* [CommunicationStatus](#communicationstatus)
+
+* [Add Pro SDK for Offline usage](#add-pro-sdk-for-offline-usage)
+
+# Installation
+
+Download and install [Node](https://nodejs.org/en/download/) plus the Cordova CLI
+```bash
+$ sudo npm install -g cordova
+```
+
+Create your Cordova example app:
 
 ```bash
-cordova create flomio-plugin-example-app && cd $_
---
-meteor create flomio-plugin-example-app && cd $_
+$ cordova create hello com.example.hello HelloWorld 
 ```
 
-- Add the plugin to it.
+Add the plugin to it:
 
 ```bash
-cordova plugin add https://github.com/flomio/flomio_cordova_plugin#<latest-commit-code>
---
-meteor add cordova:com.flomio.sdk@https://github.com/flomio/flomio_cordova_plugin/tarball/<latest-commit-code>
+$ cordova plugin add https://github.com/flomio/flomio_cordova_plugin#<latest-commit-code>
 ```
 
-- Implement a simple code snippet to test your setup.
+# Example
 
-```
-flomioPlugin.selectDeviceType("floble-plus");
-let configuration = {};
-configuration = {
-    scanPeriod: 1000, // scan period in ms
-    scanSound: false, // toggle scan sound on/off
-    readerState: 'read-data', //read-data or read-uuid
-    powerOperation: 'auto-polling-control' //bluetooth-connection-control or auto-polling-control
+```js
+const deviceConfiguration = {
+    powerOperation: flomioPlugin.PowerOperation.AutoPollingControl, 
+    deviceType: 'floble-plus'
 }
-flomioPlugin.setConfiguration(configuration);
-flomioPlugin.init();
-flomioPlugin.addConnectedDevicesListener(this.flomioConnectedDevicesListener.bind(this));
+flomioPlugin.setConfiguration(deviceConfiguration)
+flomioPlugin.init()
+flomioPlugin.addConnectedDevicesListener(this.flomioConnectedDevicesListener.bind(this))
 flomioPlugin.addTagDiscoveredListener(this.flomioTagDiscovered.bind(this))
 ```
 
-- Prepare the app.
-
+Prepare the app:
 ```bash
-cordova prepare
---
-meteor add-platform ios
+$ cordova platform add ios
+$ cordova prepare
 ```
 
-- Open the generated Xcode project located at `platforms/ios` or with Meteor, `.meteor/local/cordova-build/platforms/ios`.
+Open the generated Xcode project:
+```bash
+$ open platforms/ios/*.xcodeproj
+```
 
-- Build and run the app on an iOS device.
+Add your provisioning profile and signing identity and then build and run the app on an iOS device.
 
-## API
+# API
 
-**Required for operation**
+## init
+Initializes the plugin and begins a session. 
+To configure the session, use [setConfiguration](##set-configuration) before initialization.
 
-* `selectDeviceType(deviceType)`
+`    flomioPlugin.init([onSuccess], [onFailure]);
+`
 
-	Activates the specified device type for the current session. Choice of FloJack-BZR, FloJack-MSR, FloBLE-EMV or FloBLE-Plus
-	
-	`String readerType: <"flojack-bzr", "flojack-msr", "floble-emv" or "floble-plus">`
+### Parameters
+- __onSuccess__:(Optional)  The callback that is called if init was successful.
+- __onFailure__:(Optional)  The callback that is called if there was an error.
 
-* `init()`
+## setConfiguration
+Configures the current session. Changes the device type and power operation.
 
-	Initialises the plugin, preparing it for first use in the current session
+```js
+const deviceConfiguration = {
+    powerOperation: flomioPlugin.PowerOperation.AutoPollingControl, 
+    deviceType: 'floble-plus'
+}
+flomioPlugin.setConfiguration(deviceConfiguration)
+```
+### Parameters
+- __deviceConfiguration__:  [DeviceConfiguration](#deviceconfiguration)	
+
+## getConfiguration
+Returns the current configuration of the session.
+
+`    flomioPlugin.getConfiguration([onSuccess], [onFailure]);
+`
+
+### Parameters
+- __onSuccess__:(Optional)  The callback that returns the [DeviceConfiguration](#deviceconfiguration)	object.
+- __onFailure__:(Optional)  The callback that is called if there was an error.
+
+## startReaders
+Starts the readers after they has been stopped with [StopReaders](#stopreaders) or [SleepReaders](#sleepreaders).
+
+`    flomioPlugin.startReaders([onSuccess], [onFailure]);
+`
+
+### Parameters
+- __onSuccess__:(Optional)  The callback that is called if startReaders was successful.
+- __onFailure__:(Optional)  The callback that is called if there was an error.
+
+## stopReaders
+Stops the readers.
+Depending on the [PowerOperation](#poweroperation) configuration the readers either stop scanning or disconnect from bluetooth.
+
+`    flomioPlugin.stopReaders([onSuccess], [onFailure]);
+`
+
+### Parameters
+- __onSuccess__:(Optional)  The callback that is called if stopReaders was successful.
+- __onFailure__:(Optional)  The callback that is called if there was an error.
+
+## sleepReaders
+Stops the reader from polling and will set the reader to sleep after 60 seconds during future use.
+
+`    flomioPlugin.sleepReaders([onSuccess], [onFailure]);
+`
+
+### Parameters
+- __onSuccess__:(Optional)  The callback that is called if sleepReaders was successful.
+- __onFailure__:(Optional)  The callback that is called if there was an error.
 
 
-* `setConfiguration(configuration)`
+## sleepReaders
+Stops the reader from polling and will set the reader to sleep after 60 seconds during future use.
 
-	Configures settings for the current session. Both values in `readerSettings` are optional
-	
-	```
-	Object configuration
-	{
-		int scanPeriod,  // scan period in ms
-		bool scanSound  // toggle scan sound on/off
-	}
+`    flomioPlugin.sleepReaders([onSuccess], [onFailure]);
+`
 
-	e.g 
-	let configuration = {}
-      configuration = {
-        scanPeriod: 1000,  // scan period in ms
-        scanSound: true,  // toggle scan sound on/off
-        readerState: 'read-data', //read-data or read-uuid
-        powerOperation: 'auto-polling-control'  //bluetooth-connection-control or auto-polling-control
-      }
+### Parameters
+- __onSuccess__:(Optional)  The callback that is called if sleepReaders was successful.
+- __onFailure__:(Optional)  The callback that is called if there was an error.
 
-  flomioPlugin.setConfiguration(configuration);
-	```
-	
-**Optional methods**
+## selectSpecificDeviceId
+Use this before initialization to only connect to a certain device with a known deviceId.
+
+`    flomioPlugin.selectSpecificDeviceId([onSuccess], [onFailure]);
+`
+
+### Parameters
+- __onSuccess__:(Optional)  The callback that is called if selectSpecificDeviceId was successful.
+- __onFailure__:(Optional)  The callback that is called if there was an error.
+
+## sendApdu
+Sends an APDU command to a target device
+
+`    flomioPlugin.sendApdu(deviceId, apdu, [onSuccess], [onFailure]);
+`
+
+### Parameters
+- __deviceId__:  The unique ID code of the target reader.
+- __apdu__:  The APDU command in hexadecimal format.
+- __onSuccess__:(Optional)  The callback that is called if sendApdu was successful, it returns a hexadecimal response APDU as a string.
+- __onFailure__:(Optional)  The callback that is called if there was an error.
+
+## getBatteryLevel
+Gets the battery level of the currently connected device.
+
+`    flomioPlugin.getBatteryLevel([onSuccess], [onFailure]);
+`
+
+### Parameters
+- __onSuccess__:(Optional)  The callback that returns a number which represents the battery level between 0 - 100%
+- __onFailure__:(Optional)  The callback that is called if there was an error.
+
+## getCommunicationStatus
+Gets the latest [communication status](#communicationstatus) of the device
+
+`    flomioPlugin.getCommunicationStatus([onSuccess], [onFailure]);
+`
+
+### Parameters
+- __onSuccess__:(Optional)  The callback that returns the latest [communication status](#communicationstatus) of the device
+- __onFailure__:(Optional)  The callback that is called if there was an error.
+
+## writeNdef
+Write NDEF formatted data to a tag in proximity of a specified target device.
+
+```js
+    const url = 'http://www.flomio.com'
+    const ndefMessage = [
+        flomioPlugin.ndef.uriRecord(url)
+    ]
+    flomioPlugin.writeNdef(deviceId, ndefMessage, [onSuccess], [onFailure]);
+```
+
+### Parameters
+- __deviceId__:  The unique ID code of the target reader.
+- __ndefMessage__:  The NDEF formatted data to be written to the tag.
+- __onSuccess__:(Optional)  The callback that is called if writeNdef was successful.
+- __onFailure__:(Optional)  The callback that is called if there was an error. This will occur if a tag is removed while writing.
+
+## write
+Write unformatted data to a tag in proximity of a specified target device.
+
+`   
+    const data = '00000000'
+    flomioPlugin.writeNdef(deviceId, data, [onSuccess], [onFailure]);
+`
+
+### Parameters
+- __deviceId__:  The unique ID code of the target reader.
+- __data__:  The unformatted data to be written to the tag.
+- __onSuccess__:(Optional)  The callback that is called if write was successful.
+- __onFailure__:(Optional)  The callback that is called if there was an error.
+
+## launchNativeNfc
+Starts iOS 11 CoreNfc Reader session with compatible devices. 
+
+`   
+    flomioPlugin.launchNativeNfc([onSuccess], [onFailure]);
+`
+
+### Parameters
+- __onSuccess__:(Optional)  The callback that returns the NDEF object if a tag is tapped on the iPhone.
+- __onFailure__:(Optional)  The callback that is called if there was an error with reading or if the session was invalidated.
+
+## readNdef
+Retrieve NDEF formatted data from a tag in proximity of a specified target device.
+When a tag is found, in your addTagDiscoveredListener success callback, call readNdef.
+
+`flomioPlugin.readNdef(deviceId, [onSuccess], [onFailure]);
+`
+
+Example
+```js
+ function flomioTagDiscovered(result) {
+    flomioPlugin.readNdef(result.deviceId, this.onNdefFound.bind(this), this.onReadNdefFail.bind(this),)
+ }
+  
+ function onNdefFound(response) {
+     console.log(JSON.stringify(response.ndefMessage));
+ }
+ function onReadNdefFail(error) {
+     console.log(error.message)
+ }
+```
+
+### Parameters
+- __deviceId__:  The unique ID code of the target reader.
+- __onSuccess__:(Optional)  The callback that returns the NDEF object if a tag NDEF data is successfully read from a tag.
+- __onFailure__:(Optional)  The callback that is called if there was an error with reading.
+
+## addConnectedDevicesListener
+Registers for device discovery events. When a devices is connected, the onSuccess callback returns a [DeviceInfo](#deviceinfo) object.
+
+`    flomioPlugin.addConnectedDevicesListener([onSuccess], [onFailure]);
+`
+### Parameters
+- __onSuccess__:(Optional)  The callback that returns a [DeviceInfo](#deviceinfo) object when a devices is connected or has updates to report.
+- __onFailure__:(Optional)  The callback that is called if there was an error.
+
+## addTagDiscoveredListener
+Registers for tag discovery events. When a tag is tapped, the onSuccess callback returns a [Tag](#tag) object.
+
+`    flomioPlugin.addTagDiscoveredListener([onSuccess], [onFailure]);
+`
+### Parameters
+- __onSuccess__:(Optional)  The callback that returns a [Tag](#tag) object when a tag is tapped.
+- __onFailure__:(Optional)  The callback that is called if there was an error.
 
 
-* `getConfiguration(resultCallback)`
+## addTagStatusChangeListener
+Registers for status change events. When a tag is added/removed from field, the onSuccess callback returns a [TagStatus](#tagstatus) object.
 
-	Retrieves settings for the current session
-	
-	```
-	function resultCallback(result)
-	Object result
-	{
-		int scanPeriod,  // scan period in ms
-		bool scanSound  // toggle scan sound on/off
-	}
-	```
+`    flomioPlugin.addTagStatusChangeListener([onSuccess], [onFailure]);
+`
+### Parameters
+- __onSuccess__:(Optional)  The callback that returns a [TagStatus](#tagstatus) object when a tag is added/removed from the reader field.
+- __onFailure__:(Optional)  The callback that is called if there was an error.
 
-* `stopReaders()`
+# Tag 
+`Object`
 
-	Stops all readers polling in the current session
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| uuid | `string` |  | The unique ID of the tag. |
+| atr | `string` |  | The Answer To Reset (ATR) of the tag. This can be used to determine the tag's manufacturer or issuer and other details. |
 
-* `sendApdu(resultCallback, deviceId, apdu)`
+# DeviceInfo 
+`Object`
 
-	Sends an APDU command to a target device
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| deviceId | `string` |  | The unique ID / serial number of the connected reader. |
+| batteryLevel | `number` |  |  a number which represents the battery level between 0 - 100%. |
+| hardwareRevision | `string` |  | The devices hardware revision string. |
+| firmwareRevision | `string` |  | The devices firmware revision string. |
+| communicationStatus | `CommunicationStatus` |  | See [CommunicationStation](#communicationstatus) for details. |
 
-	```
-	function resultCallback(result)
-	Object result
-	{
-		String deviceId,
-		String responseApdu  // the APDU message received as a response
-	}
-	```
-	`String deviceId`: unique ID code of the target reader (case insensitive, whitespace insensitive)
+# DeviceConfiguration
+`Object`
 
-	`String apdu`: APDU command in hexadecimal format (case insensitive, whitespace insensitive)
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| deviceType | `string` | `'floble-plus'` | The device type for the current session. Only `floble-plus` and `floble-micro` are supported at the moment. |
+| powerOperation | `PowerOperation` | `0` | Describes how startReaders and stopReaders operate. See [PowerOperation](#PowerOperation) for details. |
 
-* `addConnectedDevicesListener(resultCallback)`
 
-	Assign a callback function to fire when any device connects or disconnects
-	
-	```
-	function resultCallback(deviceIdList)
-	Array deviceIdList  // list of connected device IDs
-	```
-		
-* `addTagStatusChangeListener(resultCallback)`
+# PowerOperation
+ `enum`
 
-	Assign a callback function to fire when a tag enters or leaves the proximity of any reader
-	
-	```
-	function resultCallback(result)
-	Object result
-	{
-		String deviceId,
-		int status  // 0 == out of proximity, 1 == within proximity
-	}
-	```
+ Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| AutoPollingControl | `number` | `0` | startReaders and stopReaders turns on/off the reader from polling. |
+| BluetoothConnectionControl | `number` | `1` | startReaders and stopReaders turns on/off bluetooth, this can be used when exiting from/returning to your app. |
 
-* `addTagDiscoveredListener(resultCallback)`
+# CommunicationStatus
+ `enum`
 
-	Assign a callback function to fire when the UID of a tag is found by any reader
-	
-	```
-	function resultCallback(result)
-	Object result
-	{
-		String deviceId,
-		String tagUid
-	}
-	```
+ Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| Scanning | `number` | `0` | The device is connected and scanning for tags. |
+| Connected | `number` | `1` | The device is connected to bluetooth but not scanning for tags. |
+| Disconnected | `number` | `2` | The device is disconnected from bluetooth and not scanning for tags. |
 
-* `readNdef(resultCallback, deviceId)`
+# TagStatus
+ `enum`
 
-	Retrieve NDEF formatted data from a tag in proximity of a specified target device.
-	When a tag is found, in your flomioTagDiscovered callback, call 
-	```
-    flomioTagDiscovered: function(result) {
-        flomioPlugin.readNdef(this.flomioNdefListener.bind(this), result.deviceId)
-    }	
-    ```
-	
-	and in that callback 
-	```
-	flomioNdefListener: function(response, error) {
-	    if (error) {
-	        console.log(error.message)
-	        return
-	    }
-        console.log(JSON.stringify(response.ndefMessage));
-    }
-    ```
-    Use error to indicate to users if a tag was removed too early while reading.
-    
-    
-* `writeNdef(resultCallback, deviceId, message)`
+ Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| NotPresent | `number` | `0` | A tag is not in range of the reader |
+| Present | `number` | `1` | A tag is in range of the reader. |
 
-	Write NDEF formatted data to a tag in proximity of a specified target device.
-	```
-    write: function(result) {
-        flomioPlugin.writeNdef(this.writeCallback.bind(this), deviceId, message)
-    }
-    ```
-	and in that callback 
-	```
-	writeCallback: function(result, error) {
-	    if (error) {
-	        console.log(error.message)
-	        return
-	    }
-        console.log(result);
-    }
-    ```
-    Use error to indicate to users if a tag was removed too early while reading.
- 
- * `getBatteryLevel()`
- 
- 	Returns a promise containing most recent battery level of device.
- 	
-* `getCommunicationStatus()`
- 
-    Returns a promise containing most recent communication status of device.
-    Responses:  
-    0 = Polling for tags
-    1 = Connected but not polling for tags
-    2 = Disconnected
-    
-* `stopReaders()`
- 
-    Turn off polling for tags, use `startReaders()` to turn it back on.
- 	
-*  `startReaders()`
-
-    Turn back on polling for tags after `stopReaders()` is called
-
-**Add Pro SDK for Offline usage**
+# Add Pro SDK for Offline usage
 
 - Add libSDKClassesPro.a to a folder named resources. Add this and the scripts folder from this repo to the root of your project (same directory as package.json). 
   So your project structure looks like this
   
-  ```
-  ProjectName
-  - scripts
-    - copyProSDK.js
-  - resources
-    - libSDKClassesPro.a
-  - package.json
-  - node_modules
+  ```bash
+  ├── ProjectName
+  │   ├── scripts
+  │   │   ├── copyProSDK.js
+  │   ├── resources
+  │   │   ├── libSDKClassesPro.a
+  │   ├── package.json
+  │   ├── node_modules
   ```
     
     Add
-    ```
+    ```xml
     <hook src="scripts/copyProSDK.js" type="after_plugin_install" />
 
     ```
-    after  
-    ```
+   
+    to `config.xml` after  
+    ```xml
     <platform name="ios">
     ```
    
