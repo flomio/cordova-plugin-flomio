@@ -34,6 +34,7 @@ This plugin is only supported for the FloBLE Plus or FloBLE Micro
 * [CommunicationStatus](#communicationstatus)
 
 * [Add Pro SDK for Offline usage](#add-pro-sdk-for-offline-usage)
+* [Use with Ionic](#use-with-ionic)
 
 # Installation
 
@@ -376,3 +377,60 @@ Registers for status change events. When a tag is added/removed from field, the 
     ```
    
    Then when you add the Flomio Cordova Plugin, the ProSDK will be added to your project instead of the Basic SDK.
+   
+# Use with Ionic
+
+## Installation
+
+- Install: 
+ ```bash
+ ionic cordova plugin add https://github.com/flomio/flomio_cordova_plugin#<latest-commit-code>
+ ```
+ 
+- Copy the files within `ionic-native/dist` in this repo to `node_modules/@ionic-native` in your project.
+
+- [Add Ndef and FlomioPlugin to your app's module.](https://ionicframework.com/docs/native/#Add_Plugins_to_Your_App_Module)
+
+## Usage
+
+ ```ts
+import {
+  FlomioPlugin,
+  PowerOperation,
+  CommunicationStatus,
+  DeviceConfiguration,
+  DeviceInfo,
+  Tag,
+  Ndef
+} from '@ionic-native/flomio_cordova_plugin'
+
+private deviceId: string
+constructor(  private flomio: FlomioPlugin,
+              private ndef: Ndef) { }
+
+initReader () {
+    this.platform.ready().then(() => {
+        const configuration: DeviceConfiguration = {
+            powerOperation: PowerOperation.AutoPollingControl,
+            deviceType: 'floble-plus'
+        }
+        
+        this.flomio.setConfiguration(configuration)
+        this.flomio.init()
+        this.addListeners()
+    })
+  }
+
+addListeners() {
+    this.flomio.addConnectedDevicesListener().subscribe((device: DeviceInfo) => {
+        console.log(`deviceId: ${device.deviceId}`)
+        this.deviceId = device.deviceId
+    })
+
+    this.flomio.addTagDiscoveredListener().subscribe(async (tag: Tag) => {
+        console.log(`tag uuid: ${tag.uuid}`)
+        const response = await this.flomio.readNdef(this.deviceId)
+        console.log(JSON.stringify(response))
+    })
+  }
+ ```

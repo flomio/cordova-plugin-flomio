@@ -228,8 +228,7 @@ NSString * NSDataToHex(NSData *data) {
     dispatch_async(dispatch_get_main_queue(), ^{
         // send card status change to Cordova
         if (didChangeTagStatusCallbackId){
-            NSArray* result = @[deviceUuid, [NSNumber numberWithInt:status]];
-            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsMultipart:result];
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsInt:status];
             [pluginResult setKeepCallback:[NSNumber numberWithBool:YES]];
             [self.commandDelegate sendPluginResult:pluginResult callbackId:didChangeTagStatusCallbackId];
         }
