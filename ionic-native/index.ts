@@ -17,7 +17,7 @@ export interface DeviceConfiguration {
 }
 
 export interface Tag {
-  uuid: string;
+  uid: string;
   atr: string;
 }
 
@@ -50,9 +50,9 @@ export declare type IMessage = IRecord[];
 
 @Plugin({
   pluginName: 'FlomioPlugin',
-  plugin: 'flomio_cordova_plugin',
+  plugin: 'cordova-plugin-flomio',
   pluginRef: 'flomioPlugin',
-  repo: 'https://github.com/flomio/flomio_cordova_plugin',
+  repo: 'https://github.com/flomio/cordova-plugin-flomio',
   platforms: ['iOS']
 })
 
@@ -95,7 +95,7 @@ export class FlomioPlugin extends IonicNativePlugin {
   }
 
   @Cordova()
-  sendApdu(deviceId: string, apdu: string): Promise<string> {
+  sendApdu(deviceId: string, apdu: any): Promise<string> {
     return;
   }
 
@@ -115,7 +115,7 @@ export class FlomioPlugin extends IonicNativePlugin {
   }
 
   @Cordova()
-  write(deviceId: string, buffer: any): Promise<string> {
+  write(deviceId: string, data: any): Promise<string> {
     return;
   }
 

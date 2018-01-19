@@ -75,7 +75,7 @@ var FlomioPlugin = (function (_super) {
     FlomioPlugin.prototype.writeNdef = function (deviceId, ndefMessage) {
         return;
     };
-    FlomioPlugin.prototype.write = function (deviceId, buffer) {
+    FlomioPlugin.prototype.write = function (deviceId, data) {
         return;
     };
     FlomioPlugin.prototype.launchNativeNfc = function () {
@@ -143,7 +143,7 @@ var FlomioPlugin = (function (_super) {
     __decorate([
         Cordova(),
         __metadata("design:type", Function),
-        __metadata("design:paramtypes", [String, String]),
+        __metadata("design:paramtypes", [String, Object]),
         __metadata("design:returntype", Promise)
     ], FlomioPlugin.prototype, "sendApdu", null);
     __decorate([
@@ -209,9 +209,9 @@ var FlomioPlugin = (function (_super) {
     FlomioPlugin = __decorate([
         Plugin({
             pluginName: 'FlomioPlugin',
-            plugin: 'flomio_cordova_plugin',
+            plugin: 'cordova-plugin-flomio',
             pluginRef: 'flomioPlugin',
-            repo: 'https://github.com/flomio/flomio_cordova_plugin',
+            repo: 'https://github.com/flomio/cordova-plugin-flomio',
             platforms: ['iOS']
         })
     ], FlomioPlugin);

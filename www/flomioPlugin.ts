@@ -1,5 +1,6 @@
 const exec = require('cordova/exec')
 import * as ndef from 'ndef-lib'
+import * as isBuffer from 'is-buffer'
 
 export function init (success, failure) {
   exec(success, failure, 'FlomioPlugin', 'init', [])
@@ -30,14 +31,23 @@ export function selectSpecificDeviceId (specificDeviceId: string, success, failu
   exec(success, failure, 'FlomioPlugin', 'selectSpecificDeviceId', [specificDeviceId])
 }
 
-export function sendApdu (deviceId: string, apdu: string, success, failure) {
+export function sendApdu (deviceId: string, apdu: any, success, failure) {
   if (deviceId == null) {
     throw new ReferenceError('deviceId parameter is null')
   }
   if (apdu == null) {
     throw new ReferenceError('apdu parameter is null')
   }
-  exec(success, failure, 'FlomioPlugin', 'sendApdu', [deviceId, apdu])
+  let apduString: string
+  if (isBuffer(apdu)) {
+    apduString = apdu.toString('hex')
+  }
+  if (typeof apdu === 'string') {
+    apduString = apdu
+  } else {
+    throw new ReferenceError('apdu parameter needs to be a Buffer or a string')
+  }
+  exec(success, failure, 'FlomioPlugin', 'sendApdu', [deviceId, apduString])
 }
 
 export function getBatteryLevel (success, failure) {
@@ -54,7 +64,17 @@ export function writeNdef (deviceId: string, ndefMessage: ndef.IMessage, success
   this.write(deviceId, tlvEncoded, success, failure)
 }
 
-export async function write (deviceId: string, encoded: Buffer, success, failure) {
+export async function write (deviceId: string, data: any, success, failure) {
+  let encoded: Buffer
+  if (typeof data === 'string') {
+    encoded = Buffer.from(data, 'hex')
+  }
+  if (isBuffer(data)) {
+    encoded = data
+  }
+  if (!(encoded instanceof Buffer)) {
+    throw new ReferenceError('data parameter needs to be a Buffer or a string')
+  }
   const apduArray = ndef.createWriteApdus('mifareUltralight', encoded)
   await Promise.all(apduArray.map(async (apdu) => {
     await this.sendApduWithPromise(deviceId, apdu.toString('hex'))

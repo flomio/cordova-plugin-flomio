@@ -203,7 +203,7 @@ NSString * NSDataToHex(NSData *data) {
         NSLog(@"Found tag UUID: %@ from device:%@", tag.uuid, deviceId);
         if (didFindTagWithUuidCallbackId) {
             NSDictionary* result = @{
-                                     @"uuid": tag.uuid,
+                                     @"uid": tag.uuid,
                                      @"atr": tag.atr
                                      };
             CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:result];

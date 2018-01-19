@@ -1,5 +1,5 @@
 {
-  "name": "@ionic-native/flomio_cordova_plugin",
+  "name": "@ionic-native/cordova-plugin-flomio",
   "version": "4.5.0",
   "description": "Ionic Native - Native plugins for ionic apps",
   "module": "index.js",

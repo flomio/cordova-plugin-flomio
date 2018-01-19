@@ -12,7 +12,7 @@ export interface DeviceConfiguration {
     powerOperation: PowerOperation;
 }
 export interface Tag {
-    uuid: string;
+    uid: string;
     atr: string;
 }
 export declare enum CommunicationStatus {
@@ -45,11 +45,11 @@ export declare class FlomioPlugin extends IonicNativePlugin {
     stopReaders(): Promise<any>;
     sleepReaders(): Promise<any>;
     selectSpecificDeviceId(specificDeviceId: string): Promise<any>;
-    sendApdu(deviceId: string, apdu: string): Promise<string>;
+    sendApdu(deviceId: string, apdu: any): Promise<string>;
     getBatteryLevel(): Promise<number>;
     getCommunicationStatus(): Promise<CommunicationStatus>;
     writeNdef(deviceId: string, ndefMessage: any): Promise<string>;
-    write(deviceId: string, buffer: any): Promise<string>;
+    write(deviceId: string, data: any): Promise<string>;
     launchNativeNfc(): Promise<any>;
     readNdef(deviceId: string): Promise<any>;
     addConnectedDevicesListener(): Observable<DeviceInfo>;
