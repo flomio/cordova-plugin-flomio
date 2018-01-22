@@ -1,6 +1,5 @@
 const exec = require('cordova/exec')
 import * as ndef from 'ndef-lib'
-import * as isBuffer from 'is-buffer'
 
 export function init (success, failure) {
   exec(success, failure, 'FlomioPlugin', 'init', [])
@@ -31,21 +30,21 @@ export function selectSpecificDeviceId (specificDeviceId: string, success, failu
   exec(success, failure, 'FlomioPlugin', 'selectSpecificDeviceId', [specificDeviceId])
 }
 
-export function sendApdu (deviceId: string, apdu: any, success, failure) {
+export function sendApdu (deviceId: string, apdu: string | Buffer, success, failure) {
   if (deviceId == null) {
-    throw new ReferenceError('deviceId parameter is null')
+    throw new ReferenceError('`deviceId` parameter is `null`')
   }
   if (apdu == null) {
-    throw new ReferenceError('apdu parameter is null')
+    throw new ReferenceError('`apdu` parameter is `null`')
   }
   let apduString: string
-  if (isBuffer(apdu)) {
+  if (Buffer.isBuffer(apdu)) {
     apduString = apdu.toString('hex')
   }
   if (typeof apdu === 'string') {
     apduString = apdu
   } else {
-    throw new ReferenceError('apdu parameter needs to be a Buffer or a string')
+    throw new ReferenceError('`apdu` parameter needs to be a `Buffer` or a `string`')
   }
   exec(success, failure, 'FlomioPlugin', 'sendApdu', [deviceId, apduString])
 }
@@ -64,16 +63,16 @@ export function writeNdef (deviceId: string, ndefMessage: ndef.IMessage, success
   this.write(deviceId, tlvEncoded, success, failure)
 }
 
-export async function write (deviceId: string, data: any, success, failure) {
+export async function write (deviceId: string, data: string | Buffer, success, failure) {
   let encoded: Buffer
   if (typeof data === 'string') {
-    encoded = Buffer.from(data, 'hex')
+    encoded = Buffer.from(this.removeSpaces(data), 'hex')
   }
-  if (isBuffer(data)) {
+  if (Buffer.isBuffer(data)) {
     encoded = data
   }
   if (!(encoded instanceof Buffer)) {
-    throw new ReferenceError('data parameter needs to be a Buffer or a string')
+    throw new ReferenceError('`data` parameter needs to be a `Buffer` or a `string`')
   }
   const apduArray = ndef.createWriteApdus('mifareUltralight', encoded)
   await Promise.all(apduArray.map(async (apdu) => {

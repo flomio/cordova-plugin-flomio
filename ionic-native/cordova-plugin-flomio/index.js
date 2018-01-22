@@ -161,7 +161,7 @@ var FlomioPlugin = (function (_super) {
     __decorate([
         Cordova(),
         __metadata("design:type", Function),
-        __metadata("design:paramtypes", [String, Object]),
+        __metadata("design:paramtypes", [String, Array]),
         __metadata("design:returntype", Promise)
     ], FlomioPlugin.prototype, "writeNdef", null);
     __decorate([
@@ -233,7 +233,7 @@ var Ndef = (function (_super) {
     Ndef.prototype.androidApplicationRecord = function (packageName) { return; };
     Ndef.prototype.encodeMessage = function (ndefRecords) { return; };
     Ndef.prototype.decodeMessage = function (bytes) { return; };
-    Ndef.prototype.docodeTnf = function (tnf_byte) { return; };
+    Ndef.prototype.decodeTnf = function (tnf_byte) { return; };
     Ndef.prototype.encodeTnf = function (mb, me, cf, sr, il, tnf) { return; };
     Ndef.prototype.tnfToString = function (tnf) { return; };
     Ndef.decorators = [
@@ -306,7 +306,7 @@ var Ndef = (function (_super) {
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [Object]),
         __metadata("design:returntype", Object)
-    ], Ndef.prototype, "docodeTnf", null);
+    ], Ndef.prototype, "decodeTnf", null);
     __decorate([
         Cordova({ sync: true }),
         __metadata("design:type", Function),

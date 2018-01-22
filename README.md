@@ -33,6 +33,10 @@ This plugin is only supported for the FloBLE Plus or FloBLE Micro
 * [PowerOperation](#poweroperation)
 * [CommunicationStatus](#communicationstatus)
 
+- [NDEF](#ndef)
+    - [IRecord](#irecord)
+    - [IMessage](#imessage)
+    
 * [Add Pro SDK for Offline usage](#add-pro-sdk-for-offline-usage)
 * [Use with Ionic](#use-with-ionic)
 
@@ -57,7 +61,7 @@ $ cordova plugin add https://github.com/flomio/cordova-plugin-flomio#<latest-com
 
 # Example
 
-```js
+```javascript
 const deviceConfiguration = {
     powerOperation: flomioPlugin.PowerOperation.AutoPollingControl, 
     deviceType: 'floble-plus'
@@ -352,6 +356,46 @@ Registers for status change events. When a tag is added/removed from field, the 
 | --- | --- | --- | --- |
 | NotPresent | `number` | `0` | A tag is not in range of the reader |
 | Present | `number` | `1` | A tag is in range of the reader. |
+
+# NDEF
+ `Object`
+
+> The `ndef` object provides functions for creating IRecords.
+
+## IMessage
+ `Array`
+
+Represents an NDEF (NFC Data Exchange Format) data message that contains one or more [IRecords](#IRecord).
+
+## IRecord
+ `Object`
+
+Represents a NDEF (NFC Data Exchange Format) record as defined by the NDEF specification.
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| tnf | `number` |  | The Type Name Format field of the payload. |
+| type | `Buffer or string` | | The type of the payload. |
+| id | `Buffer` |  | The identifier of the payload |
+| payload | `payload` |  | The data of the payload |
+| value | `string?` |  | An optional convenience parameter which will return the payload as text for Text and URI records. |
+
+The `flomioPlugin.ndef` object has a function for creating IRecords
+
+Create a URI record
+```javascript
+    const record = flomioPlugin.ndef.uriRecord("http://www.flomio.com");
+```
+
+Create a plain text record
+```javascript
+    const record = flomioPlugin.ndef.textRecord("Plain text message");
+```
+
+Create an Empty record
+```javascript
+    const record = flomioPlugin.ndef.emptyRecord();
+```
 
 # Add Pro SDK for Offline usage
 

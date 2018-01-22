@@ -40,9 +40,9 @@ export enum TagStatus {
 
 export interface IRecord {
   tnf: number;
-  type: any | string;
-  id: any;
-  payload: any;
+  type: Buffer | string;
+  id: Buffer;
+  payload: Buffer;
   value?: string;
 }
 export declare type IMessage = IRecord[];
@@ -95,7 +95,7 @@ export class FlomioPlugin extends IonicNativePlugin {
   }
 
   @Cordova()
-  sendApdu(deviceId: string, apdu: any): Promise<string> {
+  sendApdu(deviceId: string, apdu: Buffer | string): Promise<string> {
     return;
   }
 
@@ -110,22 +110,22 @@ export class FlomioPlugin extends IonicNativePlugin {
   }
 
   @Cordova()
-  writeNdef(deviceId: string, ndefMessage: any): Promise<string> {
+  writeNdef(deviceId: string, ndefMessage: IMessage): Promise<string> {
     return;
   }
 
   @Cordova()
-  write(deviceId: string, data: any): Promise<string> {
+  write(deviceId: string, data: Buffer | string): Promise<string> {
     return;
   }
 
   @Cordova()
-  launchNativeNfc(): Promise<any> {
+  launchNativeNfc(): Promise<IMessage> {
     return;
   }
 
   @Cordova()
-  readNdef(deviceId: string): Promise<any> {
+  readNdef(deviceId: string): Promise<IMessage> {
     return;
   }
 
@@ -189,7 +189,7 @@ export class Ndef extends IonicNativePlugin {
   decodeMessage(bytes: any): any { return; }
 
   @Cordova({ sync: true })
-  docodeTnf(tnf_byte: any): any { return; }
+  decodeTnf(tnf_byte: any): any { return; }
 
   @Cordova({ sync: true })
   encodeTnf(mb: any, me: any, cf: any, sr: any, il: any, tnf: any): any { return; }

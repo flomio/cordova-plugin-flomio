@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { IonicNativePlugin } from '@ionic-native/core';
 import { Observable } from 'rxjs/Observable';
 export interface DeviceInfo {
@@ -31,9 +32,9 @@ export declare enum TagStatus {
 }
 export interface IRecord {
     tnf: number;
-    type: any | string;
-    id: any;
-    payload: any;
+    type: Buffer | string;
+    id: Buffer;
+    payload: Buffer;
     value?: string;
 }
 export declare type IMessage = IRecord[];
@@ -45,13 +46,13 @@ export declare class FlomioPlugin extends IonicNativePlugin {
     stopReaders(): Promise<any>;
     sleepReaders(): Promise<any>;
     selectSpecificDeviceId(specificDeviceId: string): Promise<any>;
-    sendApdu(deviceId: string, apdu: any): Promise<string>;
+    sendApdu(deviceId: string, apdu: Buffer | string): Promise<string>;
     getBatteryLevel(): Promise<number>;
     getCommunicationStatus(): Promise<CommunicationStatus>;
-    writeNdef(deviceId: string, ndefMessage: any): Promise<string>;
-    write(deviceId: string, data: any): Promise<string>;
-    launchNativeNfc(): Promise<any>;
-    readNdef(deviceId: string): Promise<any>;
+    writeNdef(deviceId: string, ndefMessage: IMessage): Promise<string>;
+    write(deviceId: string, data: Buffer | string): Promise<string>;
+    launchNativeNfc(): Promise<IMessage>;
+    readNdef(deviceId: string): Promise<IMessage>;
     addConnectedDevicesListener(): Observable<DeviceInfo>;
     addTagStatusChangeListener(): Observable<TagStatus>;
     addTagDiscoveredListener(): Observable<Tag>;
@@ -67,7 +68,7 @@ export declare class Ndef extends IonicNativePlugin {
     androidApplicationRecord(packageName: string): IRecord;
     encodeMessage(ndefRecords: any): any;
     decodeMessage(bytes: any): any;
-    docodeTnf(tnf_byte: any): any;
+    decodeTnf(tnf_byte: any): any;
     encodeTnf(mb: any, me: any, cf: any, sr: any, il: any, tnf: any): any;
     tnfToString(tnf: any): string;
 }
