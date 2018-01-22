@@ -377,10 +377,10 @@ Represents a NDEF (NFC Data Exchange Format) record as defined by the NDEF speci
 | tnf | `number` |  | The Type Name Format field of the payload. |
 | type | `Buffer or string` | | The type of the payload. |
 | id | `Buffer` |  | The identifier of the payload |
-| payload | `payload` |  | The data of the payload |
+| payload | `Buffer` |  | The data of the payload |
 | value | `string?` |  | An optional convenience parameter which will return the payload as text for Text and URI records. |
 
-The `flomioPlugin.ndef` object has a function for creating IRecords
+The `flomioPlugin.ndef` object provides functions for creating IRecords
 
 Create a URI record
 ```javascript
@@ -392,7 +392,7 @@ Create a plain text record
     const record = flomioPlugin.ndef.textRecord("Plain text message");
 ```
 
-Create an Empty record
+Create an empty record
 ```javascript
     const record = flomioPlugin.ndef.emptyRecord();
 ```
